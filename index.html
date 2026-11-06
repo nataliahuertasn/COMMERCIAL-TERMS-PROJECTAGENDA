@@ -4,65 +4,169 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Payment Terms por cliente</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 <style>
   :root {
-    --bg: #f5f5f5; --surface: #ffffff; --tabs: #eeeeee; --text: #212121; --muted: #616161;
-    --line: #e0e0e0; --line-strong: #bdbdbd; --accent: #1976d2; --accent-soft: #e3f2fd;
+    --text: #212121; --muted: #616161; --soft: #757575; --line: #e0e0e0; --tabs: #eeeeee;
+    --blue: #1976d2; --blue-soft: #e3edf7; --toggle: #a9cdf0; --grey-icon: #757575;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; padding: 24px 16px; background: var(--bg); color: var(--text); font: 14px/1.5 Roboto, "Segoe UI", Arial, sans-serif; }
-  .card { max-width: 860px; margin: 0 auto; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
-  .tabs { display: flex; flex-wrap: wrap; gap: 24px; padding: 14px 20px; background: var(--tabs); font-size: 13px; font-weight: 500; letter-spacing: .6px; color: var(--muted); }
-  .tabs .active { color: var(--accent); }
-  .body { padding: 16px 20px 20px; }
-  h1 { margin: 0; padding-bottom: 12px; border-bottom: 1px solid var(--line); font-size: 20px; font-weight: 500; }
-  .grid { display: grid; grid-template-columns: 180px minmax(0, 1fr); row-gap: 6px; padding: 14px 0; color: var(--muted); }
-  .row { display: flex; align-items: center; gap: 10px; padding: 14px 0; border-top: 1px solid var(--line); color: var(--muted); }
-  .new { border: 2px solid var(--accent); border-radius: 8px; padding: 14px 16px; margin-top: 4px; }
-  .new-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 10px; }
-  .new-head h2 { margin: 0; font-size: 15px; font-weight: 500; }
-  .badge { background: var(--accent-soft); color: #0d47a1; font-size: 12px; padding: 2px 10px; border-radius: 8px; white-space: nowrap; }
-  .options { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 10px; }
-  .options label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
-  input[type=radio], input[type=checkbox] { accent-color: var(--accent); margin: 0; }
-  textarea { width: 100%; min-height: 84px; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: 8px; color: var(--text); font: inherit; resize: vertical; }
-  textarea:read-only { background: var(--bg); color: var(--muted); }
-  .hint { margin-top: 8px; font-size: 12px; color: var(--muted); }
-  @media (max-width: 520px) { .grid { grid-template-columns: 130px minmax(0, 1fr); } }
+  html, body { height: 100%; margin: 0; }
+  body { display: flex; flex-direction: column; background: #fff; color: var(--text); font: 18px/1.4 Roboto, Arial, sans-serif; }
+  .material-icons { font-size: 26px; line-height: 1; }
+  .app { flex: 1; min-height: 0; display: flex; }
+
+  .rail { width: 80px; flex: none; padding-top: 52px; }
+  .rail div { height: 54px; margin-left: 6px; background: #f2f2f2; display: flex; align-items: center; justify-content: center; color: var(--blue); }
+
+  .clients { width: 450px; flex: none; display: flex; flex-direction: column; border-right: 1px solid #eeeeee; min-height: 0; }
+  .clients-tab { width: 200px; margin: 20px 0 10px 4px; padding-bottom: 8px; border-bottom: 2px solid var(--blue); color: var(--blue); text-align: center; font-size: 17px; font-weight: 500; letter-spacing: 1px; }
+  .search { display: flex; align-items: center; gap: 8px; height: 50px; margin: 0 10px 18px 4px; padding: 0 30px; border-radius: 25px; background: #eeeeee; color: #9e9e9e; font-size: 19px; }
+  .search .material-icons { color: var(--muted); font-size: 30px; }
+  .sort { display: flex; align-items: center; justify-content: space-between; padding: 0 10px 18px 20px; border-bottom: 1px solid #eeeeee; font-size: 19px; }
+  .sort-name { display: flex; align-items: center; gap: 140px; }
+  .sort-name .material-icons { color: var(--muted); }
+  .btn-new { display: flex; align-items: center; gap: 8px; height: 45px; padding: 0 20px; border: 0; border-radius: 23px; background: var(--blue); color: #fff; font: 500 17px Roboto, Arial, sans-serif; letter-spacing: 1px; }
+  .list { flex: 1; min-height: 0; overflow-y: auto; margin: 0; padding: 0; list-style: none; }
+  .list li { display: flex; gap: 20px; height: 132px; padding: 30px 14px; }
+  .list li.selected { background: var(--blue-soft); }
+  .avatar { width: 55px; height: 55px; flex: none; border-radius: 50%; background: var(--grey-icon); color: #fff; display: flex; align-items: center; justify-content: center; }
+  .avatar .material-icons { font-size: 38px; }
+  .client-name { font-size: 19.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .selected .client-name { color: var(--blue); }
+  .client-city { display: flex; align-items: center; gap: 12px; margin-top: 10px; color: var(--muted); }
+  .client-city .material-icons { color: var(--grey-icon); }
+  .selected .client-city .material-icons { color: var(--text); }
+  .client-text { min-width: 0; }
+
+  .detail { flex: 1; min-width: 0; display: flex; flex-direction: column; min-height: 0; padding-left: 20px; }
+  .tabs { display: flex; height: 60px; margin: 8px 0 0 0; background: var(--tabs); font-size: 18px; font-weight: 500; letter-spacing: 1.3px; color: var(--muted); }
+  .tabs span { display: flex; align-items: center; padding: 0 20px; }
+  .tabs .active { background: #fff; color: var(--blue); }
+  .title { display: flex; align-items: center; gap: 22px; height: 80px; margin-right: 20px; padding-left: 20px; border-bottom: 1px solid var(--line); }
+  .title .material-icons.building { font-size: 42px; color: var(--grey-icon); }
+  .title h1 { flex: 1; margin: 0; font-size: 25px; font-weight: 500; }
+  .toggle { position: relative; width: 60px; height: 34px; border-radius: 17px; background: var(--toggle); margin-right: 40px; }
+  .toggle i { position: absolute; top: 4px; right: 4px; width: 26px; height: 26px; border-radius: 50%; background: var(--blue); }
+  .more { width: 50px; height: 50px; border-radius: 50%; background: #eeeeee; display: flex; align-items: center; justify-content: center; margin-right: 5px; }
+  .scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 42px 20px 30px 0; color: var(--muted); }
+
+  .contacts { display: grid; grid-template-columns: 219px 328px 130px 219px 328px; align-items: center; }
+  .underline { display: flex; align-items: center; gap: 8px; height: 34px; border-bottom: 1px solid #9e9e9e; color: var(--muted); font-size: 14px; }
+  .underline .material-icons { font-size: 28px; }
+  .underline .grow { flex: 1; }
+  .plus { color: var(--blue); padding-left: 18px; }
+  .plus .material-icons { font-size: 30px; }
+  .contact { display: flex; align-items: center; gap: 10px; margin: 18px 0 22px 224px; color: var(--text); font-weight: 500; font-size: 17px; }
+  .contact b { width: 46px; height: 46px; border-radius: 50%; background: #f2f2f2; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 400; }
+
+  .fields { display: grid; grid-template-columns: 219px minmax(0, 1fr); row-gap: 12px; align-items: center; }
+  .flag { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(#fcd116 0 50%, #003893 50% 75%, #ce1126 75%); }
+  .box { width: 22px; height: 22px; border: 2px solid var(--blue); border-radius: 2px; display: block; margin-left: 4px; }
+  .box.grey { border-color: var(--soft); margin: 0; }
+  .divider { height: 1px; margin: 40px 0 0; background: var(--line); }
+  .directed { display: flex; align-items: center; gap: 62px; padding: 48px 0 60px; }
+
+  .terms { display: grid; grid-template-columns: 219px minmax(0, 1fr); padding-top: 34px; }
+  .terms-control { max-width: 760px; }
+  .options { display: flex; flex-wrap: wrap; gap: 30px; margin-bottom: 14px; }
+  .options label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  input[type=radio] { width: 20px; height: 20px; margin: 0; accent-color: var(--blue); }
+  textarea { display: block; width: 100%; min-height: 110px; padding: 10px 12px; border: 1px solid #9e9e9e; border-radius: 4px; color: var(--text); font: 17px/1.45 Roboto, Arial, sans-serif; resize: vertical; }
+  textarea:focus { outline: 2px solid var(--blue); outline-offset: -1px; }
+  textarea:read-only { background: #f5f5f5; color: var(--muted); }
+  .hint { margin-top: 8px; font-size: 14px; color: var(--soft); }
+
+  footer { flex: none; display: flex; justify-content: space-between; gap: 16px; padding: 12px 24px; background: #fafafa; font-size: 18px; }
+  @media (max-width: 1500px) { .contacts { grid-template-columns: 219px minmax(0, 328px) 70px; } .contacts .predef { display: none; } }
+  @media (max-width: 900px) {
+    body { font-size: 15px; }
+    .app { flex-direction: column; overflow-y: auto; }
+    .rail { display: none; }
+    .clients { width: 100%; border-right: 0; }
+    .list { max-height: 280px; }
+    .detail { padding: 0 16px; }
+    .scroll { overflow: visible; padding-right: 0; }
+    .tabs { overflow-x: auto; font-size: 14px; }
+    .title { margin-right: 0; padding-left: 0; gap: 10px; }
+    .title h1 { font-size: 19px; }
+    .toggle { margin-right: 8px; }
+    .contacts, .fields, .terms { grid-template-columns: minmax(0, 1fr); }
+    .contacts span:first-child { margin-bottom: 4px; }
+    .plus { display: none; }
+    .contact { margin-left: 0; }
+    .fields { grid-template-columns: 150px minmax(0, 1fr); }
+    .directed { gap: 16px; }
+    .terms { row-gap: 10px; }
+    footer { font-size: 13px; }
+  }
 </style>
 </head>
 <body>
-<main class="card">
-  <nav class="tabs" aria-label="Secciones del cliente">
-    <span class="active">GENERAL INFORMATION</span><span>DOCUMENTS</span><span>QUOTES</span>
-  </nav>
-  <div class="body">
-    <h1>Cliente de ejemplo</h1>
-    <div class="grid">
-      <span>City</span><span>Bogotá</span>
-      <span>Currency</span><span>COP</span>
-      <span>Margin</span><span>XX %</span>
-      <span>Language</span><span>Español</span>
-      <span>Standard Client</span><span><input type="checkbox" aria-label="Standard Client"></span>
+<div class="app">
+  <nav class="rail" aria-label="Módulos"><div><span class="material-icons" aria-hidden="true">person</span></div></nav>
+
+  <aside class="clients">
+    <div class="clients-tab">CLIENTS</div>
+    <div class="search"><span class="material-icons" aria-hidden="true">search</span>Search</div>
+    <div class="sort">
+      <span class="sort-name">Name <span class="material-icons" aria-hidden="true">expand_less</span></span>
+      <button class="btn-new" type="button"><span class="material-icons" aria-hidden="true">add</span>NEW</button>
     </div>
-    <div class="row">
-      <label for="directed">Enabled Directed Quotes for Client</label>
-      <input id="directed" type="checkbox">
+    <ul class="list">
+      <li><div class="avatar"><span class="material-icons" aria-hidden="true">apartment</span></div><div class="client-text"><div class="client-name">Cliente de ejemplo A</div><div class="client-city"><span class="material-icons" aria-hidden="true">place</span>Tampa</div></div></li>
+      <li class="selected"><div class="avatar"><span class="material-icons" aria-hidden="true">apartment</span></div><div class="client-text"><div class="client-name">Cliente de ejemplo B</div><div class="client-city"><span class="material-icons" aria-hidden="true">place</span>Bogotá</div></div></li>
+      <li><div class="avatar"><span class="material-icons" aria-hidden="true">apartment</span></div><div class="client-text"><div class="client-name">Cliente de ejemplo C</div><div class="client-city"><span class="material-icons" aria-hidden="true">place</span>Cartagena</div></div></li>
+      <li><div class="avatar"><span class="material-icons" aria-hidden="true">apartment</span></div><div class="client-text"><div class="client-name">Cliente de ejemplo D</div><div class="client-city"><span class="material-icons" aria-hidden="true">place</span>Miami</div></div></li>
+      <li><div class="avatar"><span class="material-icons" aria-hidden="true">apartment</span></div><div class="client-text"><div class="client-name">Cliente de ejemplo E</div><div class="client-city"><span class="material-icons" aria-hidden="true">place</span>Medellín</div></div></li>
+    </ul>
+  </aside>
+
+  <main class="detail">
+    <div class="tabs"><span class="active">GENERAL INFORMATION</span><span>DOCUMENTS</span><span>QUOTES</span></div>
+    <div class="title">
+      <span class="material-icons building" aria-hidden="true">apartment</span>
+      <h1>Cliente de ejemplo B</h1>
+      <div class="toggle" aria-hidden="true"><i></i></div>
+      <div class="more" aria-hidden="true"><span class="material-icons">more_horiz</span></div>
     </div>
-    <section class="new" aria-labelledby="pt-title">
-      <div class="new-head">
-        <h2 id="pt-title">Payment Terms</h2>
-        <span class="badge">Sección nueva</span>
+    <div class="scroll">
+      <div class="contacts">
+        <span>Contacts:</span>
+        <div class="underline"><span class="material-icons" aria-hidden="true">search</span></div>
+        <div class="plus"><span class="material-icons" aria-hidden="true">add</span></div>
+        <span class="predef">Predefined Contacts:</span>
+        <div class="underline predef"><span class="material-icons" aria-hidden="true">people</span><span class="grow">Contacts</span><span class="material-icons" aria-hidden="true">arrow_drop_down</span></div>
       </div>
-      <div class="options">
-        <label><input type="radio" name="terms" value="standard">Standard terms</label>
-        <label><input type="radio" name="terms" value="custom" checked>Custom terms</label>
+      <div class="contact"><b>CE</b>Contacto Ejemplo</div>
+      <div class="fields">
+        <span>City</span><span>Bogotá</span>
+        <span>Currency</span><span>COP</span>
+        <span>Margin</span><span>XX %</span>
+        <span>Accessories Margin</span><span>XX %</span>
+        <span>Commission</span><span>X %</span>
+        <span>Language</span><span class="flag" role="img" aria-label="Español"></span>
+        <span>Standard Client</span><span class="box" aria-hidden="true"></span>
       </div>
-      <textarea id="terms" aria-labelledby="pt-title">40% Advance, 30% Before shipment and 30% 30 days after shipment.</textarea>
-      <div class="hint" id="hint">Se insertará en Commercial Terms de cada cotización nueva.</div>
-    </section>
-  </div>
-</main>
+      <div class="divider"></div>
+      <div class="directed"><span>Enabled Directed Quotes for Client</span><span class="box grey" aria-hidden="true"></span></div>
+      <div class="divider" style="margin: 0"></div>
+      <section class="terms" aria-labelledby="pt-title">
+        <span id="pt-title">Payment Terms</span>
+        <div class="terms-control">
+          <div class="options">
+            <label><input type="radio" name="terms" value="standard">Standard terms</label>
+            <label><input type="radio" name="terms" value="custom" checked>Custom terms</label>
+          </div>
+          <textarea id="terms" aria-labelledby="pt-title">40% Advance, 30% Before shipment and 30% 30 days after shipment.</textarea>
+          <div class="hint" id="hint">Se insertará en Commercial Terms de cada cotización nueva.</div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+<footer><span>Designed and Built by Boston Project, LLC.</span><span>Copyright © SIGMA 2026</span></footer>
 <script>
   const standard = "40% Advance, 30% Before shipment and 30% 30 days after shipment.";
   const box = document.getElementById("terms");
