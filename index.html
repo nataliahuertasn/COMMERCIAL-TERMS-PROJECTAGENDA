@@ -336,7 +336,7 @@
       <span class="filter"><select id="fStatus" aria-label="Status"><option value="">Status</option><option>Active</option><option>Inactive</option></select></span>
       <button class="link-btn" id="clear" type="button" hidden><span class="material-icons" aria-hidden="true">close</span>Clear filters</button>
       <span class="spacer"></span>
-      <span class="meta">MT01-PRSA-02 · Version 02 · Updated <span id="updated"></span></span>
+      <span class="meta">MT01-PRSA-02 · Version 02</span>
     </div>
     <div class="kpis" id="kpis"></div>
     <div class="table-wrap">
@@ -507,7 +507,6 @@ let current = "900102", tab = "general", sortKey = "name", sortDir = 1, kpiFilte
 const filters = { fRisk: "risk", fType: "type", fCountry: "country", fActivity: "activity", fSec: "security", fDoc: "docState", fStatus: "status" };
 const fill = (id, key) => [...new Set(data.map((c) => c[key]))].sort().forEach((v) => $(id).add(new Option(v, v)));
 fill("fCountry", "country"); fill("fActivity", "activity"); fill("fSec", "security");
-$("updated").textContent = TODAY.toLocaleDateString("es-CO", { day: "2-digit", month: "2-digit", year: "numeric" });
 
 let colQ = [];
 const cellText = (c, key, f) => String(f ? f(val(c, key), c) : val(c, key) ?? "").replace(/<[^>]*>/g, "").toLowerCase();
