@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Módulo de Clientes</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined">
 <style>
   :root {
     --text: #212121; --muted: #616161; --soft: #757575; --line: #e0e0e0; --tabs: #eeeeee;
@@ -144,6 +144,44 @@
   .visits td, .visits th { height: 48px; white-space: normal; }
   .visits thead th { position: static; }
   .visits input { max-width: none; }
+  .rail button { display: flex; align-items: center; justify-content: center; width: 74px; height: 54px; margin: 0 0 6px 6px; border: 0; background: none; color: var(--soft); cursor: pointer; }
+  .rail button.active { background: #f2f2f2; color: var(--blue); }
+  .rail button:focus-visible { outline: 2px solid var(--blue); outline-offset: -2px; }
+  .slist li { height: 132px; padding: 0 28px; align-items: center; gap: 18px; border-bottom: 1px solid #eeeeee; }
+  .slist .gear { font-size: 26px; color: var(--soft); }
+  .slist .sname { font-size: 19px; }
+  .slist li.selected .gear, .slist li.selected .sname { color: var(--blue); }
+  .s-empty { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--text); font-size: 19px; }
+  .s-content { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .s-tabs { overflow-x: auto; }
+  .s-tabs button { font-size: 15px; white-space: nowrap; }
+  .material-icons-outlined { font-family: "Material Icons Outlined"; font-weight: normal; font-style: normal; line-height: 1; letter-spacing: normal; text-transform: none; white-space: nowrap; direction: ltr; -webkit-font-feature-settings: "liga"; font-feature-settings: "liga"; }
+  .rail { display: flex; flex-direction: column; }
+  .rail .logout { margin-top: auto; }
+  .s-intro { margin: 0 0 18px; max-width: 900px; font-size: 15px; line-height: 1.5; }
+  .stable { width: auto; min-width: 0; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; }
+  .stable th { position: static; height: 40px; background: #f5f5f5; }
+  .stable td { height: 44px; color: var(--text); }
+  .stable td.muted { color: var(--muted); }
+  .stable input, .stable select, .cfg input { width: 110px; height: 32px; padding: 0 4px; border: 0; border-bottom: 1px solid #9e9e9e; background: none; color: var(--text); font-size: 14px; }
+  .stable select { width: 90px; }
+  .stable input:focus, .stable select:focus, .cfg input:focus { outline: none; border-bottom: 2px solid var(--blue); }
+  .stable td.wide { white-space: normal; min-width: 360px; max-width: 620px; }
+  .stable-wrap { max-height: 560px; overflow: auto; border-radius: 8px; display: inline-block; max-width: 100%; }
+  .stable-wrap .stable thead th { position: sticky; top: 0; }
+  .cfg { display: grid; grid-template-columns: 300px 160px minmax(0, 1fr); row-gap: 16px; column-gap: 16px; align-items: center; max-width: 900px; }
+  .cfg input { width: 150px; font-size: 15px; }
+  .cfg small { color: var(--soft); font-size: 13px; }
+  .ct-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
+  .ct-grid textarea { width: 100%; min-height: 560px; padding: 12px; border: 1px solid #9e9e9e; border-radius: 4px; color: var(--text); font-size: 14px; line-height: 1.5; resize: vertical; }
+  .ct-grid textarea:focus { outline: 2px solid var(--blue); outline-offset: -1px; }
+  .preview { min-height: 560px; max-height: 720px; overflow: auto; padding: 12px 16px; border: 1px solid var(--line); border-radius: 4px; background: #fafafa; color: var(--text); font-size: 14px; line-height: 1.5; white-space: pre-wrap; }
+  .preview mark { background: #fff3c4; color: inherit; padding: 0 2px; }
+  .ct-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; color: var(--text); font-weight: 500; }
+  .ct-head select { height: 36px; padding: 0 8px; border: 0; border-bottom: 1px solid #9e9e9e; background: none; font-size: 14px; }
+  .chip { display: inline-block; padding: 2px 8px; border-radius: 12px; background: var(--blue-soft); color: #0d47a1; font-family: Consolas, monospace; font-size: 13px; }
+  .alert { margin-top: 8px; color: var(--high); font-size: 14px; }
+  @media (max-width: 1300px) { .ct-grid { grid-template-columns: minmax(0, 1fr); } .cfg { grid-template-columns: 220px 160px; } .cfg small { grid-column: 1 / -1; margin-top: -10px; } }
   footer { flex: none; display: flex; justify-content: space-between; gap: 16px; padding: 12px 24px; background: #fafafa; font-size: 18px; }
   [hidden] { display: none !important; }
   @media (max-width: 1500px) { .contacts { grid-template-columns: 219px minmax(0, 328px) 70px; } .contacts .predef { display: none; } }
@@ -175,7 +213,7 @@
 </head>
 <body>
 <div class="app">
-  <nav class="rail" aria-label="Módulos"><div><span class="material-icons" aria-hidden="true">person</span></div></nav>
+  <nav class="rail" aria-label="Módulos"><button type="button" class="active" data-rail="clients" title="Clients" aria-label="Clients"><span class="material-icons" aria-hidden="true">person</span></button><button type="button" data-rail="settings" title="Settings" aria-label="Settings"><span class="material-icons" aria-hidden="true">settings</span></button><button type="button" class="logout" title="Log out" aria-label="Log out"><span class="material-icons" aria-hidden="true">logout</span></button></nav>
 
   <aside class="clients" id="clientsPanel">
     <div class="module-tabs">
@@ -247,16 +285,77 @@
     </div>
     <div class="count" id="count"></div>
   </section>
+
+  <aside class="clients" id="settingsPanel" hidden>
+    <ul class="list slist" id="settingsList"></ul>
+  </aside>
+
+  <main class="detail" id="settingsView" hidden>
+    <div class="s-empty" id="sEmpty">No setting selected</div>
+    <div class="s-content" id="sContent" hidden>
+      <div class="tabs s-tabs" id="sTabs"></div>
+      <div class="title">
+        <span class="material-icons-outlined building" aria-hidden="true">settings</span>
+        <h1 id="sTitle"></h1>
+      </div>
+      <div class="scroll" id="sBody"></div>
+    </div>
+  </main>
 </div>
 <footer><span>Designed and Built by Boston Project, LLC.</span><span>Copyright © SIGMA 2026</span></footer>
 
 <script>
-const JUR = {"Afganistán":3,"Albania":3,"Bielorrusia":3,"Birmania":3,"Bosnia y Herzegovina":3,"Burundi":3,"Camerún":3,"China":3,"Corea del Norte":3,"Cuba":3,"Etiopía":3,"Guinea":3,"Guinea Bissau":3,"Haití":3,"Hong Kong, China":3,"Irán":3,"Iraq":3,"Líbano":3,"Libia":3,"Macedonia":3,"Mali":3,"Moldavia":3,"Montenegro":3,"Mozambique":3,"Nicaragua":3,"Nigeria":3,"República Centroafricana":3,"República Democrática del Congo":3,"Rusia":3,"Serbia":3,"Siria":3,"Somalia":3,"Sudán":3,"Sudán del Sur":3,"Túnez":3,"Turquía":3,"Ucrania":3,"Venezuela":3,"Yemen":3,"Zimbabwe":3,"Alemania":2,"Andorra":2,"Angola":2,"Anguila":2,"Antigua y Barbuda":2,"Arabia Saudita":2,"Argelia":2,"Argentina":2,"Armenia":2,"Azerbaiyán":2,"Bahamas":2,"Bangladesh":2,"Barbados":2,"Baréin":2,"Belice":2,"Benin":2,"Bolivia":2,"Botswana":2,"Brasil":2,"Bulgaria":2,"Burkina Faso":2,"Bután":2,"Cabo Verde":2,"Camboya":2,"Catar":2,"Chad":2,"Chipre":2,"Colombia":2,"Comoras":2,"Congo":2,"Costa de Marfil":2,"Costa Rica":2,"Croacia":2,"Dominica":2,"Ecuador":2,"Egipto":2,"El Salvador":2,"Emiratos Árabes Unidos":2,"Eritrea":2,"Eslovaquia":2,"Eslovenia":2,"Estados Unidos":2,"Filipinas":2,"Fiyi":2,"Gabón":2,"Gambia":2,"Georgia":2,"Ghana":2,"Granada":2,"Grecia":2,"Guatemala":2,"Guernsey":2,"Guinea Ecuatorial":2,"Honduras":2,"Hungría":2,"India":2,"Indonesia":2,"Isla de Man":2,"Islas Bermudas":2,"Islas Caimán":2,"Islas Cook":2,"Islas Marshall":2,"Islas Salomón":2,"Islas Turcas y Caicos":2,"Islas Vírgenes (Reino Unido)":2,"Italia":2,"Jamaica":2,"Japón":2,"Jersey":2,"Jordan":2,"Kazajistán":2,"Kenia":2,"Kirguistán":2,"Kosovo":2,"Kuwait":2,"Lesoto":2,"Liberia":2,"Liechtenstein":2,"Madagascar":2,"Malasia":2,"Malawi":2,"Maldivas":2,"Malta":2,"Marruecos":2,"Mauricio":2,"Mauritania":2,"México":2,"Monaco":2,"Mongolia":2,"Namibia":2,"Nepal":2,"Níger":2,"Omán":2,"Pakistán":2,"Panamá":2,"Papúa Nueva Guinea":2,"Paraguay":2,"Perú":2,"Polonia":2,"República Checa":2,"República Democrática Popular Laos":2,"República Dominicana":2,"Ruanda":2,"Rumania":2,"San Cristóbal y Nieves":2,"San Marino":2,"Santa Lucía":2,"Santo Tomé y Príncipe":2,"Senegal":2,"Seychelles":2,"Sierra Leona":2,"Singapur":2,"Sri Lanka":2,"Suazilandia":2,"Sudáfrica":2,"Surinam":2,"Tailandia":2,"Tanzania":2,"Tayikistan":2,"Timor-Leste":2,"Togo":2,"Tonga":2,"Trinidad y Tobago":2,"Turkmenistán":2,"Uganda":2,"Uzbekistán":2,"Vanuatu":2,"Vietnam":2,"Yibuti":2,"Zambia":2,"Aruba":1,"Australia":1,"AUSTRIA":1,"Bélgica":1,"Brunei Darussalam":1,"Canadá":1,"Chile":1,"Corea del Sur":1,"Dinamarca":1,"España":1,"Estonia":1,"Finlandia":1,"Francia":1,"Gibraltar":1,"Guayana":1,"Irlanda":1,"Islandia":1,"Israel":1,"Letonia":1,"Letonia":1,"Lituania":1,"Luxemburgo":1,"Macao, China":1,"Montserrat":1,"Nauru":1,"Niue":1,"Noruega":1,"Nueva Zelanda":1,"Países Bajos":1,"Palau":1,"Palestina":1,"Portugal":1,"Puerto Rico":1,"Reino de Curacao de los Paises Bajos":1,"Reino Unido":1,"Samoa":1,"San Vicente y las Granadinas":1,"Saint Maarten Reino de los Países Bajos":1,"Suecia":1,"Suiza":1,"Taipei, China":1,"Taiwan, China":1,"Uruguay":1,"Vaticano":1,};
+const JURD = [["Afganistán",20,"",1,1,3],["Albania",37,4.35,1,1,3],["Bielorrusia",37,5.67,1,1,3],["Birmania",20,8.17,1,3,3],["Bosnia y Herzegovina",35,"",1,1,3],["Burundi",20,"",1,1,3],["Camerún",27,6.67,1,2,""],["China",42,7.27,1,1,3],["Corea del Norte",17,"",1,3,3],["Cuba",42,5.50,1,1,3],["Etiopía",37,5.66,1,1,3],["Guinea",26,6.44,1,1,3],["Guinea Bissau",22,7.28,1,1,3],["Haití",17,7.92,1,2,3],["Hong Kong, China",75,5.34,1,1,3],["Irán",24,"",1,3,3],["Iraq",23,"",1,1,3],["Líbano",24,5.81,1,2,3],["Libia",18,"",1,1,3],["Macedonia",42,4.24,1,1,3],["Mali",28,6.81,1,2,3],["Moldavia",42,4.65,1,1,3],["Montenegro",46,4.23,1,1,3],["Mozambique",25,7.15,1,2,""],["Nicaragua",17,6.40,1,1,3],["Nigeria",25,6.85,1,2,""],["República Centroafricana",24,7.49,1,1,3],["República Democrática del Congo",20,7.73,1,2,3],["Rusia",26,"",1,1,3],["Serbia",36,4.82,1,1,3],["Siria",13,"",1,2,3],["Somalia",11,"",1,1,3],["Sudán",20,"",1,1,3],["Sudán del Sur",13,"",1,2,3],["Túnez",40,4.77,1,1,3],["Turquía",34,5.63,1,1,3],["Ucrania",36,5.26,1,1,3],["Venezuela",13,7.59,1,2,3],["Yemen",16,"",1,2,3],["Zimbabwe",24,5.98,1,1,3],["Alemania",78,4.63,1,1,""],["Andorra","",3.29,2,1,""],["Angola",33,6.71,1,2,""],["Anguila","","",3,1,""],["Antigua y Barbuda","",4.10,3,1,""],["Arabia Saudita",52,5.88,1,1,""],["Argelia",36,6.92,1,2,""],["Argentina",37,"",1,1,""],["Armenia",47,4.35,1,1,""],["Azerbaiyán",23,5.40,1,1,""],["Bahamas",64,5.21,1,1,""],["Bangladesh",24,5.62,1,1,""],["Barbados",69,4.58,3,1,""],["Baréin",42,5.17,1,1,""],["Belice","","",3,1,""],["Benin",43,6.44,1,1,""],["Bolivia",29,5.44,1,1,""],["Botswana",59,4.36,1,1,""],["Brasil",36,5.36,1,1,""],["Bulgaria",45,4.99,1,2,""],["Burkina Faso",41,6.48,1,2,""],["Bután",68,5.51,1,1,""],["Cabo Verde",64,5.45,1,1,""],["Camboya",22,6.75,1,1,""],["Catar",58,5.55,1,1,""],["Chad",20,7.60,1,1,""],["Chipre",53,4.81,1,1,""],["Colombia",40,4.92,1,1,""],["Comoras",20,6.68,1,1,""],["Congo",22,7.28,1,1,""],["Costa de Marfil",40,6.42,1,2,""],["Costa Rica",55,4.61,1,1,""],["Croacia",50,4.53,1,2,""],["Dominica",56,4.21,3,1,""],["Ecuador",34,5.06,1,1,""],["Egipto",35,5.08,1,1,""],["El Salvador",31,5.51,1,1,""],["Emiratos Árabes Unidos",69,6.18,1,1,""],["Eritrea",21,"",1,1,""],["Eslovaquia",54,4.39,1,1,""],["Eslovenia",56,3.54,1,1,""],["Estados Unidos","",4.81,1,1,""],["Filipinas",34,5.84,1,2,""],["Fiyi",52,4.71,1,1,""],["Gabón",28,7.48,1,1,""],["Gambia",37,5.56,1,1,""],["Georgia",53,4.64,1,1,""],["Ghana",43,5.28,1,1,""],["Granada",53,4.72,1,1,""],["Grecia",49,3.66,1,1,""],["Guatemala",23,5.45,1,1,""],["Guernsey","","",3,1,""],["Guinea Ecuatorial",17,"",1,1,""],["Honduras",23,5.66,1,1,""],["Hungría",42,5.06,1,1,""],["India",39,5.49,1,1,""],["Indonesia",34,5.33,1,1,""],["Isla de Man","","",2,1,""],["Islas Bermudas","","",2,1,""],["Islas Caimán","","",2,1,""],["Islas Cook","","",3,1,""],["Islas Marshall","","",3,1,""],["Islas Salomón",43,6.32,1,1,""],["Islas Turcas y Caicos","","",3,1,""],["Islas Vírgenes (Reino Unido)","","",2,1,""],["Italia",56,4.80,1,1,""],["Jamaica",44,4.79,1,1,""],["Japón",73,4.77,1,1,""],["Jersey","","",3,1,""],["Jordan",46,4.81,1,1,""],["Kazajistán",39,4.65,1,1,""],["Kenia",31,6.87,1,2,""],["Kirguistán",26,5.95,1,1,""],["Kosovo",41,"",1,1,""],["Kuwait",45,6.27,1,1,""],["Lesoto",39,5.98,1,1,""],["Liberia",25,7.11,1,1,""],["Liechtenstein","",4.16,2,1,""],["Madagascar",25,6.76,1,1,""],["Malasia",50,5.50,1,1,""],["Malawi",34,5.45,1,1,""],["Maldivas",39,"",3,1,""],["Malta",51,5.18,2,1,""],["Marruecos",38,4.94,1,1,""],["Mauricio",51,4.61,1,1,""],["Mauritania",30,6.28,1,1,""],["México",31,5.44,1,1,""],["Monaco","","",2,2,""],["Mongolia",33,4.98,1,1,""],["Namibia",49,4.89,1,2,""],["Nepal",35,6.01,1,1,""],["Níger",32,6.83,1,1,""],["Omán",43,"",1,1,""],["Pakistán",29,5.56,1,1,""],["Panamá",35,5.90,2,1,""],["Papúa Nueva Guinea",29,"",1,1,""],["Paraguay",28,5.00,1,1,""],["Perú",33,4.77,1,1,""],["Polonia",54,4.34,1,1,""],["República Checa",57,3.85,1,1,""],["República Democrática Popular Laos",28,7.53,1,1,""],["República Dominicana",35,4.96,1,1,""],["Ruanda",53,5.94,1,1,""],["Rumania",46,4.99,1,1,""],["San Cristóbal y Nieves","",5.64,3,1,""],["San Marino","",2.96,2,1,""],["Santa Lucía",55,4.46,1,1,""],["Santo Tomé y Príncipe",45,"",1,1,""],["Senegal",43,5.53,1,1,""],["Seychelles",71,4.76,2,1,""],["Sierra Leona",35,6.49,1,1,""],["Singapur",83,4.70,1,1,""],["Sri Lanka",34,5.28,1,1,""],["Suazilandia",30,6.69,1,1,""],["Sudáfrica",41,5.70,1,2,""],["Surinam",40,6.09,1,1,""],["Tailandia",35,6.16,1,1,""],["Tanzania",40,6.08,1,2,""],["Tayikistan",20,6.45,1,1,""],["Timor-Leste",43,"",1,1,""],["Togo",31,6.48,1,1,""],["Tonga","",5.65,1,1,""],["Trinidad y Tobago",42,4.19,1,1,""],["Turkmenistán",18,6.71,1,1,""],["Uganda",26,5.71,1,1,""],["Uzbekistán",33,5.27,1,1,""],["Vanuatu",48,5.05,3,1,""],["Vietnam",41,6.90,1,2,""],["Yibuti",30,"",1,1,""],["Zambia",37,5.34,1,1,""],["Aruba","","",1,1,""],["Australia",75,4.04,1,1,""],["AUSTRIA",71,4.35,1,1,""],["Bélgica",73,4.48,1,1,""],["Brunei Darussalam","",4.30,1,1,""],["Canadá",76,4.47,1,1,""],["Chile",66,4.08,1,1,""],["Corea del Sur",63,4.42,1,1,""],["Dinamarca",90,3.50,1,1,""],["España",60,4.29,1,1,""],["Estonia",76,3.16,1,1,""],["Finlandia",87,3.07,1,1,""],["Francia",71,3.86,1,1,""],["Gibraltar","","",1,1,""],["Guayana",40,"",1,1,""],["Irlanda",77,4.23,1,1,""],["Islandia",72,3.00,1,1,""],["Israel",62,3.97,1,1,""],["Letonia","",4.08,1,1,""],["Letonia",60,4.08,1,1,""],["Lituania",61,3.54,1,1,""],["Luxemburgo",78,3.99,1,1,""],["Macao, China","","",1,1,""],["Montserrat","","",1,1,""],["Nauru","","",1,1,""],["Niue","","",1,1,""],["Noruega",84,3.76,1,1,""],["Nueva Zelanda",85,3.68,1,1,""],["Países Bajos",79,4.52,1,1,""],["Palau","","",1,1,""],["Palestina","","",1,1,""],["Portugal",61,4.09,1,1,""],["Puerto Rico","","",1,1,""],["Reino de Curacao de los Paises Bajos","","",1,1,""],["Reino Unido",71,4.14,1,1,""],["Samoa","",4.56,1,1,""],["San Vicente y las Granadinas",60,4.07,1,1,""],["Saint Maarten Reino de los Países Bajos","","",1,1,""],["Suecia",82,3.45,1,1,""],["Suiza",82,4.46,1,1,""],["Taipei, China","","",1,1,""],["Taiwan, China",67,4.05,1,1,""],["Uruguay",73,4.11,1,1,""],["Vaticano","","",1,1,""],];
+const tiCal = (x) => x === "" || x === 0 ? "" : x <= 30 ? 3 : x >= 60 ? 1 : 2;
+const baCal = (x) => x === "" || x === 0 ? "" : x > 6.3 ? 3 : x <= 4.6 ? 1 : 2;
+function jurLevel([, ti, ba, g, h, i]) {
+  const D = tiCal(ti), F = baCal(ba), nums = [D, F, g, h].filter((v) => v !== "");
+  const J = i === 3 ? 3 : nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : 0;
+  return { D, F, J, K: J >= 2.2 ? 3 : J <= 1.2 ? 1 : 2 };
+}
+const JUR = {};
+const rebuildJur = () => JURD.forEach((r) => { JUR[r[0]] = jurLevel(r).K; });
+rebuildJur();
 const ACTIVIDADES = ["Actividades no Incluidas en las dos categorías siguientes", "Casas de empeño", "Casinos y negocios de apuestas", "Comercializadoras bajo el esquema de ventas multinivel o piramidal", "Comercializadoras de antigüedades, joyas, metales y piedras preciosas, monedas, objetos de arte y sellos postales", "Comercializadoras de armas, explosivos o municiones", "Comercializadoras o agencias de bienes raíces", "Comercializadoras/arrendadoras de vehículos automotores, embarcaciones y aeronaves", "Constructoras", "Distribuidores", "Empresas dedicadas a la transferencia o envío de fondos o remesas", "Empresas o personas que comercialicen productos controlados por la Dirección Nacional de Estupefacientes", "Empresas ubicadas en zonas francas", "Entidades deportivas", "Estaciones de gasolina", "Hoteles y agencias de viaje", "Operadores cambiarios fronterizos", "Otras actividades", "Prestamistas", "Profesionales y casas de cambio", "Sector transportador", "Trasportadores de dinero o de valores"];
 const TRAYECTORIA = { "> 3 años": 1, "1<>3 años": 2, "Persona Natural": 2, "<1 año": 3 };
 const MONTOS = { "Menor $600.000.000": 1, "Entre $600.000.000 y $1.200.000.000": 2, "Mayor a $1.200.000.000": 3 };
 const CERT = { "No Certificado": 0, "Otros Programas": 0, "OEA": -3, "AEO": -3, "CTPAT": -3, "ATT": -3, "GOLDEN LIST": -3, "NECC": -3, "OEC": -3, "PIP": -3, "SES": -3, "SAOC": -3, "STP": -3, "PROFAC": -3 };
 const TIPOS_ID = ["NIT", "NITE", "TID", "Tax ID", "RUC"];
+const CFG = { cop1: 600000000, cop2: 1200000000, usd1: 217000, usd2: 434000, alto: 10, medio: 7, vigencia: 730 };
+const ACT_SCORE = Object.fromEntries(ACTIVIDADES.map((a) => [a, a === "Actividades no Incluidas en las dos categorías siguientes" ? 1 : a === "Distribuidores" ? 2 : 3]));
+let CT_TEMPLATE = `INCLUSIONS
+
+1. Submittals as required for ES METALS scope portions of the project only
+2. Shop drawings signed and sealed by a Professional Engineer.
+3. Delivery of product.
+4. Price is valid for 30 days.
+
+CLARIFICATIONS AND EXCLUSIONS
+
+1. Any structural steel is excluded, if applicable.
+2. We exclude stud framing, sheathing, waterproofing, if applicable.
+3. We exclude sealants and break metal trim.
+4. ES METALS has not included any costs for permits or permit acquisition of any kind.
+5. 45% of the prices are associated with Design Services, Engineering Services, and Project Management Services.
+
+AVAILABLE FINISHES AND STOCK COLORS
+
+Explore our dedicated page for stock AAMA 2605/2604 colors, wood grain, and custom finishes.
+https://es-metals.com/acabados/
+
+STANDARD PAYMENT TERMS
+
+{{PAYMENT_TERMS}}
+
+TERMS AND CONDITIONS
+
+1. Change Orders will have burden applied separate from overhead and profit. Change Orders must be received prior to proceeding with any new work. If the total value of all Change Orders increases the Subcontracted value by more than 10% of the original Subcontract value than ES METALS reserves the right to receive a change order for the impact of the Change Orders on the value of the original Subcontract amount.
+2. Payment shall be received 45 calendar days from the invoice date. After 7 additional days, if payment has not been received, ES METALS will notify the owner or its representative of the lack of payment. If payment is still outstanding at 60 calendar days, ES METALS reserves the right to pull off the work and will restart upon receipt of payment as well a change order for the costs to demobilize and remobilize. If there is a dispute regarding payment, ES METALS must be notified within 7 days of the original submission of the invoice and the undisputed amount should be paid and the dispute, if significant, should go through the dispute resolution process enumerated below.
+3. The basis of this quotation is that there is no retainage on fabricated materials. Retainage will only be allowed on the installation, at no more than 5%.
+4. Final payment is due at the earlier date of either 45 days after the last work is installed or when the certificate of the occupancy is issued. Interest at 1.5% per month accrues on the unpaid balance from the earliest date of the money is due.
+5. ES METALS reserves the right to terminate this Subcontract for its convenience in the case of a cardinal delay or if payment has not been provided as required.
+6. If the Subcontract is terminated by the Contractor for any reason, ES METALS reserves the right to be compensated per the terms of the A1A 401 or on the basis of the completed percentage of its Schedule of Values, whichever ES METALS elects.
+7. Intellectual Property and Confidentiality of Information: All rights to designs, trademarks, patents, software, procedures, and other intangible assets used or developed by ES METALS will remain its exclusive property, as will the technical information shared. Acceptance of this proposal does not imply transfer or authorization for its use; unauthorized disclosure may lead to legal action under applicable law. Processing of Personal Data: ES METALS informs you that, in compliance with Law 1581 of 2012 and its regulations, the personal data collected will be treated confidentially and securely, exclusively for the provision of the service, administrative, legal, and billing purposes. By accepting this proposal, the client authorizes such processing. The information will not be shared with unauthorized third parties, except by legal obligation. The client may exercise their rights of access, update, rectification, or deletion through official channels.`;
 const STANDARD_TERMS = "40% Advance, 30% Before shipment and 30% 30 days after shipment.";
 const DAY = 864e5, TODAY = new Date(); TODAY.setHours(0, 0, 0, 0);
 const d = (s) => new Date(s + "T00:00:00");
@@ -286,19 +385,19 @@ data[2].terms = "50% Advance, 50% Before shipment.";
 function calc(c) {
   c.track = !c.founded ? "> 3 años" : yearsSince(c.founded) > 3 ? "> 3 años" : yearsSince(c.founded) < 1 ? "<1 año" : "1<>3 años";
   const h = Number(c.amount) || 0;
-  c.range = c.currency === "COP" ? (h < 600000000 ? "Menor $600.000.000" : h <= 1200000000 ? "Entre $600.000.000 y $1.200.000.000" : "Mayor a $1.200.000.000")
-    : c.currency === "USD" ? (h <= 217000 ? "Menor $600.000.000" : h <= 434000 ? "Entre $600.000.000 y $1.200.000.000" : "Mayor a $1.200.000.000") : "0";
+  c.range = c.currency === "COP" ? (h < CFG.cop1 ? "Menor $600.000.000" : h <= CFG.cop2 ? "Entre $600.000.000 y $1.200.000.000" : "Mayor a $1.200.000.000")
+    : c.currency === "USD" ? (h <= CFG.usd1 ? "Menor $600.000.000" : h <= CFG.usd2 ? "Entre $600.000.000 y $1.200.000.000" : "Mayor a $1.200.000.000") : "0";
   c.sJur = JUR[c.country] ?? "";
-  c.sAct = c.activity === "Actividades no Incluidas en las dos categorías siguientes" ? 1 : c.activity === "Distribuidores" ? 2 : 3;
+  c.sAct = ACT_SCORE[c.activity] ?? 3;
   c.sTrack = TRAYECTORIA[c.track] ?? "";
   c.sAmount = MONTOS[c.range] ?? 1;
   c.sSec = CERT[c.security] ?? "";
   c.score = Math.round([c.sJur, c.sAct, c.sTrack, c.sAmount, c.sSec].reduce((a, b) => a + (typeof b === "number" ? b : 0), 0));
-  c.risk = c.score >= 10 ? "ALTO" : c.score >= 7 ? "MEDIO" : "BAJO";
-  c.docApplies = (TODAY - d(c.linked)) / DAY > 730 ? "SI" : "NO";
-  c.docState = c.docApplies === "NO" ? "Vigente" : !c.docDate ? "Pendiente por actualizar" : d(c.docDate) > TODAY - 730 * DAY ? "Vigente" : "Pendiente por actualizar";
+  c.risk = c.score >= CFG.alto ? "ALTO" : c.score >= CFG.medio ? "MEDIO" : "BAJO";
+  c.docApplies = (TODAY - d(c.linked)) / DAY > CFG.vigencia ? "SI" : "NO";
+  c.docState = c.docApplies === "NO" ? "Vigente" : !c.docDate ? "Pendiente por actualizar" : d(c.docDate) > TODAY - CFG.vigencia * DAY ? "Vigente" : "Pendiente por actualizar";
   const last = Object.values(c.visits).map((v) => v[0]).filter(Boolean).map(d).sort((a, b) => b - a)[0];
-  c.visit = c.risk !== "ALTO" ? "No aplica" : last && (TODAY - last) / DAY < 730 ? "Cumple" : "No cumple";
+  c.visit = c.risk !== "ALTO" ? "No aplica" : last && (TODAY - last) / DAY < CFG.vigencia ? "Cumple" : "No cumple";
   return c;
 }
 data.forEach(calc);
@@ -395,7 +494,7 @@ function drawGeneral(c) {
       <span id="pt-title">Payment Terms</span>
       <div class="terms-control">
         <textarea id="terms" aria-labelledby="pt-title">${esc(c.terms)}</textarea>
-        <div class="hint">Condiciones de pago de este cliente. Se insertarán en Commercial Terms de cada cotización nueva.</div>
+        <div class="hint">Condiciones de pago de este cliente. Se insertarán en Commercial Terms de cada cotización nueva.</div><button type="button" class="link-btn" id="toCT" style="margin-top:6px;padding-left:0"><span class="material-icons" aria-hidden="true">visibility</span>Ver en Commercial Terms</button>
       </div>
     </section>
   </div>`;
@@ -463,8 +562,124 @@ $("q").oninput = renderMatrix;
 Object.keys(filters).forEach((id) => $(id).onchange = renderMatrix);
 $("clear").onclick = () => { $("q").value = ""; Object.keys(filters).forEach((id) => $(id).value = ""); kpiFilter = null; renderMatrix(); };
 
+const SETTINGS = [["ct", "Commercial Terms"], ["cm", "Customer Matrix"]];
+const CM_TABS = [["jur", "JURISDICCIÓN TERRITORIAL"], ["act", "ACTIVIDADES DESARROLLADAS"], ["tray", "TRAYECTORIA"], ["monto", "MONTO DE LAS OPERACIONES"], ["cert", "PROGRAMA DE SEGURIDAD"], ["interp", "INTERPRETACIÓN"], ["control", "MEDIDAS DE CONTROL"]];
+let sGroup = "", sPage = "jur", ctClient = "900102", jurQuery = "";
+const scoreSel = (key, list, v) => `<select data-s="${esc(key)}">${list.map((o) => `<option value="${o}" ${String(o) === String(v) ? "selected" : ""}>${o === "" ? "—" : o}</option>`).join("")}</select>`;
+const keepScroll = (fn) => { const a = $("sBody").scrollTop, w = $("sBody").querySelector(".stable-wrap"), b = w ? w.scrollTop : 0; fn(); $("sBody").scrollTop = a; const w2 = $("sBody").querySelector(".stable-wrap"); if (w2) w2.scrollTop = b; };
+const applyChange = () => { data.forEach(calc); keepScroll(renderSettingsPage); };
+
+function renderSettings() {
+  $("settingsList").innerHTML = SETTINGS.map(([id, name]) => `<li data-group="${id}" class="${id === sGroup ? "selected" : ""}"><span class="material-icons-outlined gear" aria-hidden="true">settings</span><span class="sname">${name}</span></li>`).join("");
+  $("settingsList").querySelectorAll("li").forEach((li) => li.onclick = () => go("settings", current, tab, true, li.dataset.group === "cm" ? (CM_TABS.some((t) => t[0] === sPage) ? sPage : "jur") : "ct", li.dataset.group));
+  $("sEmpty").hidden = !!sGroup; $("sContent").hidden = !sGroup;
+  if (!sGroup) return;
+  const tabs = sGroup === "cm" ? CM_TABS : [["ct", "GENERAL"]];
+  $("sTabs").innerHTML = tabs.map(([id, label]) => `<button type="button" data-sub="${id}" class="${id === sPage ? "active" : ""}">${label}</button>`).join("");
+  $("sTabs").querySelectorAll("[data-sub]").forEach((b) => b.onclick = () => go("settings", current, tab, true, b.dataset.sub, sGroup));
+  $("sTitle").textContent = SETTINGS.find((s) => s[0] === sGroup)[1];
+  $("sBody").scrollTop = 0;
+  renderSettingsPage();
+}
+
+function renderSettingsPage() {
+  const body = $("sBody");
+  if (sPage === "ct") {
+    const c = data.find((x) => x.sap === ctClient);
+    const parts = CT_TEMPLATE.split("{{PAYMENT_TERMS}}");
+    body.innerHTML = `<p class="s-intro">Texto estándar de Commercial Terms para todas las cotizaciones. El identificador <span class="chip">{{PAYMENT_TERMS}}</span> marca dónde se inserta el Payment Terms configurado en la ficha de cada cliente.</p>
+      <div class="ct-grid">
+        <div><div class="ct-head">Texto estándar</div><textarea id="ctText" aria-label="Texto estándar de Commercial Terms">${esc(CT_TEMPLATE)}</textarea>
+          <div class="alert" id="ctAlert" ${parts.length > 1 ? "hidden" : ""}>El texto no tiene el identificador {{PAYMENT_TERMS}}, así que no se insertará el Payment Terms del cliente.</div></div>
+        <div><div class="ct-head">Vista previa en la cotización <select id="ctClient" aria-label="Cliente para la vista previa">${data.map((x) => `<option value="${x.sap}" ${x.sap === ctClient ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select></div>
+          <div class="preview" id="ctPreview">${parts.map(esc).join(`<mark>${esc(c.terms)}</mark>`)}</div></div>
+      </div>`;
+    $("ctText").oninput = (e) => { CT_TEMPLATE = e.target.value; const p = CT_TEMPLATE.split("{{PAYMENT_TERMS}}"); $("ctAlert").hidden = p.length > 1; $("ctPreview").innerHTML = p.map(esc).join(`<mark>${esc(data.find((x) => x.sap === ctClient).terms)}</mark>`); };
+    $("ctClient").onchange = (e) => { ctClient = e.target.value; renderSettingsPage(); };
+    return;
+  }
+  if (sPage === "jur") {
+    body.innerHTML = `<p class="s-intro">Tabla de la hoja "2. Jurisdicción territorial" del Excel. El nivel se calcula con las mismas fórmulas: calificación de Transparencia Internacional y del Índice de Basilea, promedio con Paraíso fiscal y GAFI, y nivel 3 si el país está sancionado. La matriz usa este nivel en la columna Jurisdicción territorial.</p>
+      <label class="search" style="margin-bottom:14px"><span class="material-icons" aria-hidden="true">search</span><input id="jurQ" type="search" placeholder="Buscar país" value="${esc(jurQuery)}"></label>
+      <div class="stable-wrap"><table class="stable"><thead><tr><th>País</th><th>Transparencia Int.<br>Score</th><th>Calif.</th><th>Índice Basilea<br>Score</th><th>Calif.</th><th>Paraíso fiscal</th><th>GAFI</th><th>Sancionados ONU, OFAC, UE</th><th>Promedio</th><th>Nivel de riesgo</th></tr></thead><tbody id="jurRows"></tbody></table></div>`;
+    const draw = () => {
+      const q = jurQuery.trim().toLowerCase();
+      $("jurRows").innerHTML = JURD.map((r, i) => [r, i]).filter(([r]) => !q || r[0].toLowerCase().includes(q)).map(([r, i]) => { const L = jurLevel(r), lvl = ["", "BAJO", "MEDIO", "ALTO"][L.K];
+        return `<tr><td>${esc(r[0])}</td><td><input type="number" min="0" max="100" data-j="${i},1" value="${r[1]}" aria-label="Score TI ${esc(r[0])}"></td><td class="muted">${L.D}</td><td><input type="number" step="0.01" min="0" max="10" data-j="${i},2" value="${r[2]}" aria-label="Score Basilea ${esc(r[0])}"></td><td class="muted">${L.F}</td>
+          <td>${scoreSel(`j${i},3`, ["", 1, 2, 3], r[3])}</td><td>${scoreSel(`j${i},4`, ["", 1, 2, 3], r[4])}</td><td>${scoreSel(`j${i},5`, ["", 1, 2, 3], r[5])}</td><td class="muted">${Math.round(L.J * 100) / 100}</td><td><span class="badge ${lvl}">${L.K} · ${lvl}</span></td></tr>`; }).join("");
+      const set = (i, k, v) => { JURD[i][k] = v === "" ? "" : Number(v); rebuildJur(); data.forEach(calc); const w = $("sBody").querySelector(".stable-wrap"), y = w.scrollTop; draw(); w.scrollTop = y; };
+      $("jurRows").querySelectorAll("[data-j]").forEach((el) => el.onchange = () => { const [i, k] = el.dataset.j.split(","); set(+i, +k, el.value); });
+      $("jurRows").querySelectorAll("[data-s]").forEach((el) => el.onchange = () => { const [i, k] = el.dataset.s.slice(1).split(","); set(+i, +k, el.value); });
+    };
+    $("jurQ").oninput = (e) => { jurQuery = e.target.value; draw(); };
+    draw();
+    return;
+  }
+  if (sPage === "act") {
+    body.innerHTML = `<p class="s-intro">Actividades de la lista del Excel y la calificación que aplica la fórmula de la matriz. En la tabla de listas del Excel, "Otras actividades" aparece con calificación 1, pero la fórmula le asigna 3; aquí se muestra lo que hoy calcula la matriz.</p>
+      <table class="stable"><thead><tr><th>Actividad desarrollada</th><th>Calificación</th><th>Clientes</th></tr></thead><tbody>${ACTIVIDADES.map((a) => `<tr><td class="wide">${esc(a)}</td><td>${scoreSel(a, [1, 2, 3], ACT_SCORE[a])}</td><td class="muted">${data.filter((c) => c.activity === a).length}</td></tr>`).join("")}</tbody></table>`;
+    body.querySelectorAll("[data-s]").forEach((el) => el.onchange = () => { ACT_SCORE[el.dataset.s] = Number(el.value); applyChange(); });
+    return;
+  }
+  if (sPage === "tray") {
+    body.innerHTML = `<p class="s-intro">Tabla de trayectoria del Excel. La trayectoria se calcula con los años desde la fecha de constitución: más de 3 años, entre 1 y 3 años, o menos de 1 año.</p>
+      <table class="stable"><thead><tr><th>Trayectoria</th><th>Calificación</th><th>Clientes</th></tr></thead><tbody>${Object.keys(TRAYECTORIA).map((t) => `<tr><td>${esc(t)}</td><td>${scoreSel(t, [1, 2, 3], TRAYECTORIA[t])}</td><td class="muted">${data.filter((c) => c.track === t).length}</td></tr>`).join("")}</tbody></table>`;
+    body.querySelectorAll("[data-s]").forEach((el) => el.onchange = () => { TRAYECTORIA[el.dataset.s] = Number(el.value); applyChange(); });
+    return;
+  }
+  if (sPage === "monto") {
+    const [m1, m2, m3] = Object.keys(MONTOS);
+    body.innerHTML = `<p class="s-intro">Rangos del monto de operación anual, en COP y en USD, como en la fórmula del Excel.</p>
+      <table class="stable"><thead><tr><th>Rango</th><th>COP</th><th>USD</th><th>Calificación</th><th>Clientes</th></tr></thead><tbody>
+        <tr><td>${m1}</td><td>Menor a <input type="number" data-c="cop1" value="${CFG.cop1}"></td><td>Hasta <input type="number" data-c="usd1" value="${CFG.usd1}"></td><td>${scoreSel(m1, [1, 2, 3], MONTOS[m1])}</td><td class="muted">${data.filter((c) => c.range === m1).length}</td></tr>
+        <tr><td>${m2}</td><td>Hasta <input type="number" data-c="cop2" value="${CFG.cop2}"></td><td>Hasta <input type="number" data-c="usd2" value="${CFG.usd2}"></td><td>${scoreSel(m2, [1, 2, 3], MONTOS[m2])}</td><td class="muted">${data.filter((c) => c.range === m2).length}</td></tr>
+        <tr><td>${m3}</td><td class="muted">Más de ${fmtMoney(CFG.cop2)}</td><td class="muted">Más de ${fmtMoney(CFG.usd2)}</td><td>${scoreSel(m3, [1, 2, 3], MONTOS[m3])}</td><td class="muted">${data.filter((c) => c.range === m3).length}</td></tr>
+      </tbody></table>`;
+    body.querySelectorAll("[data-c]").forEach((el) => el.onchange = () => { CFG[el.dataset.c] = Number(el.value) || 0; applyChange(); });
+    body.querySelectorAll("[data-s]").forEach((el) => el.onchange = () => { MONTOS[el.dataset.s] = Number(el.value); applyChange(); });
+    return;
+  }
+  if (sPage === "cert") {
+    body.innerHTML = `<p class="s-intro">Certificaciones del programa de seguridad en la cadena de suministro y su calificación. Una certificación reduce la valoración del cliente.</p>
+      <table class="stable"><thead><tr><th>Programa</th><th>Calificación</th><th>Clientes</th></tr></thead><tbody>${Object.keys(CERT).map((k) => `<tr><td>${esc(k)}</td><td>${scoreSel(k, [-3, 0], CERT[k])}</td><td class="muted">${data.filter((c) => c.security === k).length}</td></tr>`).join("")}</tbody></table>`;
+    body.querySelectorAll("[data-s]").forEach((el) => el.onchange = () => { CERT[el.dataset.s] = Number(el.value); applyChange(); });
+    return;
+  }
+  if (sPage === "interp") {
+    const n = (r) => data.filter((c) => c.risk === r).length;
+    body.innerHTML = `<p class="s-intro">La valoración es la suma de las cinco calificaciones. Estos umbrales definen la interpretación del nivel de riesgo.</p>
+      <div class="cfg">
+        <span><span class="badge ALTO">ALTO</span> desde</span><input type="number" min="1" data-c="alto" value="${CFG.alto}" aria-label="ALTO desde"><small>${n("ALTO")} clientes</small>
+        <span><span class="badge MEDIO">MEDIO</span> desde</span><input type="number" min="1" data-c="medio" value="${CFG.medio}" aria-label="MEDIO desde"><small>${n("MEDIO")} clientes</small>
+        <span><span class="badge BAJO">BAJO</span> hasta</span><span style="color:var(--text)">${CFG.medio - 1}</span><small>${n("BAJO")} clientes</small>
+      </div>`;
+    body.querySelectorAll("[data-c]").forEach((el) => el.onchange = () => { CFG[el.dataset.c] = Number(el.value) || 0; applyChange(); });
+    return;
+  }
+  const pend = data.filter((c) => c.docState === "Pendiente por actualizar").length;
+  body.innerHTML = `<p class="s-intro">Plazos de las medidas de control. En el Excel se usan 730 días (2 años) para decidir si aplica la actualización, si la documentación está vigente y si la visita a instalaciones cumple.</p>
+    <div class="cfg">
+      <span>Vigencia en días</span><input type="number" min="1" data-c="vigencia" value="${CFG.vigencia}" aria-label="Vigencia en días"><small>${pend} clientes con documentación pendiente</small>
+      <span>Visita a instalaciones aplica para</span><span style="color:var(--text)">Nivel ALTO</span><small>Se revisa la fecha de visita más reciente de 2024, 2025 y 2026</small>
+    </div>`;
+  body.querySelectorAll("[data-c]").forEach((el) => el.onchange = () => { CFG[el.dataset.c] = Number(el.value) || 0; applyChange(); });
+}
+
+function go(view, sap = current, t = tab, push = true, page = sPage, group = sGroup) {
+  current = sap; tab = t; sPage = page; sGroup = view === "settings" ? group : sGroup;
+  const show = { clients: ["clientsPanel", "detailView"], matrix: ["matrixView"], settings: ["settingsPanel", "settingsView"] };
+  ["clientsPanel", "detailView", "matrixView", "settingsPanel", "settingsView"].forEach((id) => { $(id).hidden = !show[view].includes(id); });
+  document.querySelectorAll(".rail [data-rail]").forEach((b) => b.classList.toggle("active", b.dataset.rail === (view === "settings" ? "settings" : "clients")));
+  if (view === "matrix") renderMatrix(); else if (view === "settings") renderSettings(); else { renderClients(); $("dBody").scrollTop = 0; }
+  const hash = view === "matrix" ? "#matrix" : view === "settings" ? (sGroup === "cm" ? `#settings/cm/${sPage}` : sGroup ? "#settings/ct" : "#settings") : `#${sap}/${t}`;
+  if (push && location.hash !== hash) history.replaceState(null, "", hash);
+}
+document.querySelectorAll(".rail [data-rail]").forEach((b) => b.onclick = () => go(b.dataset.rail));
+$("dBody").addEventListener("click", (e) => { if (e.target.closest("#toCT")) { ctClient = current; go("settings", current, tab, true, "ct", "ct"); } });
+
 const [h1, h2] = location.hash.slice(1).split("/");
 if (h1 === "matrix") go("matrix", current, tab, false);
+else if (h1 === "settings") { const h3 = location.hash.split("/")[2]; go("settings", current, tab, false, h2 === "cm" ? (CM_TABS.some((x) => x[0] === h3) ? h3 : "jur") : "ct", ["ct", "cm"].includes(h2) ? h2 : ""); }
 else go("clients", data.some((c) => c.sap === h1) ? h1 : current, h2 === "matrix" ? "matrix" : "general", false);
 </script>
 </body>
