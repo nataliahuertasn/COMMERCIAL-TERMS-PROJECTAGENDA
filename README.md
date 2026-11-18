@@ -1,5 +1,6 @@
-# Payment Terms por cliente
+# Maquetas módulo de Clientes
 
-Maqueta de la nueva sección Payment Terms en la pestaña General Information del cliente.
+- `index.html`: Fase 1, sección Payment Terms en la ficha del cliente (pestaña General Information).
+- `customer-matrix.html`: Fase 2, Customer Matrix. Vista de tabla con búsqueda, filtros y ordenamiento; al hacer clic en un cliente se abre su pestaña Customer Matrix.
 
-Abre `index.html` en el navegador para verla. El campo Payment Terms se puede editar en la maqueta, pero no guarda datos.
+Los datos son de ejemplo. Los campos se pueden editar en la maqueta, pero no guardan datos.

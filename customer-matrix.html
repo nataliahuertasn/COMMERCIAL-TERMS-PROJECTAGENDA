@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Customer Matrix</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<style>
+  :root {
+    --text: #212121; --muted: #616161; --soft: #757575; --line: #e0e0e0; --tabs: #eeeeee;
+    --blue: #1976d2; --blue-soft: #e3edf7; --toggle: #a9cdf0; --grey-icon: #757575;
+    --low-bg: #e8f5e9; --low: #1b5e20; --mid-bg: #fff3e0; --mid: #8a4b00; --high-bg: #ffebee; --high: #b71c1c;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { display: flex; flex-direction: column; background: #fff; color: var(--text); font: 16px/1.4 Roboto, Arial, sans-serif; }
+  button, input, select { font: inherit; color: inherit; }
+  .material-icons { font-size: 24px; line-height: 1; }
+  .app { flex: 1; min-height: 0; display: flex; }
+  .rail { width: 80px; flex: none; padding-top: 52px; }
+  .rail div { height: 54px; margin-left: 6px; background: #f2f2f2; display: flex; align-items: center; justify-content: center; color: var(--blue); }
+  .rail .material-icons { font-size: 26px; }
+
+  .module-tabs { display: flex; gap: 8px; margin: 20px 0 10px 4px; }
+  .module-tabs a, .module-tabs button { width: 200px; padding: 0 0 8px; border: 0; border-bottom: 2px solid transparent; background: none; color: var(--muted); text-align: center; text-decoration: none; font-size: 17px; font-weight: 500; letter-spacing: 1px; cursor: pointer; }
+  .module-tabs .active { border-bottom-color: var(--blue); color: var(--blue); cursor: default; }
+
+  .matrix { flex: 1; min-width: 0; display: flex; flex-direction: column; padding-right: 20px; }
+  .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 6px 0 14px 4px; }
+  .search { display: flex; align-items: center; gap: 8px; width: 420px; max-width: 100%; height: 50px; padding: 0 24px; border-radius: 25px; background: #eeeeee; }
+  .search .material-icons { color: var(--muted); font-size: 28px; }
+  .search input { flex: 1; min-width: 0; border: 0; background: none; outline: none; font-size: 18px; }
+  .search input::placeholder { color: #9e9e9e; }
+  .filter { position: relative; }
+  .filter select { max-width: 190px; text-overflow: ellipsis; height: 40px; padding: 0 34px 0 14px; border: 1px solid #bdbdbd; border-radius: 20px; background: #fff; appearance: none; font-size: 15px; color: var(--muted); cursor: pointer; }
+  .filter select.on { border-color: var(--blue); background: var(--blue-soft); color: var(--blue); }
+  .filter::after { content: "arrow_drop_down"; font-family: "Material Icons"; position: absolute; right: 8px; top: 8px; font-size: 24px; color: var(--muted); pointer-events: none; }
+  .link-btn { display: flex; align-items: center; gap: 4px; border: 0; background: none; color: var(--blue); font-size: 15px; font-weight: 500; cursor: pointer; padding: 6px 4px; }
+  .spacer { flex: 1; }
+  .outline-btn { display: flex; align-items: center; gap: 6px; height: 40px; padding: 0 16px; border: 1px solid var(--blue); border-radius: 20px; background: #fff; color: var(--blue); font-size: 15px; font-weight: 500; letter-spacing: .5px; cursor: pointer; }
+
+  .kpis { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 14px 4px; }
+  .kpi { min-width: 150px; padding: 10px 16px; border: 1px solid var(--line); border-radius: 8px; background: #fff; text-align: left; cursor: pointer; }
+  .kpi.on { border-color: var(--blue); background: var(--blue-soft); }
+  .kpi small { display: block; color: var(--muted); font-size: 13px; }
+  .kpi b { font-size: 24px; font-weight: 500; }
+
+  .table-wrap { flex: 1; min-height: 0; overflow: auto; margin-left: 4px; border: 1px solid var(--line); border-radius: 8px; }
+  table { border-collapse: separate; border-spacing: 0; width: max-content; min-width: 100%; font-size: 15px; }
+  th, td { padding: 0 14px; border-bottom: 1px solid var(--line); white-space: nowrap; text-align: left; }
+  thead th { position: sticky; background: #f5f5f5; color: var(--muted); font-weight: 500; z-index: 2; }
+  thead tr.groups th { top: 0; height: 34px; font-size: 12px; letter-spacing: .8px; border-right: 1px solid var(--line); }
+  thead tr.cols th { top: 34px; height: 44px; cursor: pointer; user-select: none; }
+  thead tr.cols th .material-icons { font-size: 16px; vertical-align: -3px; color: var(--blue); }
+  tbody tr { cursor: pointer; }
+  tbody tr:hover td { background: #f5f9fd; }
+  td { height: 52px; color: var(--muted); background: #fff; }
+  td.name { color: var(--text); }
+  .sticky1 { position: sticky; left: 0; z-index: 1; width: 108px; min-width: 108px; max-width: 108px; }
+  .sticky2 { position: sticky; left: 108px; z-index: 1; box-shadow: inset -1px 0 0 var(--line); }
+  thead .sticky1, thead .sticky2 { z-index: 3; }
+  td.num { text-align: right; }
+  .badge { display: inline-block; min-width: 64px; padding: 3px 10px; border-radius: 12px; font-size: 13px; font-weight: 500; text-align: center; }
+  .BAJO { background: var(--low-bg); color: var(--low); }
+  .MEDIO { background: var(--mid-bg); color: var(--mid); }
+  .ALTO { background: var(--high-bg); color: var(--high); }
+  .ok, .fields .val.ok { color: var(--low); }
+  .warn, .fields .val.warn { color: var(--high); }
+  .count { margin: 10px 0 12px 4px; color: var(--muted); font-size: 14px; }
+  .empty { padding: 40px; text-align: center; color: var(--muted); }
+
+  .clients { width: 450px; flex: none; display: flex; flex-direction: column; border-right: 1px solid #eeeeee; min-height: 0; }
+  .clients .search { width: auto; margin: 0 10px 18px 4px; }
+  .list { flex: 1; min-height: 0; overflow-y: auto; margin: 0; padding: 0; list-style: none; border-top: 1px solid #eeeeee; }
+  .list li { display: flex; gap: 20px; height: 120px; padding: 26px 14px; cursor: pointer; }
+  .list li.selected { background: var(--blue-soft); }
+  .avatar { width: 55px; height: 55px; flex: none; border-radius: 50%; background: var(--grey-icon); color: #fff; display: flex; align-items: center; justify-content: center; }
+  .avatar .material-icons { font-size: 38px; }
+  .client-text { min-width: 0; }
+  .client-name { font-size: 19px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .selected .client-name { color: var(--blue); }
+  .client-city { display: flex; align-items: center; gap: 12px; margin-top: 8px; color: var(--muted); }
+
+  .detail { flex: 1; min-width: 0; display: flex; flex-direction: column; min-height: 0; padding-left: 20px; }
+  .tabs { display: flex; height: 60px; margin-top: 8px; background: var(--tabs); font-size: 18px; font-weight: 500; letter-spacing: 1.3px; }
+  .tabs a { display: flex; align-items: center; padding: 0 20px; color: var(--muted); text-decoration: none; }
+  .tabs .active { background: #fff; color: var(--blue); }
+  .title { display: flex; align-items: center; gap: 22px; height: 80px; margin-right: 20px; padding-left: 20px; border-bottom: 1px solid var(--line); }
+  .title .building { font-size: 42px; color: var(--grey-icon); }
+  .title h1 { flex: 1; margin: 0; font-size: 25px; font-weight: 500; }
+  .toggle { position: relative; width: 60px; height: 34px; border-radius: 17px; background: var(--toggle); margin-right: 40px; }
+  .toggle i { position: absolute; top: 4px; right: 4px; width: 26px; height: 26px; border-radius: 50%; background: var(--blue); }
+  .more { width: 50px; height: 50px; border-radius: 50%; background: #eeeeee; display: flex; align-items: center; justify-content: center; margin-right: 5px; }
+  .scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 24px 20px 40px 0; color: var(--muted); }
+  .legend { display: flex; flex-wrap: wrap; gap: 22px; margin-bottom: 8px; font-size: 14px; }
+  .legend span, .tag { display: inline-flex; align-items: center; gap: 4px; }
+  .tag .material-icons, .legend .material-icons { font-size: 17px; color: var(--soft); }
+  .section { padding: 22px 0; border-bottom: 1px solid var(--line); }
+  .section h2 { margin: 0 0 16px; color: var(--text); font-size: 17px; font-weight: 500; letter-spacing: .3px; }
+  .fields { display: grid; grid-template-columns: 240px minmax(0, 1fr) 240px minmax(0, 1fr); row-gap: 14px; column-gap: 16px; align-items: center; }
+  .fields .val { color: var(--text); display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .fields input, .fields select { width: 100%; max-width: 300px; height: 36px; padding: 0 2px; border: 0; border-bottom: 1px solid #9e9e9e; background: none; color: var(--text); font-size: 16px; }
+  .fields input:focus, .fields select:focus { outline: none; border-bottom: 2px solid var(--blue); }
+  .score-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+  .score { padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; }
+  .score small { display: block; font-size: 13px; }
+  .score b { display: block; margin-top: 4px; color: var(--text); font-size: 22px; font-weight: 500; }
+  .score.total { border-color: var(--blue); }
+  .visits { width: 100%; max-width: 980px; margin-top: 14px; }
+  .visits td, .visits th { height: 44px; white-space: normal; }
+  .visits thead th { position: static; }
+  footer { flex: none; display: flex; justify-content: space-between; gap: 16px; padding: 12px 24px; background: #fafafa; font-size: 18px; }
+  [hidden] { display: none !important; }
+  @media (max-width: 1300px) { .fields { grid-template-columns: 200px minmax(0, 1fr); } }
+  @media (max-width: 900px) {
+    body { font-size: 15px; }
+    .rail { display: none; }
+    .matrix { padding: 0 12px; }
+    .app { flex-direction: column; overflow-y: auto; }
+    .clients { width: 100%; border-right: 0; }
+    .list { max-height: 260px; }
+    .detail { padding: 0 12px; }
+    .scroll { overflow: visible; padding-right: 0; }
+    .tabs { overflow-x: auto; font-size: 14px; }
+    .tabs a { white-space: nowrap; }
+    .title { margin-right: 0; padding-left: 0; gap: 10px; }
+    .title h1 { font-size: 19px; }
+    .toggle { margin-right: 8px; }
+    .module-tabs a, .module-tabs button { width: auto; flex: 1; font-size: 14px; }
+    .fields { grid-template-columns: 140px minmax(0, 1fr); }
+    .table-wrap { min-height: 420px; }
+    footer { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="Módulos"><div><span class="material-icons" aria-hidden="true">person</span></div></nav>
+
+  <section class="matrix" id="matrixView">
+    <div class="module-tabs">
+      <a href="index.html">CLIENTS</a>
+      <button class="active" type="button">CUSTOMER MATRIX</button>
+    </div>
+    <div class="toolbar">
+      <label class="search"><span class="material-icons" aria-hidden="true">search</span><input id="q" type="search" placeholder="Search" aria-label="Buscar por razón social, código SAP o ID"></label>
+      <span class="filter"><select id="fRisk" aria-label="Nivel de riesgo"><option value="">Nivel de riesgo</option><option>BAJO</option><option>MEDIO</option><option>ALTO</option></select></span>
+      <span class="filter"><select id="fType" aria-label="Tipo de cliente"><option value="">Tipo de cliente</option><option>Nacional</option><option>Internacional</option></select></span>
+      <span class="filter"><select id="fCountry" aria-label="País"><option value="">País</option></select></span>
+      <span class="filter"><select id="fActivity" aria-label="Actividad"><option value="">Actividad</option></select></span>
+      <span class="filter"><select id="fDoc" aria-label="Documentación"><option value="">Documentación</option><option>Vigente</option><option>Pendiente por actualizar</option></select></span>
+      <span class="filter"><select id="fStatus" aria-label="Estado"><option value="">Estado</option><option>Activo</option><option>Inactivo</option></select></span>
+      <button class="link-btn" id="clear" type="button" hidden><span class="material-icons" aria-hidden="true">close</span>Limpiar filtros</button>
+      <span class="spacer"></span>
+      <button class="outline-btn" type="button" title="Mostrar u ocultar columnas"><span class="material-icons" aria-hidden="true">view_column</span>COLUMNS</button>
+    </div>
+    <div class="kpis" id="kpis"></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr class="groups">
+            <th colspan="12">IDENTIFICACIÓN DEL CLIENTE</th>
+            <th colspan="4">CRITERIOS DE EVALUACIÓN</th>
+            <th colspan="2">NIVEL DE RIESGO</th>
+            <th colspan="3">MEDIDAS DE CONTROL</th>
+          </tr>
+          <tr class="cols" id="cols"></tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <div class="count" id="count"></div>
+  </section>
+
+  <aside class="clients" id="clientsPanel" hidden>
+    <div class="module-tabs">
+      <a href="index.html">CLIENTS</a>
+      <button type="button" id="backToMatrix">CUSTOMER MATRIX</button>
+    </div>
+    <div class="search"><span class="material-icons" aria-hidden="true">search</span><span style="color:#9e9e9e;font-size:18px">Search</span></div>
+    <ul class="list" id="clientList"></ul>
+  </aside>
+
+  <main class="detail" id="detailView" hidden>
+    <div class="tabs"><a href="index.html">GENERAL INFORMATION</a><a href="#">DOCUMENTS</a><a href="#">QUOTES</a><a class="active" href="#">CUSTOMER MATRIX</a></div>
+    <div class="title">
+      <span class="material-icons building" aria-hidden="true">apartment</span>
+      <h1 id="dName"></h1>
+      <div class="toggle" aria-hidden="true"><i></i></div>
+      <div class="more" aria-hidden="true"><span class="material-icons">more_horiz</span></div>
+    </div>
+    <div class="scroll" id="dBody"></div>
+  </main>
+</div>
+<footer><span>Designed and Built by Boston Project, LLC.</span><span>Copyright © SIGMA 2026</span></footer>
+
+<script>
+const JUR = { "Colombia": 2, "Estados Unidos": 2, "Panamá": 2, "Puerto Rico": 2, "Costa Rica": 2, "Islas Caimán": 3 };
+const ACT = { "Actividades no incluidas en las categorías siguientes": 1, "Otras actividades": 1, "Distribuidores": 2, "Constructoras": 3, "Hoteles y agencias de viaje": 3, "Sector transportador": 3, "Comercializadoras o agencias de bienes raíces": 3 };
+const SEC = { "No certificado": 0, "Otros programas": 0, "OEA": -3, "CTPAT": -3, "AEO": -3 };
+const DAY = 864e5, TODAY = new Date();
+const d = (s) => new Date(s + "T00:00:00");
+const fmtDate = (s) => s ? d(s).toLocaleDateString("es-CO", { day: "2-digit", month: "2-digit", year: "numeric" }) : "—";
+const fmtMoney = (n, c) => n ? (c === "USD" ? "US$ " : "$ ") + n.toLocaleString("es-CO") : "—";
+
+const data = [
+  ["900101", "Cliente de ejemplo A", "Tax ID", "XX-XXX0101", "Tampa", "Estados Unidos", "2012-03-14", 380000, "USD", "2023-02-10", "Activo", "Constructoras", "No certificado", "", []],
+  ["900102", "Cliente de ejemplo B", "NIT", "900.000.102-1", "Bogotá", "Colombia", "2018-06-01", 450000000, "COP", "2019-09-20", "Activo", "Actividades no incluidas en las categorías siguientes", "No certificado", "2025-04-02", []],
+  ["900103", "Cliente de ejemplo C", "NIT", "900.000.103-4", "Cartagena", "Colombia", "2010-01-20", 1500000000, "COP", "2021-05-11", "Activo", "Hoteles y agencias de viaje", "No certificado", "2022-03-15", []],
+  ["900104", "Cliente de ejemplo D", "Tax ID", "XX-XXX0104", "Miami", "Estados Unidos", "2015-11-03", 0, "USD", "2024-08-19", "Activo", "Otras actividades", "No certificado", "", []],
+  ["900105", "Cliente de ejemplo E", "NIT", "900.000.105-7", "Medellín", "Colombia", "2016-07-07", 250000000, "COP", "2020-01-30", "Activo", "Distribuidores", "OEA", "2025-10-01", []],
+  ["900106", "Cliente de ejemplo F", "RUC", "XXXXXXX0106", "Ciudad de Panamá", "Panamá", "2024-09-12", 520000, "USD", "2025-02-14", "Activo", "Constructoras", "No certificado", "", []],
+  ["900107", "Cliente de ejemplo G", "Tax ID", "XX-XXX0107", "George Town", "Islas Caimán", "2023-04-18", 600000, "USD", "2023-06-01", "Activo", "Comercializadoras o agencias de bienes raíces", "No certificado", "", [["2024-07-15", "Favorable", "Actualizar plan de contingencia"]]],
+  ["900108", "Cliente de ejemplo H", "Tax ID", "XX-XXX0108", "Houston", "Estados Unidos", "2008-02-25", 150000, "USD", "2019-09-20", "Inactivo", "Constructoras", "No certificado", "", []],
+  ["900109", "Cliente de ejemplo I", "NIT", "900.000.109-2", "Barranquilla", "Colombia", "2019-10-10", 0, "COP", "2025-07-22", "Activo", "Sector transportador", "No certificado", "", []],
+  ["900110", "Cliente de ejemplo J", "Tax ID", "XX-XXX0110", "San Juan", "Puerto Rico", "2011-05-30", 90000, "USD", "2022-11-08", "Activo", "Otras actividades", "No certificado", "2026-01-12", []],
+  ["900111", "Cliente de ejemplo K", "Tax ID", "XX-XXX0111", "Orlando", "Estados Unidos", "2014-08-08", 260000, "USD", "2021-03-03", "Activo", "Constructoras", "CTPAT", "2024-02-20", []],
+  ["900112", "Cliente de ejemplo L", "NIT", "900.000.112-9", "Cali", "Colombia", "2013-12-01", 900000000, "COP", "2018-04-16", "Activo", "Constructoras", "No certificado", "2023-01-09", []]
+].map(([sap, name, idType, idNum, city, country, founded, amount, currency, linked, status, activity, security, docDate, visits]) =>
+  ({ sap, name, idType, idNum, city, country, founded, amount, currency, linked, status, activity, security, docDate, visits }));
+
+function calc(c) {
+  c.type = c.country === "Colombia" ? "Nacional" : "Internacional";
+  const years = (TODAY - d(c.founded)) / (365.25 * DAY);
+  c.track = years > 3 ? "> 3 años" : years < 1 ? "< 1 año" : "1 a 3 años";
+  const cop = c.currency === "USD" ? c.amount * (600000000 / 217000) : c.amount;
+  c.range = cop <= 0 ? "Sin monto" : cop < 600000000 ? "Menor a $600 M" : cop <= 1200000000 ? "$600 M a $1.200 M" : "Mayor a $1.200 M";
+  c.sJur = JUR[c.country] ?? 2;
+  c.sAct = ACT[c.activity] ?? 3;
+  c.sTrack = years > 3 ? 1 : years < 1 ? 3 : 2;
+  c.sAmount = cop > 1200000000 ? 3 : cop >= 600000000 ? 2 : 1;
+  c.sSec = SEC[c.security] ?? 0;
+  c.score = c.sJur + c.sAct + c.sTrack + c.sAmount + c.sSec;
+  c.risk = c.score >= 10 ? "ALTO" : c.score >= 7 ? "MEDIO" : "BAJO";
+  c.docApplies = (TODAY - d(c.linked)) / DAY > 730 ? "Sí" : "No";
+  c.docState = c.docApplies === "No" || (c.docDate && (TODAY - d(c.docDate)) / DAY < 730) ? "Vigente" : "Pendiente por actualizar";
+  const last = c.visits.map((v) => d(v[0])).sort((a, b) => b - a)[0];
+  c.visit = c.risk !== "ALTO" ? "No aplica" : last && (TODAY - last) / DAY < 730 ? "Cumple" : "No cumple";
+  return c;
+}
+data.forEach(calc);
+
+const COLS = [
+  ["sap", "Cód. SAP", "sticky1"], ["name", "Razón social", "sticky2 name"], ["idType", "Tipo de ID"], ["idNum", "# ID"],
+  ["city", "Ciudad"], ["country", "País"], ["type", "Tipo de cliente"], ["founded", "Fecha de constitución", "", fmtDate],
+  ["amount", "Monto anual", "num", (v, c) => fmtMoney(v, c.currency)], ["currency", "Moneda"], ["linked", "Vinculación con ESM", "", fmtDate], ["status", "Estado"],
+  ["activity", "Actividad"], ["track", "Trayectoria"], ["range", "Rango de monto"], ["security", "Programa de seguridad"],
+  ["score", "Valoración", "num"], ["risk", "Nivel", "", (v) => `<span class="badge ${v}">${v}</span>`],
+  ["docState", "Documentación", "", (v) => `<span class="${v === "Vigente" ? "ok" : "warn"}">${v}</span>`],
+  ["docDate", "Última actualización", "", fmtDate], ["visit", "Visita a instalaciones", "", (v) => `<span class="${v === "No cumple" ? "warn" : v === "Cumple" ? "ok" : ""}">${v}</span>`]
+];
+let sortKey = "name", sortDir = 1, kpiFilter = null;
+const $ = (id) => document.getElementById(id);
+const filters = { fRisk: "risk", fType: "type", fCountry: "country", fActivity: "activity", fDoc: "docState", fStatus: "status" };
+const fill = (id, key) => [...new Set(data.map((c) => c[key]))].sort().forEach((v) => $(id).add(new Option(v, v)));
+fill("fCountry", "country"); fill("fActivity", "activity");
+
+function filtered() {
+  const q = $("q").value.trim().toLowerCase();
+  return data.filter((c) => (!q || [c.name, c.sap, c.idNum, c.city].join(" ").toLowerCase().includes(q))
+    && Object.entries(filters).every(([id, key]) => !$(id).value || c[key] === $(id).value)
+    && (!kpiFilter || c[kpiFilter[0]] === kpiFilter[1]))
+    .sort((a, b) => (a[sortKey] > b[sortKey] ? 1 : a[sortKey] < b[sortKey] ? -1 : 0) * sortDir);
+}
+
+function renderKpis() {
+  const k = [["Total clientes", null], ["Riesgo alto", ["risk", "ALTO"]], ["Riesgo medio", ["risk", "MEDIO"]], ["Riesgo bajo", ["risk", "BAJO"]], ["Documentación pendiente", ["docState", "Pendiente por actualizar"]], ["Visita pendiente", ["visit", "No cumple"]]];
+  $("kpis").innerHTML = k.map(([label, f], i) => `<button type="button" class="kpi ${JSON.stringify(f) === JSON.stringify(kpiFilter) && f ? "on" : ""}" data-i="${i}"><small>${label}</small><b>${f ? data.filter((c) => c[f[0]] === f[1]).length : data.length}</b></button>`).join("");
+  $("kpis").querySelectorAll(".kpi").forEach((b) => b.onclick = () => { const f = k[b.dataset.i][1]; kpiFilter = f && JSON.stringify(f) !== JSON.stringify(kpiFilter) ? f : null; render(); });
+}
+
+function render() {
+  $("cols").innerHTML = COLS.map(([key, label, cls = ""]) => `<th class="${cls.replace("name", "")}" data-key="${key}">${label} ${sortKey === key ? `<span class="material-icons" aria-hidden="true">${sortDir > 0 ? "arrow_upward" : "arrow_downward"}</span>` : ""}</th>`).join("");
+  $("cols").querySelectorAll("th").forEach((th) => th.onclick = () => { sortDir = sortKey === th.dataset.key ? -sortDir : 1; sortKey = th.dataset.key; render(); });
+  const rows = filtered();
+  $("rows").innerHTML = rows.length ? rows.map((c) => `<tr data-sap="${c.sap}">${COLS.map(([key, , cls = "", f]) => `<td class="${cls}">${f ? f(c[key], c) : c[key]}</td>`).join("")}</tr>`).join("")
+    : `<tr><td class="empty" colspan="${COLS.length}">No hay clientes con estos filtros.</td></tr>`;
+  $("rows").querySelectorAll("tr[data-sap]").forEach((tr) => tr.onclick = () => openClient(tr.dataset.sap));
+  const active = Object.keys(filters).some((id) => $(id).value) || $("q").value || kpiFilter;
+  Object.keys(filters).forEach((id) => $(id).classList.toggle("on", !!$(id).value));
+  $("clear").hidden = !active;
+  $("count").textContent = `${rows.length} de ${data.length} clientes`;
+  renderKpis();
+}
+
+const tag = (icon, text) => `<span class="tag" title="${text}"><span class="material-icons" aria-hidden="true">${icon}</span></span>`;
+const ERP = tag("link", "Viene de la ficha del cliente"), CALC = tag("functions", "Calculado por el sistema");
+const opts = (list, val) => list.map((o) => `<option ${o === val ? "selected" : ""}>${o}</option>`).join("");
+
+function openClient(sap) {
+  const c = data.find((x) => x.sap === sap);
+  $("matrixView").hidden = true; $("clientsPanel").hidden = false; $("detailView").hidden = false;
+  $("clientList").innerHTML = data.map((x) => `<li data-sap="${x.sap}" class="${x.sap === sap ? "selected" : ""}"><div class="avatar"><span class="material-icons" aria-hidden="true">apartment</span></div><div class="client-text"><div class="client-name">${x.name}</div><div class="client-city"><span class="material-icons" aria-hidden="true">place</span>${x.city}</div></div></li>`).join("");
+  $("clientList").querySelectorAll("li").forEach((li) => li.onclick = () => openClient(li.dataset.sap));
+  $("dName").textContent = c.name;
+  drawDetail(c);
+}
+
+function drawDetail(c) {
+  $("dBody").innerHTML = `
+    <div class="legend"><span>${ERP} Viene de la ficha del cliente</span><span>${CALC} Calculado por el sistema</span><span><span class="material-icons" aria-hidden="true" style="font-size:17px;color:var(--blue)">edit</span> Editable</span></div>
+    <div class="section"><h2>Identificación del cliente</h2><div class="fields">
+      <span>Cód. SAP ${ERP}</span><span class="val">${c.sap}</span>
+      <span>Razón social ${ERP}</span><span class="val">${c.name}</span>
+      <span>Tipo de ID</span><span class="val"><select data-k="idType">${opts(["NIT", "Tax ID", "RUC", "Cédula"], c.idType)}</select></span>
+      <span># ID</span><span class="val"><input data-k="idNum" value="${c.idNum}"></span>
+      <span>City ${ERP}</span><span class="val">${c.city}</span>
+      <span>País</span><span class="val"><select data-k="country">${opts(Object.keys(JUR), c.country)}</select></span>
+      <span>Tipo de cliente ${CALC}</span><span class="val">${c.type}</span>
+      <span>Fecha de constitución</span><span class="val"><input type="date" data-k="founded" value="${c.founded}"></span>
+      <span>Monto de operación anual</span><span class="val"><input type="number" data-k="amount" value="${c.amount}"></span>
+      <span>Moneda del monto</span><span class="val"><select data-k="currency">${opts(["COP", "USD"], c.currency)}</select></span>
+      <span>Vinculación con ESM</span><span class="val"><input type="date" data-k="linked" value="${c.linked}"></span>
+      <span>Estado ${ERP}</span><span class="val">${c.status}</span>
+    </div></div>
+    <div class="section"><h2>Criterios de evaluación</h2><div class="fields">
+      <span>Actividad desarrollada</span><span class="val"><select data-k="activity">${opts(Object.keys(ACT), c.activity)}</select></span>
+      <span>Programa de seguridad</span><span class="val"><select data-k="security">${opts(Object.keys(SEC), c.security)}</select></span>
+      <span>Trayectoria ${CALC}</span><span class="val">${c.track}</span>
+      <span>Rango de monto ${CALC}</span><span class="val">${c.range}</span>
+    </div></div>
+    <div class="section"><h2>Nivel de riesgo ${CALC}</h2><div class="score-grid">
+      <div class="score"><small>Jurisdicción territorial</small><b>${c.sJur}</b></div>
+      <div class="score"><small>Actividad</small><b>${c.sAct}</b></div>
+      <div class="score"><small>Trayectoria</small><b>${c.sTrack}</b></div>
+      <div class="score"><small>Monto</small><b>${c.sAmount}</b></div>
+      <div class="score"><small>Seguridad en la cadena</small><b>${c.sSec}</b></div>
+      <div class="score total"><small>Valoración</small><b>${c.score} <span class="badge ${c.risk}" style="font-size:13px;vertical-align:4px">${c.risk}</span></b></div>
+    </div></div>
+    <div class="section"><h2>Medidas de control</h2><div class="fields">
+      <span>Actualización aplica ${CALC}</span><span class="val">${c.docApplies}</span>
+      <span>Última actualización</span><span class="val"><input type="date" data-k="docDate" value="${c.docDate}"></span>
+      <span>Estado documentación ${CALC}</span><span class="val ${c.docState === "Vigente" ? "ok" : "warn"}">${c.docState}</span>
+      <span>Visita a instalaciones ${CALC}</span><span class="val ${c.visit === "No cumple" ? "warn" : c.visit === "Cumple" ? "ok" : ""}">${c.visit}</span>
+    </div>
+    <table class="visits"><thead><tr><th>Fecha de visita</th><th>Concepto</th><th>Recomendaciones</th></tr></thead><tbody>
+      ${c.visits.length ? c.visits.map((v) => `<tr><td>${fmtDate(v[0])}</td><td>${v[1]}</td><td>${v[2]}</td></tr>`).join("") : `<tr><td colspan="3">Sin visitas registradas.</td></tr>`}
+    </tbody></table>
+    <button class="link-btn" type="button" style="margin-top:8px"><span class="material-icons" aria-hidden="true">add</span>Agregar visita</button>
+    </div>`;
+  $("dBody").querySelectorAll("[data-k]").forEach((el) => el.onchange = () => {
+    c[el.dataset.k] = el.type === "number" ? Number(el.value) : el.value;
+    calc(c); const y = $("dBody").scrollTop; drawDetail(c); $("dBody").scrollTop = y;
+  });
+}
+
+$("backToMatrix").onclick = () => { $("matrixView").hidden = false; $("clientsPanel").hidden = true; $("detailView").hidden = true; render(); };
+$("q").oninput = render;
+Object.keys(filters).forEach((id) => $(id).onchange = render);
+$("clear").onclick = () => { $("q").value = ""; Object.keys(filters).forEach((id) => $(id).value = ""); kpiFilter = null; render(); };
+render();
+if (data.some((c) => c.sap === location.hash.slice(1))) openClient(location.hash.slice(1));
+</script>
+</body>
+</html>

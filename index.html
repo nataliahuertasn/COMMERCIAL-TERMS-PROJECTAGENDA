@@ -21,7 +21,9 @@
   .rail div { height: 54px; margin-left: 6px; background: #f2f2f2; display: flex; align-items: center; justify-content: center; color: var(--blue); }
 
   .clients { width: 450px; flex: none; display: flex; flex-direction: column; border-right: 1px solid #eeeeee; min-height: 0; }
-  .clients-tab { width: 200px; margin: 20px 0 10px 4px; padding-bottom: 8px; border-bottom: 2px solid var(--blue); color: var(--blue); text-align: center; font-size: 17px; font-weight: 500; letter-spacing: 1px; }
+  .module-tabs { display: flex; gap: 8px; margin: 20px 0 10px 4px; }
+  .clients-tab { width: 200px; padding-bottom: 8px; border-bottom: 2px solid var(--blue); color: var(--blue); text-align: center; font-size: 17px; font-weight: 500; letter-spacing: 1px; }
+  .clients-tab.other { border-bottom-color: transparent; color: var(--muted); text-decoration: none; }
   .search { display: flex; align-items: center; gap: 8px; height: 50px; margin: 0 10px 18px 4px; padding: 0 30px; border-radius: 25px; background: #eeeeee; color: #9e9e9e; font-size: 19px; }
   .search .material-icons { color: var(--muted); font-size: 30px; }
   .sort { display: flex; align-items: center; justify-content: space-between; padding: 0 10px 18px 20px; border-bottom: 1px solid #eeeeee; font-size: 19px; }
@@ -106,7 +108,7 @@
   <nav class="rail" aria-label="Módulos"><div><span class="material-icons" aria-hidden="true">person</span></div></nav>
 
   <aside class="clients">
-    <div class="clients-tab">CLIENTS</div>
+    <div class="module-tabs"><span class="clients-tab">CLIENTS</span><a class="clients-tab other" href="customer-matrix.html">CUSTOMER MATRIX</a></div>
     <div class="search"><span class="material-icons" aria-hidden="true">search</span>Search</div>
     <div class="sort">
       <span class="sort-name">Name <span class="material-icons" aria-hidden="true">expand_less</span></span>
@@ -122,7 +124,7 @@
   </aside>
 
   <main class="detail">
-    <div class="tabs"><span class="active">GENERAL INFORMATION</span><span>DOCUMENTS</span><span>QUOTES</span></div>
+    <div class="tabs"><span class="active">GENERAL INFORMATION</span><span>DOCUMENTS</span><span>QUOTES</span><a href="customer-matrix.html#900102" style="display:flex;align-items:center;padding:0 20px;color:inherit;text-decoration:none">CUSTOMER MATRIX</a></div>
     <div class="title">
       <span class="material-icons building" aria-hidden="true">apartment</span>
       <h1>Cliente de ejemplo B</h1>
