@@ -27,15 +27,15 @@
   .module-tabs .active { border-bottom-color: var(--blue); color: var(--blue); cursor: default; }
 
   .matrix { flex: 1; min-width: 0; display: flex; flex-direction: column; padding-right: 20px; }
-  .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 6px 0 14px 4px; }
+  .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 6px 0 14px 4px; }
   .search { display: flex; align-items: center; gap: 8px; width: 380px; max-width: 100%; height: 50px; padding: 0 24px; border-radius: 25px; background: #eeeeee; }
   .search .material-icons { color: var(--muted); font-size: 28px; }
   .search input { flex: 1; min-width: 0; border: 0; background: none; outline: none; font-size: 18px; }
   .search input::placeholder { color: #9e9e9e; }
   .filter { position: relative; }
-  .filter select { max-width: 200px; text-overflow: ellipsis; height: 40px; padding: 0 34px 0 14px; border: 1px solid #bdbdbd; border-radius: 20px; background: #fff; appearance: none; font-size: 15px; color: var(--muted); cursor: pointer; }
+  .filter select { max-width: 180px; text-overflow: ellipsis; height: 32px; padding: 0 28px 0 12px; border: 1px solid #bdbdbd; border-radius: 20px; background: #fff; appearance: none; font-size: 13px; color: var(--muted); cursor: pointer; }
   .filter select.on { border-color: var(--blue); background: var(--blue-soft); color: var(--blue); }
-  .filter::after { content: "arrow_drop_down"; font-family: "Material Icons"; position: absolute; right: 8px; top: 8px; font-size: 24px; color: var(--muted); pointer-events: none; }
+  .filter::after { content: "arrow_drop_down"; font-family: "Material Icons"; position: absolute; right: 8px; top: 6px; font-size: 20px; color: var(--muted); pointer-events: none; }
   .link-btn { display: flex; align-items: center; gap: 4px; border: 0; background: none; color: var(--blue); font-size: 15px; font-weight: 500; cursor: pointer; padding: 6px 4px; }
   .spacer { flex: 1; }
   .meta { color: var(--muted); font-size: 14px; }
@@ -238,11 +238,12 @@
   .col-sp { display: block; height: 30px; }
   thead tr.cols th { height: auto; padding-top: 8px; padding-bottom: 6px; vertical-align: bottom; }
   thead tr.cols th .col-f { min-width: 90px; font-size: 13px; font-weight: 400; height: 26px; }
-  .io-btn { display: flex; align-items: center; gap: 6px; height: 42px; padding: 0 20px; border: 0; border-radius: 21px; color: #fff; font-size: 16px; font-weight: 500; letter-spacing: 1px; cursor: pointer; }
+  .io-group { display: flex; align-items: center; gap: 8px; margin-left: auto; white-space: nowrap; }
+  .io-btn { display: flex; align-items: center; gap: 4px; height: 32px; padding: 0 14px; border: 0; border-radius: 16px; color: #fff; font-size: 13px; font-weight: 500; letter-spacing: 1px; cursor: pointer; }
   .io-btn.import { background: #4caf50; }
   .io-btn.export { background: #2196f3; }
   .io-btn.busy { opacity: .6; cursor: progress; }
-  .io-btn .material-icons { font-size: 22px; }
+  .io-btn .material-icons { font-size: 18px; }
   .imp-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
   .imp-stats div { padding: 10px 14px; border: 1px solid var(--line); border-radius: 8px; }
   .imp-stats small { display: block; color: var(--muted); font-size: 13px; }
@@ -324,9 +325,6 @@
       <button class="active" type="button">CUSTOMER MATRIX</button>
     </div>
     <div class="toolbar">
-      <button type="button" class="io-btn import" id="mxImport"><span class="material-icons" aria-hidden="true">upload_file</span>IMPORT</button>
-      <button type="button" class="io-btn export" id="mxExport"><span class="material-icons" aria-hidden="true">download</span>EXPORT</button>
-      <input type="file" id="mxFile" accept=".xlsx" hidden>
       <span class="filter"><select id="fRisk" aria-label="Risk level"><option value="">Risk level</option><option>LOW</option><option>MEDIUM</option><option>HIGH</option></select></span>
       <span class="filter"><select id="fType" aria-label="Customer type"><option value="">Customer type</option><option>National</option><option>International</option></select></span>
       <span class="filter"><select id="fCountry" aria-label="Jurisdiction"><option value="">Jurisdiction</option></select></span>
@@ -336,7 +334,12 @@
       <span class="filter"><select id="fStatus" aria-label="Status"><option value="">Status</option><option>Active</option><option>Inactive</option></select></span>
       <button class="link-btn" id="clear" type="button" hidden><span class="material-icons" aria-hidden="true">close</span>Clear filters</button>
       <span class="spacer"></span>
+      <span class="io-group">
       <span class="meta">MT01-PRSA-02 · Version 02</span>
+      <button type="button" class="io-btn import" id="mxImport"><span class="material-icons" aria-hidden="true">upload_file</span>IMPORT</button>
+      <button type="button" class="io-btn export" id="mxExport"><span class="material-icons" aria-hidden="true">download</span>EXPORT</button>
+      <input type="file" id="mxFile" accept=".xlsx" hidden>
+      </span>
     </div>
     <div class="kpis" id="kpis"></div>
     <div class="table-wrap">
