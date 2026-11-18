@@ -235,6 +235,27 @@
   .col-h { display: block; margin-bottom: 4px; white-space: nowrap; }
   .col-f { width: 100%; min-width: 70px; height: 30px; padding: 0 2px; border: 0; border-bottom: 1px solid #9e9e9e; background: none; color: var(--text); font-size: 15px; font-weight: 500; }
   .col-f:focus { outline: none; border-bottom: 2px solid var(--blue); }
+  .col-sp { display: block; height: 30px; }
+  thead tr.cols th { height: auto; padding-top: 8px; padding-bottom: 6px; vertical-align: bottom; }
+  thead tr.cols th .col-f { min-width: 90px; font-size: 13px; font-weight: 400; height: 26px; }
+  .io-btn { display: flex; align-items: center; gap: 6px; height: 42px; padding: 0 20px; border: 0; border-radius: 21px; color: #fff; font-size: 16px; font-weight: 500; letter-spacing: 1px; cursor: pointer; }
+  .io-btn.import { background: #4caf50; }
+  .io-btn.export { background: #2196f3; }
+  .io-btn.busy { opacity: .6; cursor: progress; }
+  .io-btn .material-icons { font-size: 22px; }
+  .imp-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+  .imp-stats div { padding: 10px 14px; border: 1px solid var(--line); border-radius: 8px; }
+  .imp-stats small { display: block; color: var(--muted); font-size: 13px; }
+  .imp-stats b { font-size: 24px; font-weight: 500; }
+  .modal h4 { margin: 20px 0 6px; color: var(--text); font-size: 15px; font-weight: 500; }
+  .imp-list { margin: 0; padding-left: 18px; color: var(--text); font-size: 14px; line-height: 1.6; }
+  .imp-list.warn { color: var(--high); }
+  .imp-list b { font-weight: 500; }
+  .imp-empty { margin: 18px 0 0; color: var(--muted); }
+  .m-foot { gap: 12px; }
+  .m-save.secondary { background: #fff; color: var(--blue); border: 1px solid var(--blue); }
+  .notice { position: fixed; left: 50%; bottom: 70px; z-index: 60; transform: translateX(-50%); max-width: calc(100% - 32px); padding: 12px 20px; border-radius: 6px; background: #323232; color: #fff; font-size: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, .3); }
+  .notice.error { background: var(--high); }
   footer { flex: none; display: flex; justify-content: space-between; gap: 16px; padding: 12px 24px; background: #fafafa; font-size: 18px; }
   [hidden] { display: none !important; }
   @media (max-width: 1500px) { .contacts { grid-template-columns: 219px minmax(0, 328px) 70px; } .contacts .predef { display: none; } }
@@ -303,7 +324,9 @@
       <button class="active" type="button">CUSTOMER MATRIX</button>
     </div>
     <div class="toolbar">
-      <label class="search"><span class="material-icons" aria-hidden="true">search</span><input id="q" type="search" placeholder="Search" aria-label="Search by company name, SAP code, ID or city"></label>
+      <button type="button" class="io-btn import" id="mxImport"><span class="material-icons" aria-hidden="true">upload_file</span>IMPORT</button>
+      <button type="button" class="io-btn export" id="mxExport"><span class="material-icons" aria-hidden="true">download</span>EXPORT</button>
+      <input type="file" id="mxFile" accept=".xlsx" hidden>
       <span class="filter"><select id="fRisk" aria-label="Risk level"><option value="">Risk level</option><option>BAJO</option><option>MEDIO</option><option>ALTO</option></select></span>
       <span class="filter"><select id="fType" aria-label="Customer type"><option value="">Customer type</option><option>Nacional</option><option>Internacional</option></select></span>
       <span class="filter"><select id="fCountry" aria-label="Jurisdiction"><option value="">Jurisdiction</option></select></span>
@@ -313,7 +336,7 @@
       <span class="filter"><select id="fStatus" aria-label="Status"><option value="">Status</option><option>Activo</option><option>Inactivo</option></select></span>
       <button class="link-btn" id="clear" type="button" hidden><span class="material-icons" aria-hidden="true">close</span>Clear filters</button>
       <span class="spacer"></span>
-      <span class="meta">MT01-PRSA-02 · Version 02 · Updated<span id="updated"></span></span>
+      <span class="meta">MT01-PRSA-02 · Version 02 · Updated <span id="updated"></span></span>
     </div>
     <div class="kpis" id="kpis"></div>
     <div class="table-wrap">
@@ -486,9 +509,10 @@ const fill = (id, key) => [...new Set(data.map((c) => c[key]))].sort().forEach((
 fill("fCountry", "country"); fill("fActivity", "activity"); fill("fSec", "security");
 $("updated").textContent = TODAY.toLocaleDateString("es-CO", { day: "2-digit", month: "2-digit", year: "numeric" });
 
+let colQ = [];
+const cellText = (c, key, f) => String(f ? f(val(c, key), c) : val(c, key) ?? "").replace(/<[^>]*>/g, "").toLowerCase();
 function filtered() {
-  const q = $("q").value.trim().toLowerCase();
-  return data.filter((c) => (!q || [c.name, c.sap, c.idNum, c.city].join(" ").toLowerCase().includes(q))
+  return data.filter((c) => COLS.every(([key, , , f], j) => !(colQ[j] || "").trim() || cellText(c, key, f).includes(colQ[j].trim().toLowerCase()))
     && Object.entries(filters).every(([id, key]) => !$(id).value || c[key] === $(id).value)
     && (!kpiFilter || c[kpiFilter[0]] === kpiFilter[1]))
     .sort((a, b) => { const x = val(a, sortKey), y = val(b, sortKey); return (x > y ? 1 : x < y ? -1 : 0) * sortDir; });
@@ -504,14 +528,15 @@ function renderKpis() {
 function refill() { { const v = $("fRisk").value; $("fRisk").innerHTML = `<option value="">Risk level</option>` + RISK_LEVELS.map((r) => `<option>${esc(r.label)}</option>`).join(""); $("fRisk").value = v; } [["fCountry", "country", "Jurisdiction"], ["fActivity", "activity", "Business activity"], ["fSec", "security", "Security program"]].forEach(([id, key, label]) => { const v = $(id).value; $(id).innerHTML = `<option value="">${label}</option>` + [...new Set(data.map((c) => c[key]))].sort().map((o) => `<option>${esc(o)}</option>`).join(""); $(id).value = v; }); }
 function renderMatrix() {
   refill();
-  $("cols").innerHTML = COLS.map(([key, label, cls = ""]) => `<th class="${cls.replace(/name|wrap/, "")}" data-key="${key}">${label} ${sortKey === key ? `<span class="material-icons" aria-hidden="true">${sortDir > 0 ? "arrow_upward" : "arrow_downward"}</span>` : ""}</th>`).join("");
-  $("cols").querySelectorAll("th").forEach((th) => th.onclick = () => { sortDir = sortKey === th.dataset.key ? -sortDir : 1; sortKey = th.dataset.key; renderMatrix(); });
+  $("cols").innerHTML = COLS.map(([key, label, cls = ""], j) => `<th class="${cls.replace(/name|wrap/, "")}" data-key="${key}"><span class="col-h">${label} ${sortKey === key ? `<span class="material-icons" aria-hidden="true">${sortDir > 0 ? "arrow_upward" : "arrow_downward"}</span>` : ""}</span><input class="col-f" data-mq="${j}" value="${esc(colQ[j] || "")}" aria-label="Filter ${label}"></th>`).join("");
+  $("cols").querySelectorAll("th").forEach((th) => th.onclick = (e) => { if (e.target.closest("input")) return; sortDir = sortKey === th.dataset.key ? -sortDir : 1; sortKey = th.dataset.key; renderMatrix(); });
+  $("cols").querySelectorAll("[data-mq]").forEach((el) => el.oninput = () => { const j = +el.dataset.mq, pos = el.selectionStart; colQ[j] = el.value; renderMatrix(); const n = $("cols").querySelector(`[data-mq="${j}"]`); n.focus(); n.setSelectionRange(pos, pos); });
   const rows = filtered();
   $("rows").innerHTML = rows.length ? rows.map((c) => `<tr data-sap="${c.sap}">${COLS.map(([key, , cls = "", f]) => { const v = val(c, key); return `<td class="${cls}">${f ? f(v, c) : esc(v)}</td>`; }).join("")}</tr>`).join("")
     : `<tr><td class="empty" colspan="${COLS.length}">No customers match these filters.</td></tr>`;
   $("rows").querySelectorAll("tr[data-sap]").forEach((tr) => tr.onclick = () => go("clients", tr.dataset.sap, "matrix"));
   Object.keys(filters).forEach((id) => $(id).classList.toggle("on", !!$(id).value));
-  $("clear").hidden = !(Object.keys(filters).some((id) => $(id).value) || $("q").value || kpiFilter);
+  $("clear").hidden = !(Object.keys(filters).some((id) => $(id).value) || colQ.some((v) => (v || "").trim()) || kpiFilter);
   $("count").textContent = `${rows.length} of ${data.length} customers`;
   renderKpis();
 }
@@ -623,9 +648,8 @@ function go(view, sap = current, t = tab, push = true) {
 document.querySelectorAll("[data-go]").forEach((b) => b.onclick = () => go(b.dataset.go));
 $("dToggle").onclick = () => { const c = data.find((x) => x.sap === current); c.status = c.status === "Activo" ? "Inactivo" : "Activo"; renderClients(); };
 $("detailTabs").querySelectorAll("[data-tab]").forEach((b) => b.onclick = () => go("clients", current, b.dataset.tab));
-$("q").oninput = renderMatrix;
 Object.keys(filters).forEach((id) => $(id).onchange = renderMatrix);
-$("clear").onclick = () => { $("q").value = ""; Object.keys(filters).forEach((id) => $(id).value = ""); kpiFilter = null; renderMatrix(); };
+$("clear").onclick = () => { colQ = []; Object.keys(filters).forEach((id) => $(id).value = ""); kpiFilter = null; renderMatrix(); };
 
 const SETTINGS = [["ct", "Commercial Terms"], ["cm", "Customer Matrix"]];
 const CM_TABS = [["jur", "JURISDICTION"], ["act", "ACTIVITIES"], ["tray", "TRACK RECORD"], ["monto", "AMOUNTS"], ["cert", "SECURITY"], ["interp", "RISK LEVEL"], ["control", "CONTROL MEASURES"]];
@@ -721,7 +745,7 @@ function renderCatalog(cfg) {
   const warn = cfg.warn ? cfg.warn() : "";
   body.innerHTML = `<div class="cat">
     <div class="cat-head"><h2>${cfg.title}</h2><button class="btn-new" type="button" id="catNew"><span class="material-icons" aria-hidden="true">add</span>NEW</button></div>
-    <div class="cat-body"><table class="cat-table"><thead><tr>${cfg.cols.map(([h], j) => `<th><span class="col-h">${h}</span><input class="col-f" data-cf="${j}" value="${esc(qs[j] || "")}" aria-label="Filter ${h}"></th>`).join("")}${cfg.enabled ? "<th>ENABLED</th>" : ""}<th class="act-col">ACTIONS</th></tr></thead>
+    <div class="cat-body"><table class="cat-table"><thead><tr>${cfg.cols.map(([h], j) => `<th><span class="col-h">${h}</span><input class="col-f" data-cf="${j}" value="${esc(qs[j] || "")}" aria-label="Filter ${h}"></th>`).join("")}${cfg.enabled ? `<th><span class="col-h">ENABLED</span><span class="col-sp"></span></th>` : ""}<th class="act-col"><span class="col-h">ACTIONS</span><span class="col-sp"></span></th></tr></thead>
       <tbody>${rows.length ? rows.map(([x, i]) => `<tr>${cfg.cols.map(([, f], j) => `<td class="${j === 0 ? "first" : ""}">${f(x)}</td>`).join("")}
         ${cfg.enabled ? `<td><button type="button" class="toggle mini ${x.enabled === false ? "off" : ""}" data-en="${i}" role="switch" aria-checked="${x.enabled !== false}" aria-label="Enabled"><i></i></button></td>` : ""}
         <td class="act-col"><button type="button" class="icon-btn" data-edit="${i}" aria-label="Edit" title="Edit"><span class="material-icons" aria-hidden="true">edit</span></button><button type="button" class="icon-btn del" data-del="${i}" aria-label="Delete" title="Delete"><span class="material-icons" aria-hidden="true">delete</span></button></td></tr>`).join("")
@@ -836,6 +860,125 @@ function go(view, sap = current, t = tab, push = true, page = sPage, group = sGr
 }
 document.querySelectorAll(".rail [data-rail]").forEach((b) => b.onclick = () => go(b.dataset.rail));
 $("dBody").addEventListener("click", (e) => { if (e.target.closest("#toCT")) { ctClient = current; go("settings", current, tab, true, "ct", "ct"); } });
+
+const XL_EDIT = new Set(["idType", "idNum", "type", "founded", "amount", "currency", "linked", "country", "activity", "security", "docDate", "v20240", "v20241", "v20242", "v20250", "v20251", "v20252", "v20260", "v20261", "v20262"]);
+const XL_RECORD = new Set(["sap", "name", "city", "status"]);
+const XL_DATES = new Set(["founded", "linked", "docDate", "v20240", "v20250", "v20260"]);
+const XL_GROUPS = [["CUSTOMER IDENTIFICATION", 11], ["RISK ASSESSMENT CRITERIA", 5], ["CUSTOMER RISK RATING", 5], ["RISK LEVEL ASSESSMENT", 2], ["DOCUMENTATION UPDATE", 3], ["SITE VISIT", 1], ["YEAR 2024", 3], ["YEAR 2025", 3], ["YEAR 2026", 3]];
+const XL_NAMES = { docApplies: "DOCUMENTATION UPDATE APPLIES", docDate: "DOCUMENTATION UPDATE DATE", docState: "DOCUMENTATION STATUS", visit: "SITE VISIT STATUS" };
+const xlHeader = (key, label) => (key.startsWith("v20") ? `VISIT ${key.slice(1, 5)} ${label}` : XL_NAMES[key] || label);
+const XL_LISTS = () => ({ idType: TIPOS_ID, type: ["Nacional", "Internacional"], currency: ["COP", "USD"], country: JURD.map((r) => r[0]).sort((a, b) => a.localeCompare(b, "es")),
+  activity: ACTS.filter((a) => a.enabled !== false).map((a) => a.name), security: CERTS.filter((x) => x.enabled !== false).map((x) => x.name) });
+let excelLib = null;
+const loadExcel = () => excelLib || (excelLib = new Promise((ok, fail) => { if (window.ExcelJS) return ok(window.ExcelJS); const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"; s.onload = () => ok(window.ExcelJS); s.onerror = () => { excelLib = null; fail(new Error("load")); }; document.head.appendChild(s); }));
+const colLetter = (n) => { let s = ""; while (n > 0) { const m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = Math.floor((n - 1) / 26); } return s; };
+const isoDate = (v) => {
+  if (v === null || v === undefined || v === "") return "";
+  if (v instanceof Date) return Number.isNaN(+v) ? null : v.toISOString().slice(0, 10);
+  if (typeof v === "number") return new Date(Date.UTC(1899, 11, 30) + v * 864e5).toISOString().slice(0, 10);
+  const s = String(v).trim(), m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (m) return `${m[3]}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}`;
+  return /^\d{4}-\d{2}-\d{2}$/.test(s) ? s : null;
+};
+const cellVal = (cell) => { let v = cell.value; if (v && typeof v === "object" && !(v instanceof Date)) { if ("result" in v) v = v.result; else if (v.richText) v = v.richText.map((t) => t.text).join(""); else if (v.text) v = v.text; } return v ?? ""; };
+function busy(btn, on) { btn.disabled = on; btn.classList.toggle("busy", on); }
+
+async function exportMatrix() {
+  const btn = $("mxExport"); busy(btn, true);
+  try {
+    const ExcelJS = await loadExcel(), wb = new ExcelJS.Workbook(), ws = wb.addWorksheet("Customer Matrix", { views: [{ state: "frozen", xSplit: 2, ySplit: 2 }] });
+    const lists = XL_LISTS(), lw = wb.addWorksheet("Lists", { state: "veryHidden" }), listRef = {};
+    Object.entries(lists).forEach(([k, arr], i) => { const L = colLetter(i + 1); lw.getCell(`${L}1`).value = k; arr.forEach((v, j) => { lw.getCell(`${L}${j + 2}`).value = v; }); listRef[k] = `Lists!$${L}$2:$${L}$${arr.length + 1}`; });
+    const fill = (argb) => ({ type: "pattern", pattern: "solid", fgColor: { argb } }), thin = { style: "thin", color: { argb: "FFD0D0D0" } }, border = { top: thin, left: thin, bottom: thin, right: thin };
+    let c = 1; XL_GROUPS.forEach(([g, n]) => { ws.mergeCells(1, c, 1, c + n - 1); const cell = ws.getCell(1, c); cell.value = g; cell.font = { bold: true, color: { argb: "FF424242" } }; cell.fill = fill("FFEEEEEE"); cell.alignment = { horizontal: "center" }; c += n; });
+    COLS.forEach(([key, label], i) => {
+      const cell = ws.getCell(2, i + 1), kind = XL_EDIT.has(key) ? "edit" : XL_RECORD.has(key) ? "record" : "calc";
+      cell.value = xlHeader(key, label) + (kind === "calc" ? " (CALCULATED)" : "");
+      cell.font = { bold: true, color: { argb: kind === "edit" ? "FFFFFFFF" : "FF424242" } };
+      cell.fill = fill(kind === "edit" ? "FF1976D2" : kind === "record" ? "FFE0E0E0" : "FFBDBDBD");
+      cell.alignment = { wrapText: true, vertical: "middle" }; cell.border = border;
+      cell.note = kind === "edit" ? "Editable" : kind === "record" ? "From the customer record. Not editable here." : "Calculated with the Excel formula. Not editable.";
+      ws.getColumn(i + 1).width = Math.max(12, Math.min(40, label.length + 4));
+    });
+    ws.getRow(2).height = 42;
+    data.forEach((cl, r) => COLS.forEach(([key], i) => {
+      const cell = ws.getCell(r + 3, i + 1), v = val(cl, key), kind = XL_EDIT.has(key) ? "edit" : XL_RECORD.has(key) ? "record" : "calc";
+      cell.value = XL_DATES.has(key) ? (v ? new Date(v + "T00:00:00Z") : null) : v === "" ? null : v;
+      if (XL_DATES.has(key)) cell.numFmt = "dd/mm/yyyy"; if (key === "amount") cell.numFmt = "#,##0";
+      cell.border = border;
+      if (kind === "edit") cell.protection = { locked: false }; else { cell.fill = fill(kind === "record" ? "FFF5F5F5" : "FFEEEEEE"); cell.font = { italic: kind === "calc", color: { argb: "FF616161" } }; }
+    }));
+    const last = data.length + 2;
+    COLS.forEach(([key], i) => { if (listRef[key]) ws.dataValidations.add(`${colLetter(i + 1)}3:${colLetter(i + 1)}${last}`, { type: "list", allowBlank: true, formulae: [listRef[key]], showErrorMessage: true, errorTitle: "Invalid value", error: "Choose a value from the list." }); });
+    ws.autoFilter = { from: { row: 2, column: 1 }, to: { row: last, column: COLS.length } };
+    await ws.protect("", { selectLockedCells: true, selectUnlockedCells: true, formatColumns: true, formatRows: true, autoFilter: true, sort: false });
+    const info = wb.addWorksheet("Instructions");
+    [["Customer Matrix template"], [""], ["Blue columns: editable. Change the values and import the file in Customer Matrix > IMPORT."], ["Light grey columns: come from the customer record (SAP code, company name, city, status). Not editable here."],
+      ["Dark grey columns marked (CALCULATED): calculated with the Excel formulas. They are locked and recalculated after the import."], ["Do not add, remove or reorder rows or columns. Rows are matched by SAP code."]].forEach((row, i) => { info.getCell(i + 1, 1).value = row[0]; });
+    info.getCell(1, 1).font = { bold: true, size: 14 }; info.getColumn(1).width = 110;
+    const buf = await wb.xlsx.writeBuffer(), a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
+    a.download = `Customer_Matrix_${TODAY.toISOString().slice(0, 10)}.xlsx`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  } catch (e) { notice("The Excel file couldn't be created. Check your internet connection and try again.", true); }
+  busy(btn, false);
+}
+
+async function importMatrix(file) {
+  const btn = $("mxImport"); busy(btn, true);
+  try {
+    const ExcelJS = await loadExcel(), wb = new ExcelJS.Workbook(); await wb.xlsx.load(await file.arrayBuffer());
+    const ws = wb.getWorksheet("Customer Matrix");
+    const expected = COLS.map(([key, label]) => xlHeader(key, label) + (XL_EDIT.has(key) || XL_RECORD.has(key) ? "" : " (CALCULATED)"));
+    if (!ws || expected.some((h, i) => String(cellVal(ws.getCell(2, i + 1))).trim() !== h)) { busy(btn, false); return notice("This file doesn't match the Customer Matrix template. Use EXPORT to download it again.", true); }
+    const lists = XL_LISTS(), errors = [], changes = [], seen = new Set();
+    for (let r = 3; r <= ws.rowCount; r++) {
+      const sap = String(cellVal(ws.getCell(r, 1))).trim(); if (!sap) continue;
+      const cl = data.find((x) => x.sap === sap);
+      if (!cl) { errors.push(`Row ${r}: SAP code ${sap} doesn't exist.`); continue; }
+      if (seen.has(sap)) { errors.push(`Row ${r}: SAP code ${sap} is repeated.`); continue; } seen.add(sap);
+      const rowChanges = []; let bad = false;
+      COLS.forEach(([key, label], i) => {
+        if (!XL_EDIT.has(key)) return;
+        let v = cellVal(ws.getCell(r, i + 1));
+        if (XL_DATES.has(key)) { const d = isoDate(v); if (d === null) { errors.push(`Row ${r} (${sap}), ${xlHeader(key, label)}: "${v}" isn't a valid date.`); bad = true; return; } v = d; }
+        else if (key === "amount") { const n = v === "" ? 0 : Number(String(v).replace(/[^\d.-]/g, "")); if (Number.isNaN(n)) { errors.push(`Row ${r} (${sap}), ${label}: "${v}" isn't a number.`); bad = true; return; } v = n; }
+        else v = String(v).trim();
+        if (lists[key] && v !== "" && !lists[key].includes(v) && v !== val(cl, key)) { errors.push(`Row ${r} (${sap}), ${label}: "${v}" isn't in the list.`); bad = true; return; }
+        const cur = val(cl, key) ?? "";
+        if (String(cur) !== String(v)) rowChanges.push({ cl, key, label: xlHeader(key, label), from: cur, to: v });
+      });
+      if (!bad) changes.push(...rowChanges);
+    }
+    busy(btn, false); showImportSummary(changes, errors);
+  } catch (e) { busy(btn, false); notice("The file couldn't be read. Make sure it's the .xlsx template from EXPORT.", true); }
+}
+
+function showImportSummary(changes, errors) {
+  const customers = new Set(changes.map((c) => c.cl.sap)).size, fmt = (k, v) => (XL_DATES.has(k) ? fmtDate(v) : k === "amount" ? fmtMoney(v) : v) || "—";
+  const back = document.createElement("div"); back.className = "modal-back";
+  back.innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-labelledby="iTitle">
+    <div class="m-head"><button type="button" class="m-close" aria-label="Close"><span class="material-icons" aria-hidden="true">close</span></button><h3 id="iTitle">Import Customer Matrix</h3></div>
+    <div class="imp-stats"><div><small>Customers to update</small><b>${customers}</b></div><div><small>Changes</small><b>${changes.length}</b></div><div><small>Errors</small><b class="${errors.length ? "warn" : ""}">${errors.length}</b></div></div>
+    ${errors.length ? `<h4>Errors (these rows won't be imported)</h4><ul class="imp-list warn">${errors.slice(0, 10).map((e) => `<li>${esc(e)}</li>`).join("")}${errors.length > 10 ? `<li>And ${errors.length - 10} more.</li>` : ""}</ul>` : ""}
+    ${changes.length ? `<h4>Changes</h4><ul class="imp-list">${changes.slice(0, 12).map((c) => `<li><b>${esc(c.cl.sap)} · ${esc(c.cl.name)}</b> · ${esc(c.label)}: ${esc(fmt(c.key, c.from))} → ${esc(fmt(c.key, c.to))}</li>`).join("")}${changes.length > 12 ? `<li>And ${changes.length - 12} more.</li>` : ""}</ul>` : `<p class="imp-empty">There are no changes to import.</p>`}
+    <div class="m-foot"><button type="button" class="m-save secondary" id="iCancel">CANCEL</button><button type="button" class="m-save" id="iApply" ${changes.length ? "" : "disabled"}>APPLY CHANGES</button></div></div>`;
+  document.body.appendChild(back);
+  const close = () => back.remove();
+  back.onclick = (e) => { if (e.target === back) close(); };
+  back.querySelector(".m-close").onclick = close; back.querySelector("#iCancel").onclick = close;
+  back.querySelector("#iApply").onclick = () => {
+    changes.forEach(({ cl, key, to }) => { if (key.startsWith("v20")) cl.visits[key.slice(1, 5)][key[5]] = to; else cl[key] = to; });
+    data.forEach(calc); close(); renderMatrix(); notice(`${customers} customers updated (${changes.length} changes).`);
+  };
+}
+
+function notice(text, isError = false) {
+  let n = $("mxNotice"); if (!n) { n = document.createElement("div"); n.id = "mxNotice"; n.setAttribute("role", "status"); document.body.appendChild(n); }
+  n.className = isError ? "notice error" : "notice"; n.textContent = text; n.hidden = false; clearTimeout(n._t); n._t = setTimeout(() => { n.hidden = true; }, 6000);
+}
+$("mxExport").onclick = exportMatrix;
+$("mxImport").onclick = () => $("mxFile").click();
+$("mxFile").onchange = (e) => { const f = e.target.files[0]; e.target.value = ""; if (f) importMatrix(f); };
 
 const [h1, h2] = location.hash.slice(1).split("/");
 if (h1 === "matrix") go("matrix", current, tab, false);
