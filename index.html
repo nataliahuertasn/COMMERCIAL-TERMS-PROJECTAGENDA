@@ -182,6 +182,18 @@
   .chip { display: inline-block; padding: 2px 8px; border-radius: 12px; background: var(--blue-soft); color: #0d47a1; font-family: Consolas, monospace; font-size: 13px; }
   .alert { margin-top: 8px; color: var(--high); font-size: 14px; }
   @media (max-width: 1300px) { .ct-grid { grid-template-columns: minmax(0, 1fr); } .cfg { grid-template-columns: 220px 160px; } .cfg small { grid-column: 1 / -1; margin-top: -10px; } }
+  .ct-toolbar { display: flex; gap: 12px; margin: 4px 0 14px; }
+  .outline-btn { display: flex; align-items: center; gap: 6px; height: 40px; padding: 0 16px; border: 1px solid var(--blue); border-radius: 20px; background: #fff; color: var(--blue); font-size: 14px; font-weight: 500; letter-spacing: .5px; cursor: pointer; white-space: nowrap; }
+  .outline-btn .material-icons { font-size: 20px; }
+  .ct-editor { max-width: 1100px; min-height: 600px; padding: 16px 18px; border: 1px solid #9e9e9e; border-radius: 4px; color: var(--text); font-size: 15px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .ct-editor:focus { outline: 2px solid var(--blue); outline-offset: -1px; }
+  .pt-chip { display: inline-block; padding: 1px 12px; border-radius: 14px; background: var(--blue-soft); color: #0d47a1; font-size: 14px; font-weight: 500; user-select: none; }
+  .icon-btn { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 0; border-radius: 50%; background: none; color: var(--soft); cursor: pointer; }
+  .icon-btn:hover { background: #f2f2f2; color: var(--high); }
+  .stable input.name-in { width: 100%; min-width: 320px; }
+  .stable input.name-in.short { min-width: 160px; }
+  .stable input.money { width: 150px; }
+  .stable tr.add-row td { background: #fafafa; }
   footer { flex: none; display: flex; justify-content: space-between; gap: 16px; padding: 12px 24px; background: #fafafa; font-size: 18px; }
   [hidden] { display: none !important; }
   @media (max-width: 1500px) { .contacts { grid-template-columns: 219px minmax(0, 328px) 70px; } .contacts .predef { display: none; } }
@@ -322,7 +334,12 @@ const MONTOS = { "Menor $600.000.000": 1, "Entre $600.000.000 y $1.200.000.000":
 const CERT = { "No Certificado": 0, "Otros Programas": 0, "OEA": -3, "AEO": -3, "CTPAT": -3, "ATT": -3, "GOLDEN LIST": -3, "NECC": -3, "OEC": -3, "PIP": -3, "SES": -3, "SAOC": -3, "STP": -3, "PROFAC": -3 };
 const TIPOS_ID = ["NIT", "NITE", "TID", "Tax ID", "RUC"];
 const CFG = { cop1: 600000000, cop2: 1200000000, usd1: 217000, usd2: 434000, alto: 10, medio: 7, vigencia: 730 };
-const ACT_SCORE = Object.fromEntries(ACTIVIDADES.map((a) => [a, a === "Actividades no Incluidas en las dos categorías siguientes" ? 1 : a === "Distribuidores" ? 2 : 3]));
+let ACTS = ACTIVIDADES.map((name) => ({ name, score: name === "Actividades no Incluidas en las dos categorías siguientes" ? 1 : name === "Distribuidores" ? 2 : 3 }));
+let CERTS = Object.entries(CERT).map(([name, score]) => ({ name, score }));
+let TRAY_RULES = [{ label: "<1 año", from: 0, to: 0, score: 3 }, { label: "1<>3 años", from: 1, to: 3, score: 2 }, { label: "> 3 años", from: 4, to: "", score: 1 }];
+let MONTO_RULES = [{ label: "Menor $600.000.000", cop: 599999999, usd: 217000, score: 1 }, { label: "Entre $600.000.000 y $1.200.000.000", cop: 1200000000, usd: 434000, score: 2 }, { label: "Mayor a $1.200.000.000", cop: "", usd: "", score: 3 }];
+const RISK = { MEDIO: 7, ALTO: 10 };
+const riskOf = (s) => (s >= RISK.ALTO ? "ALTO" : s >= RISK.MEDIO ? "MEDIO" : "BAJO");
 let CT_TEMPLATE = `INCLUSIONS
 
 1. Submittals as required for ES METALS scope portions of the project only
@@ -383,17 +400,19 @@ data[6].visits[2026] = ["2026-05-20", "Favorable", "Actualizar plan de contingen
 data[2].terms = "50% Advance, 50% Before shipment.";
 
 function calc(c) {
-  c.track = !c.founded ? "> 3 años" : yearsSince(c.founded) > 3 ? "> 3 años" : yearsSince(c.founded) < 1 ? "<1 año" : "1<>3 años";
-  const h = Number(c.amount) || 0;
-  c.range = c.currency === "COP" ? (h < CFG.cop1 ? "Menor $600.000.000" : h <= CFG.cop2 ? "Entre $600.000.000 y $1.200.000.000" : "Mayor a $1.200.000.000")
-    : c.currency === "USD" ? (h <= CFG.usd1 ? "Menor $600.000.000" : h <= CFG.usd2 ? "Entre $600.000.000 y $1.200.000.000" : "Mayor a $1.200.000.000") : "0";
+  const yrs = c.founded ? yearsSince(c.founded) : Infinity;
+  const tr = TRAY_RULES.find((r) => yrs >= (r.from === "" ? -Infinity : r.from) && yrs <= (r.to === "" ? Infinity : r.to));
+  c.track = tr ? tr.label : "Sin rango";
+  const h = Number(c.amount) || 0, cur = c.currency === "COP" ? "cop" : c.currency === "USD" ? "usd" : "";
+  const mr = cur ? MONTO_RULES.find((r) => r[cur] === "" || h <= r[cur]) : null;
+  c.range = mr ? mr.label : "0";
   c.sJur = JUR[c.country] ?? "";
-  c.sAct = ACT_SCORE[c.activity] ?? 3;
-  c.sTrack = TRAYECTORIA[c.track] ?? "";
-  c.sAmount = MONTOS[c.range] ?? 1;
-  c.sSec = CERT[c.security] ?? "";
+  c.sAct = ACTS.find((a) => a.name === c.activity)?.score ?? 3;
+  c.sTrack = tr ? tr.score : "";
+  c.sAmount = mr ? mr.score : 1;
+  c.sSec = CERTS.find((x) => x.name === c.security)?.score ?? "";
   c.score = Math.round([c.sJur, c.sAct, c.sTrack, c.sAmount, c.sSec].reduce((a, b) => a + (typeof b === "number" ? b : 0), 0));
-  c.risk = c.score >= CFG.alto ? "ALTO" : c.score >= CFG.medio ? "MEDIO" : "BAJO";
+  c.risk = riskOf(c.score);
   c.docApplies = (TODAY - d(c.linked)) / DAY > CFG.vigencia ? "SI" : "NO";
   c.docState = c.docApplies === "NO" ? "Vigente" : !c.docDate ? "Pendiente por actualizar" : d(c.docDate) > TODAY - CFG.vigencia * DAY ? "Vigente" : "Pendiente por actualizar";
   const last = Object.values(c.visits).map((v) => v[0]).filter(Boolean).map(d).sort((a, b) => b - a)[0];
@@ -438,7 +457,9 @@ function renderKpis() {
   $("kpis").querySelectorAll(".kpi").forEach((b) => b.onclick = () => { const f = KPIS[b.dataset.i][1]; kpiFilter = f && !same(f) ? f : null; renderMatrix(); });
 }
 
+function refill() { [["fCountry", "country", "Jurisdicción territorial"], ["fActivity", "activity", "Actividades desarrolladas"], ["fSec", "security", "Programa de seguridad"]].forEach(([id, key, label]) => { const v = $(id).value; $(id).innerHTML = `<option value="">${label}</option>` + [...new Set(data.map((c) => c[key]))].sort().map((o) => `<option>${esc(o)}</option>`).join(""); $(id).value = v; }); }
 function renderMatrix() {
+  refill();
   $("cols").innerHTML = COLS.map(([key, label, cls = ""]) => `<th class="${cls.replace(/name|wrap/, "")}" data-key="${key}">${label} ${sortKey === key ? `<span class="material-icons" aria-hidden="true">${sortDir > 0 ? "arrow_upward" : "arrow_downward"}</span>` : ""}</th>`).join("");
   $("cols").querySelectorAll("th").forEach((th) => th.onclick = () => { sortDir = sortKey === th.dataset.key ? -sortDir : 1; sortKey = th.dataset.key; renderMatrix(); });
   const rows = filtered();
@@ -494,7 +515,7 @@ function drawGeneral(c) {
       <span id="pt-title">Payment Terms</span>
       <div class="terms-control">
         <textarea id="terms" aria-labelledby="pt-title">${esc(c.terms)}</textarea>
-        <div class="hint">Condiciones de pago de este cliente. Se insertarán en Commercial Terms de cada cotización nueva.</div><button type="button" class="link-btn" id="toCT" style="margin-top:6px;padding-left:0"><span class="material-icons" aria-hidden="true">visibility</span>Ver en Commercial Terms</button>
+        <div class="hint">Condiciones de pago de este cliente. Se insertarán en Commercial Terms de cada cotización nueva.</div>
       </div>
     </section>
   </div>`;
@@ -518,10 +539,10 @@ function drawMatrixTab(c) {
     </div></div>
     <div class="section"><h2>Criterios para evaluación del nivel de riesgo</h2><div class="fields">
       <span>Jurisdicción territorial</span><span class="val"><select data-k="country">${opts(Object.keys(JUR).sort((a, b) => a.localeCompare(b, "es")), c.country)}</select></span>
-      <span>Actividades desarrolladas</span><span class="val"><select data-k="activity">${opts(ACTIVIDADES, c.activity)}</select></span>
+      <span>Actividades desarrolladas</span><span class="val"><select data-k="activity">${opts(ACTS.map((a) => a.name), c.activity)}</select></span>
       <span>Trayectoria en el mercado ${CALC}</span><span class="val">${c.track}</span>
       <span>Monto de las operaciones ${CALC}</span><span class="val">${c.range}</span>
-      <span>Programa de seguridad en la cadena de suministro</span><span class="val"><select data-k="security">${opts(Object.keys(CERT), c.security)}</select></span>
+      <span>Programa de seguridad en la cadena de suministro</span><span class="val"><select data-k="security">${opts(CERTS.map((x) => x.name), c.security)}</select></span>
     </div></div>
     <div class="section"><h2>Calificación y evaluación del nivel de riesgo ${CALC}</h2><div class="score-grid">
       <div class="score"><small>Jurisdicción territorial</small><b>${c.sJur}</b></div>
@@ -563,7 +584,7 @@ Object.keys(filters).forEach((id) => $(id).onchange = renderMatrix);
 $("clear").onclick = () => { $("q").value = ""; Object.keys(filters).forEach((id) => $(id).value = ""); kpiFilter = null; renderMatrix(); };
 
 const SETTINGS = [["ct", "Commercial Terms"], ["cm", "Customer Matrix"]];
-const CM_TABS = [["jur", "JURISDICCIÓN TERRITORIAL"], ["act", "ACTIVIDADES DESARROLLADAS"], ["tray", "TRAYECTORIA"], ["monto", "MONTO DE LAS OPERACIONES"], ["cert", "PROGRAMA DE SEGURIDAD"], ["interp", "INTERPRETACIÓN"], ["control", "MEDIDAS DE CONTROL"]];
+const CM_TABS = [["jur", "JURISDICCIÓN"], ["act", "ACTIVIDADES"], ["tray", "TRAYECTORIA"], ["monto", "MONTOS"], ["cert", "SEGURIDAD"], ["interp", "NIVEL DE RIESGO"], ["control", "MEDIDAS DE CONTROL"]];
 let sGroup = "", sPage = "jur", ctClient = "900102", jurQuery = "";
 const scoreSel = (key, list, v) => `<select data-s="${esc(key)}">${list.map((o) => `<option value="${o}" ${String(o) === String(v) ? "selected" : ""}>${o === "" ? "—" : o}</option>`).join("")}</select>`;
 const keepScroll = (fn) => { const a = $("sBody").scrollTop, w = $("sBody").querySelector(".stable-wrap"), b = w ? w.scrollTop : 0; fn(); $("sBody").scrollTop = a; const w2 = $("sBody").querySelector(".stable-wrap"); if (w2) w2.scrollTop = b; };
@@ -582,20 +603,46 @@ function renderSettings() {
   renderSettingsPage();
 }
 
+const PT_CHIP = '<span class="pt-chip" contenteditable="false">Payment Terms</span>';
+let CT_HTML = null, ctRange = null;
+document.addEventListener("selectionchange", () => { const ed = document.getElementById("ctEditor"), s = getSelection(); if (ed && s.rangeCount && ed.contains(s.anchorNode)) ctRange = s.getRangeAt(0).cloneRange(); });
+const num = (v) => (String(v).trim() === "" ? "" : Number(v));
+const delBtn = (i) => `<button type="button" class="icon-btn" data-del="${i}" title="Eliminar" aria-label="Eliminar"><span class="material-icons" aria-hidden="true">delete_outline</span></button>`;
+const addBtn = `<button type="button" class="outline-btn" id="addBtn"><span class="material-icons" aria-hidden="true">add</span>AGREGAR</button>`;
+function rangeIssue(rules, from, to) {
+  const s = [...rules].sort((a, b) => (a[from] === "" ? -1 : a[from]) - (b[from] === "" ? -1 : b[from]));
+  for (let i = 1; i < s.length; i++) { const prevTo = s[i - 1][to]; if (prevTo === "" || s[i][from] <= prevTo) return "Hay rangos que se cruzan. Revisa los valores Desde y Hasta."; if (s[i][from] > prevTo + 1) return `Hay un hueco entre ${prevTo} y ${s[i][from]} años: esos clientes quedarían sin rango.`; }
+  return "";
+}
+function wireRanges(rules, readNew, order) {
+  const body = $("sBody"), err = (m) => { $("sErr").textContent = m; $("sErr").hidden = !m; };
+  const resort = () => rules.sort((a, b) => order(a) - order(b));
+  body.querySelectorAll("[data-f]").forEach((el) => el.onchange = () => { const [i, k] = el.dataset.f.split(","), r = rules[+i];
+    if (k === "label") { const n = el.value.trim(); if (!n || rules.some((x) => x !== r && x.label.toLowerCase() === n.toLowerCase())) { el.value = r.label; return err("Escribe un nombre que no esté repetido."); } r.label = n; }
+    else r[k] = k === "score" ? Number(el.value) || 0 : num(el.value);
+    resort(); applyChange(); });
+  body.querySelectorAll("[data-del]").forEach((b) => b.onclick = () => { if (rules.length === 1) return err("Debe quedar al menos un rango."); rules.splice(+b.dataset.del, 1); applyChange(); });
+  $("addBtn").onclick = () => { const r = readNew(); if (!r.label || rules.some((x) => x.label.toLowerCase() === r.label.toLowerCase())) return err("Escribe un nombre que no esté repetido.");
+    rules.push(r); resort(); applyChange(); };
+}
 function renderSettingsPage() {
   const body = $("sBody");
   if (sPage === "ct") {
-    const c = data.find((x) => x.sap === ctClient);
-    const parts = CT_TEMPLATE.split("{{PAYMENT_TERMS}}");
-    body.innerHTML = `<p class="s-intro">Texto estándar de Commercial Terms para todas las cotizaciones. El identificador <span class="chip">{{PAYMENT_TERMS}}</span> marca dónde se inserta el Payment Terms configurado en la ficha de cada cliente.</p>
-      <div class="ct-grid">
-        <div><div class="ct-head">Texto estándar</div><textarea id="ctText" aria-label="Texto estándar de Commercial Terms">${esc(CT_TEMPLATE)}</textarea>
-          <div class="alert" id="ctAlert" ${parts.length > 1 ? "hidden" : ""}>El texto no tiene el identificador {{PAYMENT_TERMS}}, así que no se insertará el Payment Terms del cliente.</div></div>
-        <div><div class="ct-head">Vista previa en la cotización <select id="ctClient" aria-label="Cliente para la vista previa">${data.map((x) => `<option value="${x.sap}" ${x.sap === ctClient ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select></div>
-          <div class="preview" id="ctPreview">${parts.map(esc).join(`<mark>${esc(c.terms)}</mark>`)}</div></div>
-      </div>`;
-    $("ctText").oninput = (e) => { CT_TEMPLATE = e.target.value; const p = CT_TEMPLATE.split("{{PAYMENT_TERMS}}"); $("ctAlert").hidden = p.length > 1; $("ctPreview").innerHTML = p.map(esc).join(`<mark>${esc(data.find((x) => x.sap === ctClient).terms)}</mark>`); };
-    $("ctClient").onchange = (e) => { ctClient = e.target.value; renderSettingsPage(); };
+    if (CT_HTML === null) CT_HTML = esc(CT_TEMPLATE).replace("{{PAYMENT_TERMS}}", PT_CHIP);
+    body.innerHTML = `<div class="ct-toolbar"><button type="button" class="outline-btn" id="ptBtn"><span class="material-icons" aria-hidden="true">add</span>PAYMENT TERMS</button></div>
+      <div class="ct-editor" id="ctEditor" contenteditable="true" spellcheck="false" role="textbox" aria-multiline="true" aria-label="Commercial Terms">${CT_HTML}</div>`;
+    const ed = $("ctEditor");
+    ed.oninput = () => { CT_HTML = ed.innerHTML; };
+    $("ptBtn").onmousedown = (e) => e.preventDefault();
+    $("ptBtn").onclick = () => {
+      ed.querySelectorAll(".pt-chip").forEach((x) => x.remove());
+      const holder = document.createElement("span"); holder.innerHTML = PT_CHIP; const chip = holder.firstChild;
+      let range = ctRange && ed.contains(ctRange.startContainer) ? ctRange : null;
+      if (!range) { range = document.createRange(); range.selectNodeContents(ed); range.collapse(false); }
+      range.deleteContents(); range.insertNode(chip); range.setStartAfter(chip); range.collapse(true);
+      const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range); ctRange = range.cloneRange();
+      CT_HTML = ed.innerHTML; ed.focus();
+    };
     return;
   }
   if (sPage === "jur") {
@@ -615,45 +662,57 @@ function renderSettingsPage() {
     draw();
     return;
   }
-  if (sPage === "act") {
-    body.innerHTML = `<p class="s-intro">Actividades de la lista del Excel y la calificación que aplica la fórmula de la matriz. En la tabla de listas del Excel, "Otras actividades" aparece con calificación 1, pero la fórmula le asigna 3; aquí se muestra lo que hoy calcula la matriz.</p>
-      <table class="stable"><thead><tr><th>Actividad desarrollada</th><th>Calificación</th><th>Clientes</th></tr></thead><tbody>${ACTIVIDADES.map((a) => `<tr><td class="wide">${esc(a)}</td><td>${scoreSel(a, [1, 2, 3], ACT_SCORE[a])}</td><td class="muted">${data.filter((c) => c.activity === a).length}</td></tr>`).join("")}</tbody></table>`;
-    body.querySelectorAll("[data-s]").forEach((el) => el.onchange = () => { ACT_SCORE[el.dataset.s] = Number(el.value); applyChange(); });
+  if (sPage === "act" || sPage === "cert") {
+    const isAct = sPage === "act", list = isAct ? ACTS : CERTS, key = isAct ? "activity" : "security";
+    const used = (n) => data.filter((c) => c[key] === n).length;
+    body.innerHTML = `<table class="stable"><thead><tr><th>${isAct ? "Actividad desarrollada" : "Programa de seguridad"}</th><th>Calificación</th><th>Clientes</th><th></th></tr></thead><tbody>
+      ${list.map((x, i) => `<tr><td class="wide"><input class="name-in" data-n="${i}" value="${esc(x.name)}" aria-label="Nombre"></td><td><input type="number" data-sc="${i}" value="${x.score}" aria-label="Calificación"></td><td class="muted">${used(x.name)}</td><td>${delBtn(i)}</td></tr>`).join("")}
+      <tr class="add-row"><td class="wide"><input class="name-in" id="newName" placeholder="${isAct ? "Nueva actividad" : "Nuevo programa"}" aria-label="Nombre nuevo"></td><td><input type="number" id="newScore" value="${isAct ? 3 : 0}" aria-label="Calificación nueva"></td><td colspan="2">${addBtn}</td></tr>
+      </tbody></table><div class="alert" id="sErr" hidden></div>`;
+    const err = (m) => { $("sErr").textContent = m; $("sErr").hidden = !m; };
+    const clash = (n, i) => !n || list.some((x, j) => j !== i && x.name.toLowerCase() === n.toLowerCase());
+    body.querySelectorAll("[data-n]").forEach((el) => el.onchange = () => { const i = +el.dataset.n, n = el.value.trim(), old = list[i].name;
+      if (clash(n, i)) { el.value = old; return err("Escribe un nombre que no esté repetido."); }
+      data.forEach((c) => { if (c[key] === old) c[key] = n; }); list[i].name = n; applyChange(); });
+    body.querySelectorAll("[data-sc]").forEach((el) => el.onchange = () => { list[+el.dataset.sc].score = Number(el.value) || 0; applyChange(); });
+    body.querySelectorAll("[data-del]").forEach((b) => b.onclick = () => { const i = +b.dataset.del, u = used(list[i].name);
+      if (u) return err(`No se puede eliminar "${list[i].name}" porque la usan ${u} clientes. Cámbiales la opción primero.`);
+      list.splice(i, 1); applyChange(); });
+    $("addBtn").onclick = () => { const n = $("newName").value.trim(); if (clash(n, -1)) return err("Escribe un nombre que no esté repetido.");
+      list.push({ name: n, score: Number($("newScore").value) || 0 }); applyChange(); };
     return;
   }
   if (sPage === "tray") {
-    body.innerHTML = `<p class="s-intro">Tabla de trayectoria del Excel. La trayectoria se calcula con los años desde la fecha de constitución: más de 3 años, entre 1 y 3 años, o menos de 1 año.</p>
-      <table class="stable"><thead><tr><th>Trayectoria</th><th>Calificación</th><th>Clientes</th></tr></thead><tbody>${Object.keys(TRAYECTORIA).map((t) => `<tr><td>${esc(t)}</td><td>${scoreSel(t, [1, 2, 3], TRAYECTORIA[t])}</td><td class="muted">${data.filter((c) => c.track === t).length}</td></tr>`).join("")}</tbody></table>`;
-    body.querySelectorAll("[data-s]").forEach((el) => el.onchange = () => { TRAYECTORIA[el.dataset.s] = Number(el.value); applyChange(); });
+    const count = (l) => data.filter((c) => c.track === l).length;
+    body.innerHTML = `<p class="s-intro">Rangos en años desde la fecha de constitución. Deja "Hasta" vacío para un rango sin límite.</p>
+      <table class="stable"><thead><tr><th>Trayectoria</th><th>Desde (años)</th><th>Hasta (años)</th><th>Calificación</th><th>Clientes</th><th></th></tr></thead><tbody>
+      ${TRAY_RULES.map((r, i) => `<tr><td><input class="name-in short" data-f="${i},label" value="${esc(r.label)}" aria-label="Nombre del rango"></td><td><input type="number" min="0" data-f="${i},from" value="${r.from}" aria-label="Desde"></td><td><input type="number" min="0" data-f="${i},to" value="${r.to}" placeholder="Sin límite" aria-label="Hasta"></td><td><input type="number" data-f="${i},score" value="${r.score}" aria-label="Calificación"></td><td class="muted">${count(r.label)}</td><td>${delBtn(i)}</td></tr>`).join("")}
+      <tr class="add-row"><td><input class="name-in short" id="nLabel" placeholder="Nuevo rango" aria-label="Nombre del rango nuevo"></td><td><input type="number" min="0" id="nFrom" aria-label="Desde"></td><td><input type="number" min="0" id="nTo" placeholder="Sin límite" aria-label="Hasta"></td><td><input type="number" id="nScore" value="1" aria-label="Calificación"></td><td colspan="2">${addBtn}</td></tr>
+      </tbody></table><div class="alert" id="sErr" ${rangeIssue(TRAY_RULES, "from", "to") ? "" : "hidden"}>${rangeIssue(TRAY_RULES, "from", "to")}</div>`;
+    wireRanges(TRAY_RULES, () => ({ label: $("nLabel").value.trim(), from: num($("nFrom").value), to: num($("nTo").value), score: Number($("nScore").value) || 0 }), (r) => r.from === "" ? -1 : r.from);
     return;
   }
   if (sPage === "monto") {
-    const [m1, m2, m3] = Object.keys(MONTOS);
-    body.innerHTML = `<p class="s-intro">Rangos del monto de operación anual, en COP y en USD, como en la fórmula del Excel.</p>
-      <table class="stable"><thead><tr><th>Rango</th><th>COP</th><th>USD</th><th>Calificación</th><th>Clientes</th></tr></thead><tbody>
-        <tr><td>${m1}</td><td>Menor a <input type="number" data-c="cop1" value="${CFG.cop1}"></td><td>Hasta <input type="number" data-c="usd1" value="${CFG.usd1}"></td><td>${scoreSel(m1, [1, 2, 3], MONTOS[m1])}</td><td class="muted">${data.filter((c) => c.range === m1).length}</td></tr>
-        <tr><td>${m2}</td><td>Hasta <input type="number" data-c="cop2" value="${CFG.cop2}"></td><td>Hasta <input type="number" data-c="usd2" value="${CFG.usd2}"></td><td>${scoreSel(m2, [1, 2, 3], MONTOS[m2])}</td><td class="muted">${data.filter((c) => c.range === m2).length}</td></tr>
-        <tr><td>${m3}</td><td class="muted">Más de ${fmtMoney(CFG.cop2)}</td><td class="muted">Más de ${fmtMoney(CFG.usd2)}</td><td>${scoreSel(m3, [1, 2, 3], MONTOS[m3])}</td><td class="muted">${data.filter((c) => c.range === m3).length}</td></tr>
-      </tbody></table>`;
-    body.querySelectorAll("[data-c]").forEach((el) => el.onchange = () => { CFG[el.dataset.c] = Number(el.value) || 0; applyChange(); });
-    body.querySelectorAll("[data-s]").forEach((el) => el.onchange = () => { MONTOS[el.dataset.s] = Number(el.value); applyChange(); });
-    return;
-  }
-  if (sPage === "cert") {
-    body.innerHTML = `<p class="s-intro">Certificaciones del programa de seguridad en la cadena de suministro y su calificación. Una certificación reduce la valoración del cliente.</p>
-      <table class="stable"><thead><tr><th>Programa</th><th>Calificación</th><th>Clientes</th></tr></thead><tbody>${Object.keys(CERT).map((k) => `<tr><td>${esc(k)}</td><td>${scoreSel(k, [-3, 0], CERT[k])}</td><td class="muted">${data.filter((c) => c.security === k).length}</td></tr>`).join("")}</tbody></table>`;
-    body.querySelectorAll("[data-s]").forEach((el) => el.onchange = () => { CERT[el.dataset.s] = Number(el.value); applyChange(); });
+    const count = (l) => data.filter((c) => c.range === l).length;
+    body.innerHTML = `<p class="s-intro">Cada rango llega hasta el valor indicado en COP y en USD. Deja "Hasta" vacío en el último rango para que no tenga límite.</p>
+      <table class="stable"><thead><tr><th>Monto de las operaciones</th><th>COP hasta</th><th>USD hasta</th><th>Calificación</th><th>Clientes</th><th></th></tr></thead><tbody>
+      ${MONTO_RULES.map((r, i) => `<tr><td class="wide"><input class="name-in" data-f="${i},label" value="${esc(r.label)}" aria-label="Nombre del rango"></td><td><input class="money" type="number" min="0" data-f="${i},cop" value="${r.cop}" placeholder="Sin límite" aria-label="COP hasta"></td><td><input class="money" type="number" min="0" data-f="${i},usd" value="${r.usd}" placeholder="Sin límite" aria-label="USD hasta"></td><td><input type="number" data-f="${i},score" value="${r.score}" aria-label="Calificación"></td><td class="muted">${count(r.label)}</td><td>${delBtn(i)}</td></tr>`).join("")}
+      <tr class="add-row"><td class="wide"><input class="name-in" id="nLabel" placeholder="Nuevo rango" aria-label="Nombre del rango nuevo"></td><td><input class="money" type="number" min="0" id="nCop" placeholder="Sin límite" aria-label="COP hasta"></td><td><input class="money" type="number" min="0" id="nUsd" placeholder="Sin límite" aria-label="USD hasta"></td><td><input type="number" id="nScore" value="1" aria-label="Calificación"></td><td colspan="2">${addBtn}</td></tr>
+      </tbody></table>${(() => { const m = ["cop", "usd"].filter((k) => !MONTO_RULES.some((r) => r[k] === "")).map((k) => k.toUpperCase()); return `<div class="alert" id="sErr" ${m.length ? "" : "hidden"}>${m.length ? `Deja vacío "Hasta" en el último rango de ${m.join(" y ")}; si no, los montos mayores quedan sin rango.` : ""}</div>`; })()}`;
+    wireRanges(MONTO_RULES, () => ({ label: $("nLabel").value.trim(), cop: num($("nCop").value), usd: num($("nUsd").value), score: Number($("nScore").value) || 0 }), (r) => r.cop === "" ? Infinity : r.cop);
     return;
   }
   if (sPage === "interp") {
     const n = (r) => data.filter((c) => c.risk === r).length;
-    body.innerHTML = `<p class="s-intro">La valoración es la suma de las cinco calificaciones. Estos umbrales definen la interpretación del nivel de riesgo.</p>
-      <div class="cfg">
-        <span><span class="badge ALTO">ALTO</span> desde</span><input type="number" min="1" data-c="alto" value="${CFG.alto}" aria-label="ALTO desde"><small>${n("ALTO")} clientes</small>
-        <span><span class="badge MEDIO">MEDIO</span> desde</span><input type="number" min="1" data-c="medio" value="${CFG.medio}" aria-label="MEDIO desde"><small>${n("MEDIO")} clientes</small>
-        <span><span class="badge BAJO">BAJO</span> hasta</span><span style="color:var(--text)">${CFG.medio - 1}</span><small>${n("BAJO")} clientes</small>
-      </div>`;
-    body.querySelectorAll("[data-c]").forEach((el) => el.onchange = () => { CFG[el.dataset.c] = Number(el.value) || 0; applyChange(); });
+    body.innerHTML = `<p class="s-intro">La valoración es la suma de las cinco calificaciones. Indica a partir de qué valoración un cliente es riesgo medio y riesgo alto.</p>
+      <table class="stable"><thead><tr><th>Nivel de riesgo</th><th>Desde</th><th>Hasta</th><th>Clientes</th></tr></thead><tbody>
+        <tr><td><span class="badge BAJO">BAJO</span></td><td class="muted">Mínimo</td><td class="muted">${RISK.MEDIO - 1}</td><td class="muted">${n("BAJO")}</td></tr>
+        <tr><td><span class="badge MEDIO">MEDIO</span></td><td><input type="number" data-r="MEDIO" value="${RISK.MEDIO}" aria-label="MEDIO desde"></td><td class="muted">${RISK.ALTO - 1}</td><td class="muted">${n("MEDIO")}</td></tr>
+        <tr><td><span class="badge ALTO">ALTO</span></td><td><input type="number" data-r="ALTO" value="${RISK.ALTO}" aria-label="ALTO desde"></td><td class="muted">Sin límite</td><td class="muted">${n("ALTO")}</td></tr>
+      </tbody></table><div class="alert" id="sErr" hidden></div>`;
+    body.querySelectorAll("[data-r]").forEach((el) => el.onchange = () => { const k = el.dataset.r, v = Number(el.value), next = { ...RISK, [k]: v };
+      if (!(next.MEDIO < next.ALTO)) { el.value = RISK[k]; $("sErr").textContent = "El valor de riesgo alto debe ser mayor que el de riesgo medio."; $("sErr").hidden = false; return; }
+      RISK[k] = v; applyChange(); });
     return;
   }
   const pend = data.filter((c) => c.docState === "Pendiente por actualizar").length;
