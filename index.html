@@ -62,9 +62,9 @@
   td.num, th.num { text-align: right; }
   td.wrap { white-space: normal; min-width: 220px; max-width: 320px; }
   .badge { display: inline-block; min-width: 64px; padding: 3px 10px; border-radius: 12px; font-size: 13px; font-weight: 500; text-align: center; }
-  .BAJO { background: var(--low-bg); color: var(--low); }
-  .MEDIO { background: var(--mid-bg); color: var(--mid); }
-  .ALTO { background: var(--high-bg); color: var(--high); }
+  .LOW { background: var(--low-bg); color: var(--low); }
+  .MEDIUM { background: var(--mid-bg); color: var(--mid); }
+  .HIGH { background: var(--high-bg); color: var(--high); }
   .ok, .fields .val.ok { color: var(--low); }
   .warn, .fields .val.warn { color: var(--high); }
   .count { margin: 10px 0 12px 4px; color: var(--muted); font-size: 14px; }
@@ -327,13 +327,13 @@
       <button type="button" class="io-btn import" id="mxImport"><span class="material-icons" aria-hidden="true">upload_file</span>IMPORT</button>
       <button type="button" class="io-btn export" id="mxExport"><span class="material-icons" aria-hidden="true">download</span>EXPORT</button>
       <input type="file" id="mxFile" accept=".xlsx" hidden>
-      <span class="filter"><select id="fRisk" aria-label="Risk level"><option value="">Risk level</option><option>BAJO</option><option>MEDIO</option><option>ALTO</option></select></span>
-      <span class="filter"><select id="fType" aria-label="Customer type"><option value="">Customer type</option><option>Nacional</option><option>Internacional</option></select></span>
+      <span class="filter"><select id="fRisk" aria-label="Risk level"><option value="">Risk level</option><option>LOW</option><option>MEDIUM</option><option>HIGH</option></select></span>
+      <span class="filter"><select id="fType" aria-label="Customer type"><option value="">Customer type</option><option>National</option><option>International</option></select></span>
       <span class="filter"><select id="fCountry" aria-label="Jurisdiction"><option value="">Jurisdiction</option></select></span>
       <span class="filter"><select id="fActivity" aria-label="Business activity"><option value="">Business activity</option></select></span>
       <span class="filter"><select id="fSec" aria-label="Security program"><option value="">Security program</option></select></span>
-      <span class="filter"><select id="fDoc" aria-label="Documentation"><option value="">Documentation</option><option>Vigente</option><option>Pendiente por actualizar</option></select></span>
-      <span class="filter"><select id="fStatus" aria-label="Status"><option value="">Status</option><option>Activo</option><option>Inactivo</option></select></span>
+      <span class="filter"><select id="fDoc" aria-label="Documentation"><option value="">Documentation</option><option>Up to date</option><option>Pending update</option></select></span>
+      <span class="filter"><select id="fStatus" aria-label="Status"><option value="">Status</option><option>Active</option><option>Inactive</option></select></span>
       <button class="link-btn" id="clear" type="button" hidden><span class="material-icons" aria-hidden="true">close</span>Clear filters</button>
       <span class="spacer"></span>
       <span class="meta">MT01-PRSA-02 · Version 02 · Updated <span id="updated"></span></span>
@@ -381,7 +381,7 @@
 <footer><span>Designed and Built by Boston Project, LLC.</span><span>Copyright © SIGMA 2026</span></footer>
 
 <script>
-const JURD = [["Afganistán",20,"",1,1,3],["Albania",37,4.35,1,1,3],["Bielorrusia",37,5.67,1,1,3],["Birmania",20,8.17,1,3,3],["Bosnia y Herzegovina",35,"",1,1,3],["Burundi",20,"",1,1,3],["Camerún",27,6.67,1,2,""],["China",42,7.27,1,1,3],["Corea del Norte",17,"",1,3,3],["Cuba",42,5.50,1,1,3],["Etiopía",37,5.66,1,1,3],["Guinea",26,6.44,1,1,3],["Guinea Bissau",22,7.28,1,1,3],["Haití",17,7.92,1,2,3],["Hong Kong, China",75,5.34,1,1,3],["Irán",24,"",1,3,3],["Iraq",23,"",1,1,3],["Líbano",24,5.81,1,2,3],["Libia",18,"",1,1,3],["Macedonia",42,4.24,1,1,3],["Mali",28,6.81,1,2,3],["Moldavia",42,4.65,1,1,3],["Montenegro",46,4.23,1,1,3],["Mozambique",25,7.15,1,2,""],["Nicaragua",17,6.40,1,1,3],["Nigeria",25,6.85,1,2,""],["República Centroafricana",24,7.49,1,1,3],["República Democrática del Congo",20,7.73,1,2,3],["Rusia",26,"",1,1,3],["Serbia",36,4.82,1,1,3],["Siria",13,"",1,2,3],["Somalia",11,"",1,1,3],["Sudán",20,"",1,1,3],["Sudán del Sur",13,"",1,2,3],["Túnez",40,4.77,1,1,3],["Turquía",34,5.63,1,1,3],["Ucrania",36,5.26,1,1,3],["Venezuela",13,7.59,1,2,3],["Yemen",16,"",1,2,3],["Zimbabwe",24,5.98,1,1,3],["Alemania",78,4.63,1,1,""],["Andorra","",3.29,2,1,""],["Angola",33,6.71,1,2,""],["Anguila","","",3,1,""],["Antigua y Barbuda","",4.10,3,1,""],["Arabia Saudita",52,5.88,1,1,""],["Argelia",36,6.92,1,2,""],["Argentina",37,"",1,1,""],["Armenia",47,4.35,1,1,""],["Azerbaiyán",23,5.40,1,1,""],["Bahamas",64,5.21,1,1,""],["Bangladesh",24,5.62,1,1,""],["Barbados",69,4.58,3,1,""],["Baréin",42,5.17,1,1,""],["Belice","","",3,1,""],["Benin",43,6.44,1,1,""],["Bolivia",29,5.44,1,1,""],["Botswana",59,4.36,1,1,""],["Brasil",36,5.36,1,1,""],["Bulgaria",45,4.99,1,2,""],["Burkina Faso",41,6.48,1,2,""],["Bután",68,5.51,1,1,""],["Cabo Verde",64,5.45,1,1,""],["Camboya",22,6.75,1,1,""],["Catar",58,5.55,1,1,""],["Chad",20,7.60,1,1,""],["Chipre",53,4.81,1,1,""],["Colombia",40,4.92,1,1,""],["Comoras",20,6.68,1,1,""],["Congo",22,7.28,1,1,""],["Costa de Marfil",40,6.42,1,2,""],["Costa Rica",55,4.61,1,1,""],["Croacia",50,4.53,1,2,""],["Dominica",56,4.21,3,1,""],["Ecuador",34,5.06,1,1,""],["Egipto",35,5.08,1,1,""],["El Salvador",31,5.51,1,1,""],["Emiratos Árabes Unidos",69,6.18,1,1,""],["Eritrea",21,"",1,1,""],["Eslovaquia",54,4.39,1,1,""],["Eslovenia",56,3.54,1,1,""],["Estados Unidos","",4.81,1,1,""],["Filipinas",34,5.84,1,2,""],["Fiyi",52,4.71,1,1,""],["Gabón",28,7.48,1,1,""],["Gambia",37,5.56,1,1,""],["Georgia",53,4.64,1,1,""],["Ghana",43,5.28,1,1,""],["Granada",53,4.72,1,1,""],["Grecia",49,3.66,1,1,""],["Guatemala",23,5.45,1,1,""],["Guernsey","","",3,1,""],["Guinea Ecuatorial",17,"",1,1,""],["Honduras",23,5.66,1,1,""],["Hungría",42,5.06,1,1,""],["India",39,5.49,1,1,""],["Indonesia",34,5.33,1,1,""],["Isla de Man","","",2,1,""],["Islas Bermudas","","",2,1,""],["Islas Caimán","","",2,1,""],["Islas Cook","","",3,1,""],["Islas Marshall","","",3,1,""],["Islas Salomón",43,6.32,1,1,""],["Islas Turcas y Caicos","","",3,1,""],["Islas Vírgenes (Reino Unido)","","",2,1,""],["Italia",56,4.80,1,1,""],["Jamaica",44,4.79,1,1,""],["Japón",73,4.77,1,1,""],["Jersey","","",3,1,""],["Jordan",46,4.81,1,1,""],["Kazajistán",39,4.65,1,1,""],["Kenia",31,6.87,1,2,""],["Kirguistán",26,5.95,1,1,""],["Kosovo",41,"",1,1,""],["Kuwait",45,6.27,1,1,""],["Lesoto",39,5.98,1,1,""],["Liberia",25,7.11,1,1,""],["Liechtenstein","",4.16,2,1,""],["Madagascar",25,6.76,1,1,""],["Malasia",50,5.50,1,1,""],["Malawi",34,5.45,1,1,""],["Maldivas",39,"",3,1,""],["Malta",51,5.18,2,1,""],["Marruecos",38,4.94,1,1,""],["Mauricio",51,4.61,1,1,""],["Mauritania",30,6.28,1,1,""],["México",31,5.44,1,1,""],["Monaco","","",2,2,""],["Mongolia",33,4.98,1,1,""],["Namibia",49,4.89,1,2,""],["Nepal",35,6.01,1,1,""],["Níger",32,6.83,1,1,""],["Omán",43,"",1,1,""],["Pakistán",29,5.56,1,1,""],["Panamá",35,5.90,2,1,""],["Papúa Nueva Guinea",29,"",1,1,""],["Paraguay",28,5.00,1,1,""],["Perú",33,4.77,1,1,""],["Polonia",54,4.34,1,1,""],["República Checa",57,3.85,1,1,""],["República Democrática Popular Laos",28,7.53,1,1,""],["República Dominicana",35,4.96,1,1,""],["Ruanda",53,5.94,1,1,""],["Rumania",46,4.99,1,1,""],["San Cristóbal y Nieves","",5.64,3,1,""],["San Marino","",2.96,2,1,""],["Santa Lucía",55,4.46,1,1,""],["Santo Tomé y Príncipe",45,"",1,1,""],["Senegal",43,5.53,1,1,""],["Seychelles",71,4.76,2,1,""],["Sierra Leona",35,6.49,1,1,""],["Singapur",83,4.70,1,1,""],["Sri Lanka",34,5.28,1,1,""],["Suazilandia",30,6.69,1,1,""],["Sudáfrica",41,5.70,1,2,""],["Surinam",40,6.09,1,1,""],["Tailandia",35,6.16,1,1,""],["Tanzania",40,6.08,1,2,""],["Tayikistan",20,6.45,1,1,""],["Timor-Leste",43,"",1,1,""],["Togo",31,6.48,1,1,""],["Tonga","",5.65,1,1,""],["Trinidad y Tobago",42,4.19,1,1,""],["Turkmenistán",18,6.71,1,1,""],["Uganda",26,5.71,1,1,""],["Uzbekistán",33,5.27,1,1,""],["Vanuatu",48,5.05,3,1,""],["Vietnam",41,6.90,1,2,""],["Yibuti",30,"",1,1,""],["Zambia",37,5.34,1,1,""],["Aruba","","",1,1,""],["Australia",75,4.04,1,1,""],["AUSTRIA",71,4.35,1,1,""],["Bélgica",73,4.48,1,1,""],["Brunei Darussalam","",4.30,1,1,""],["Canadá",76,4.47,1,1,""],["Chile",66,4.08,1,1,""],["Corea del Sur",63,4.42,1,1,""],["Dinamarca",90,3.50,1,1,""],["España",60,4.29,1,1,""],["Estonia",76,3.16,1,1,""],["Finlandia",87,3.07,1,1,""],["Francia",71,3.86,1,1,""],["Gibraltar","","",1,1,""],["Guayana",40,"",1,1,""],["Irlanda",77,4.23,1,1,""],["Islandia",72,3.00,1,1,""],["Israel",62,3.97,1,1,""],["Letonia","",4.08,1,1,""],["Letonia",60,4.08,1,1,""],["Lituania",61,3.54,1,1,""],["Luxemburgo",78,3.99,1,1,""],["Macao, China","","",1,1,""],["Montserrat","","",1,1,""],["Nauru","","",1,1,""],["Niue","","",1,1,""],["Noruega",84,3.76,1,1,""],["Nueva Zelanda",85,3.68,1,1,""],["Países Bajos",79,4.52,1,1,""],["Palau","","",1,1,""],["Palestina","","",1,1,""],["Portugal",61,4.09,1,1,""],["Puerto Rico","","",1,1,""],["Reino de Curacao de los Paises Bajos","","",1,1,""],["Reino Unido",71,4.14,1,1,""],["Samoa","",4.56,1,1,""],["San Vicente y las Granadinas",60,4.07,1,1,""],["Saint Maarten Reino de los Países Bajos","","",1,1,""],["Suecia",82,3.45,1,1,""],["Suiza",82,4.46,1,1,""],["Taipei, China","","",1,1,""],["Taiwan, China",67,4.05,1,1,""],["Uruguay",73,4.11,1,1,""],["Vaticano","","",1,1,""],];
+const JURD = [["Afghanistan",20,"",1,1,3],["Albania",37,4.35,1,1,3],["Belarus",37,5.67,1,1,3],["Myanmar",20,8.17,1,3,3],["Bosnia and Herzegovina",35,"",1,1,3],["Burundi",20,"",1,1,3],["Cameroon",27,6.67,1,2,""],["China",42,7.27,1,1,3],["North Korea",17,"",1,3,3],["Cuba",42,5.50,1,1,3],["Ethiopia",37,5.66,1,1,3],["Guinea",26,6.44,1,1,3],["Guinea-Bissau",22,7.28,1,1,3],["Haiti",17,7.92,1,2,3],["Hong Kong, China",75,5.34,1,1,3],["Iran",24,"",1,3,3],["Iraq",23,"",1,1,3],["Lebanon",24,5.81,1,2,3],["Libya",18,"",1,1,3],["North Macedonia",42,4.24,1,1,3],["Mali",28,6.81,1,2,3],["Moldova",42,4.65,1,1,3],["Montenegro",46,4.23,1,1,3],["Mozambique",25,7.15,1,2,""],["Nicaragua",17,6.40,1,1,3],["Nigeria",25,6.85,1,2,""],["Central African Republic",24,7.49,1,1,3],["Democratic Republic of the Congo",20,7.73,1,2,3],["Russia",26,"",1,1,3],["Serbia",36,4.82,1,1,3],["Syria",13,"",1,2,3],["Somalia",11,"",1,1,3],["Sudan",20,"",1,1,3],["South Sudan",13,"",1,2,3],["Tunisia",40,4.77,1,1,3],["Turkey",34,5.63,1,1,3],["Ukraine",36,5.26,1,1,3],["Venezuela",13,7.59,1,2,3],["Yemen",16,"",1,2,3],["Zimbabwe",24,5.98,1,1,3],["Germany",78,4.63,1,1,""],["Andorra","",3.29,2,1,""],["Angola",33,6.71,1,2,""],["Anguilla","","",3,1,""],["Antigua and Barbuda","",4.10,3,1,""],["Saudi Arabia",52,5.88,1,1,""],["Algeria",36,6.92,1,2,""],["Argentina",37,"",1,1,""],["Armenia",47,4.35,1,1,""],["Azerbaijan",23,5.40,1,1,""],["Bahamas",64,5.21,1,1,""],["Bangladesh",24,5.62,1,1,""],["Barbados",69,4.58,3,1,""],["Bahrain",42,5.17,1,1,""],["Belize","","",3,1,""],["Benin",43,6.44,1,1,""],["Bolivia",29,5.44,1,1,""],["Botswana",59,4.36,1,1,""],["Brazil",36,5.36,1,1,""],["Bulgaria",45,4.99,1,2,""],["Burkina Faso",41,6.48,1,2,""],["Bhutan",68,5.51,1,1,""],["Cape Verde",64,5.45,1,1,""],["Cambodia",22,6.75,1,1,""],["Qatar",58,5.55,1,1,""],["Chad",20,7.60,1,1,""],["Cyprus",53,4.81,1,1,""],["Colombia",40,4.92,1,1,""],["Comoros",20,6.68,1,1,""],["Congo",22,7.28,1,1,""],["Ivory Coast",40,6.42,1,2,""],["Costa Rica",55,4.61,1,1,""],["Croatia",50,4.53,1,2,""],["Dominica",56,4.21,3,1,""],["Ecuador",34,5.06,1,1,""],["Egypt",35,5.08,1,1,""],["El Salvador",31,5.51,1,1,""],["United Arab Emirates",69,6.18,1,1,""],["Eritrea",21,"",1,1,""],["Slovakia",54,4.39,1,1,""],["Slovenia",56,3.54,1,1,""],["United States","",4.81,1,1,""],["Philippines",34,5.84,1,2,""],["Fiji",52,4.71,1,1,""],["Gabon",28,7.48,1,1,""],["Gambia",37,5.56,1,1,""],["Georgia",53,4.64,1,1,""],["Ghana",43,5.28,1,1,""],["Grenada",53,4.72,1,1,""],["Greece",49,3.66,1,1,""],["Guatemala",23,5.45,1,1,""],["Guernsey","","",3,1,""],["Equatorial Guinea",17,"",1,1,""],["Honduras",23,5.66,1,1,""],["Hungary",42,5.06,1,1,""],["India",39,5.49,1,1,""],["Indonesia",34,5.33,1,1,""],["Isle of Man","","",2,1,""],["Bermuda","","",2,1,""],["Cayman Islands","","",2,1,""],["Cook Islands","","",3,1,""],["Marshall Islands","","",3,1,""],["Solomon Islands",43,6.32,1,1,""],["Turks and Caicos Islands","","",3,1,""],["British Virgin Islands","","",2,1,""],["Italy",56,4.80,1,1,""],["Jamaica",44,4.79,1,1,""],["Japan",73,4.77,1,1,""],["Jersey","","",3,1,""],["Jordan",46,4.81,1,1,""],["Kazakhstan",39,4.65,1,1,""],["Kenya",31,6.87,1,2,""],["Kyrgyzstan",26,5.95,1,1,""],["Kosovo",41,"",1,1,""],["Kuwait",45,6.27,1,1,""],["Lesotho",39,5.98,1,1,""],["Liberia",25,7.11,1,1,""],["Liechtenstein","",4.16,2,1,""],["Madagascar",25,6.76,1,1,""],["Malaysia",50,5.50,1,1,""],["Malawi",34,5.45,1,1,""],["Maldives",39,"",3,1,""],["Malta",51,5.18,2,1,""],["Morocco",38,4.94,1,1,""],["Mauritius",51,4.61,1,1,""],["Mauritania",30,6.28,1,1,""],["Mexico",31,5.44,1,1,""],["Monaco","","",2,2,""],["Mongolia",33,4.98,1,1,""],["Namibia",49,4.89,1,2,""],["Nepal",35,6.01,1,1,""],["Niger",32,6.83,1,1,""],["Oman",43,"",1,1,""],["Pakistan",29,5.56,1,1,""],["Panama",35,5.90,2,1,""],["Papua New Guinea",29,"",1,1,""],["Paraguay",28,5.00,1,1,""],["Peru",33,4.77,1,1,""],["Poland",54,4.34,1,1,""],["Czech Republic",57,3.85,1,1,""],["Laos",28,7.53,1,1,""],["Dominican Republic",35,4.96,1,1,""],["Rwanda",53,5.94,1,1,""],["Romania",46,4.99,1,1,""],["Saint Kitts and Nevis","",5.64,3,1,""],["San Marino","",2.96,2,1,""],["Saint Lucia",55,4.46,1,1,""],["Sao Tome and Principe",45,"",1,1,""],["Senegal",43,5.53,1,1,""],["Seychelles",71,4.76,2,1,""],["Sierra Leone",35,6.49,1,1,""],["Singapore",83,4.70,1,1,""],["Sri Lanka",34,5.28,1,1,""],["Eswatini",30,6.69,1,1,""],["South Africa",41,5.70,1,2,""],["Suriname",40,6.09,1,1,""],["Thailand",35,6.16,1,1,""],["Tanzania",40,6.08,1,2,""],["Tajikistan",20,6.45,1,1,""],["Timor-Leste",43,"",1,1,""],["Togo",31,6.48,1,1,""],["Tonga","",5.65,1,1,""],["Trinidad and Tobago",42,4.19,1,1,""],["Turkmenistan",18,6.71,1,1,""],["Uganda",26,5.71,1,1,""],["Uzbekistan",33,5.27,1,1,""],["Vanuatu",48,5.05,3,1,""],["Vietnam",41,6.90,1,2,""],["Djibouti",30,"",1,1,""],["Zambia",37,5.34,1,1,""],["Aruba","","",1,1,""],["Australia",75,4.04,1,1,""],["Austria",71,4.35,1,1,""],["Belgium",73,4.48,1,1,""],["Brunei Darussalam","",4.30,1,1,""],["Canada",76,4.47,1,1,""],["Chile",66,4.08,1,1,""],["South Korea",63,4.42,1,1,""],["Denmark",90,3.50,1,1,""],["Spain",60,4.29,1,1,""],["Estonia",76,3.16,1,1,""],["Finland",87,3.07,1,1,""],["France",71,3.86,1,1,""],["Gibraltar","","",1,1,""],["Guyana",40,"",1,1,""],["Ireland",77,4.23,1,1,""],["Iceland",72,3.00,1,1,""],["Israel",62,3.97,1,1,""],["Latvia","",4.08,1,1,""],["Latvia",60,4.08,1,1,""],["Lithuania",61,3.54,1,1,""],["Luxembourg",78,3.99,1,1,""],["Macao, China","","",1,1,""],["Montserrat","","",1,1,""],["Nauru","","",1,1,""],["Niue","","",1,1,""],["Norway",84,3.76,1,1,""],["New Zealand",85,3.68,1,1,""],["Netherlands",79,4.52,1,1,""],["Palau","","",1,1,""],["Palestine","","",1,1,""],["Portugal",61,4.09,1,1,""],["Puerto Rico","","",1,1,""],["Curaçao (Kingdom of the Netherlands)","","",1,1,""],["United Kingdom",71,4.14,1,1,""],["Samoa","",4.56,1,1,""],["Saint Vincent and the Grenadines",60,4.07,1,1,""],["Sint Maarten (Kingdom of the Netherlands)","","",1,1,""],["Sweden",82,3.45,1,1,""],["Switzerland",82,4.46,1,1,""],["Taipei, China","","",1,1,""],["Taiwan, China",67,4.05,1,1,""],["Uruguay",73,4.11,1,1,""],["Vatican City","","",1,1,""],];
 const tiCal = (x) => x === "" || x === 0 ? "" : x <= 30 ? 3 : x >= 60 ? 1 : 2;
 const baCal = (x) => x === "" || x === 0 ? "" : x > 6.3 ? 3 : x <= 4.6 ? 1 : 2;
 function jurLevel([, ti, ba, g, h, i]) {
@@ -392,18 +392,18 @@ function jurLevel([, ti, ba, g, h, i]) {
 const JUR = {};
 const rebuildJur = () => JURD.forEach((r) => { JUR[r[0]] = jurLevel(r).K; });
 rebuildJur();
-const ACTIVIDADES = ["Actividades no Incluidas en las dos categorías siguientes", "Casas de empeño", "Casinos y negocios de apuestas", "Comercializadoras bajo el esquema de ventas multinivel o piramidal", "Comercializadoras de antigüedades, joyas, metales y piedras preciosas, monedas, objetos de arte y sellos postales", "Comercializadoras de armas, explosivos o municiones", "Comercializadoras o agencias de bienes raíces", "Comercializadoras/arrendadoras de vehículos automotores, embarcaciones y aeronaves", "Constructoras", "Distribuidores", "Empresas dedicadas a la transferencia o envío de fondos o remesas", "Empresas o personas que comercialicen productos controlados por la Dirección Nacional de Estupefacientes", "Empresas ubicadas en zonas francas", "Entidades deportivas", "Estaciones de gasolina", "Hoteles y agencias de viaje", "Operadores cambiarios fronterizos", "Otras actividades", "Prestamistas", "Profesionales y casas de cambio", "Sector transportador", "Trasportadores de dinero o de valores"];
-const TRAYECTORIA = { "> 3 años": 1, "1<>3 años": 2, "Persona Natural": 2, "<1 año": 3 };
-const MONTOS = { "Menor $600.000.000": 1, "Entre $600.000.000 y $1.200.000.000": 2, "Mayor a $1.200.000.000": 3 };
-const CERT = { "No Certificado": 0, "Otros Programas": 0, "OEA": -3, "AEO": -3, "CTPAT": -3, "ATT": -3, "GOLDEN LIST": -3, "NECC": -3, "OEC": -3, "PIP": -3, "SES": -3, "SAOC": -3, "STP": -3, "PROFAC": -3 };
+const ACTIVIDADES = ["Activities not included in the following categories", "Pawnshops", "Casinos and gambling businesses", "Multilevel or pyramid sales companies", "Dealers in antiques, jewelry, precious metals and stones, coins, art and postage stamps", "Dealers in weapons, explosives or ammunition", "Real estate dealers or agencies", "Dealers or lessors of motor vehicles, boats and aircraft", "Construction companies", "Distributors", "Money transfer or remittance companies", "Companies or individuals selling products controlled by the National Narcotics Directorate", "Companies located in free trade zones", "Sports organizations", "Gas stations", "Hotels and travel agencies", "Border currency exchange operators", "Other activities", "Money lenders", "Currency exchange professionals and offices", "Transportation sector", "Cash or valuables transporters"];
+const TRAYECTORIA = { "> 3 years": 1, "1 to 3 years": 2, "Individual": 2, "< 1 year": 3 };
+const MONTOS = { "Less than $600.000.000": 1, "Between $600.000.000 and $1.200.000.000": 2, "More than $1.200.000.000": 3 };
+const CERT = { "Not certified": 0, "Other programs": 0, "OEA": -3, "AEO": -3, "CTPAT": -3, "ATT": -3, "GOLDEN LIST": -3, "NECC": -3, "OEC": -3, "PIP": -3, "SES": -3, "SAOC": -3, "STP": -3, "PROFAC": -3 };
 const TIPOS_ID = ["NIT", "NITE", "TID", "Tax ID", "RUC"];
 const CFG = { cop1: 600000000, cop2: 1200000000, usd1: 217000, usd2: 434000, alto: 10, medio: 7, vigencia: 730 };
-let ACTS = ACTIVIDADES.map((name) => ({ name, score: name === "Actividades no Incluidas en las dos categorías siguientes" ? 1 : name === "Distribuidores" ? 2 : 3 }));
+let ACTS = ACTIVIDADES.map((name) => ({ name, score: name === "Activities not included in the following categories" ? 1 : name === "Distributors" ? 2 : 3 }));
 let CERTS = Object.entries(CERT).map(([name, score]) => ({ name, score }));
-let TRAY_RULES = [{ label: "<1 año", from: 0, to: 0, score: 3 }, { label: "1<>3 años", from: 1, to: 3, score: 2 }, { label: "> 3 años", from: 4, to: "", score: 1 }];
-let MONTO_RULES = [{ label: "Menor $600.000.000", cop: 599999999, usd: 217000, score: 1 }, { label: "Entre $600.000.000 y $1.200.000.000", cop: 1200000000, usd: 434000, score: 2 }, { label: "Mayor a $1.200.000.000", cop: "", usd: "", score: 3 }];
-let RISK_LEVELS = [{ label: "BAJO", from: "", to: 6, color: "Green", visit: "No" }, { label: "MEDIO", from: 7, to: 9, color: "Yellow", visit: "No" }, { label: "ALTO", from: 10, to: "", color: "Red", visit: "Yes" }];
-const COLOR_CLS = { Green: "BAJO", Yellow: "MEDIO", Red: "ALTO" };
+let TRAY_RULES = [{ label: "< 1 year", from: 0, to: 0, score: 3 }, { label: "1 to 3 years", from: 1, to: 3, score: 2 }, { label: "> 3 years", from: 4, to: "", score: 1 }];
+let MONTO_RULES = [{ label: "Less than $600.000.000", cop: 599999999, usd: 217000, score: 1 }, { label: "Between $600.000.000 and $1.200.000.000", cop: 1200000000, usd: 434000, score: 2 }, { label: "More than $1.200.000.000", cop: "", usd: "", score: 3 }];
+let RISK_LEVELS = [{ label: "LOW", from: "", to: 6, color: "Green", visit: "No" }, { label: "MEDIUM", from: 7, to: 9, color: "Yellow", visit: "No" }, { label: "HIGH", from: 10, to: "", color: "Red", visit: "Yes" }];
+const COLOR_CLS = { Green: "LOW", Yellow: "MEDIUM", Red: "HIGH" };
 const levelOf = (s) => RISK_LEVELS.find((r) => (r.from === "" || s >= r.from) && (r.to === "" || s <= r.to));
 const riskOf = (s) => levelOf(s)?.label ?? "No level";
 const riskCls = (name) => COLOR_CLS[RISK_LEVELS.find((r) => r.label === name)?.color] || "";
@@ -449,21 +449,21 @@ const yearsSince = (s) => { const a = d(s); let y = TODAY.getFullYear() - a.getF
 
 const blankVisits = () => ({ 2024: ["", "", ""], 2025: ["", "", ""], 2026: ["", "", ""] });
 const data = [
-  ["900101", "Sample Client A", "TID", "XX-XXX0101", "Tampa", "Internacional", "2012-03-14", 380000, "USD", "2023-02-10", "Activo", "Estados Unidos", "Constructoras", "No Certificado", ""],
-  ["900102", "Sample Client B", "NIT", "900000102", "Bogotá", "Nacional", "2018-06-01", 450000000, "COP", "2019-09-20", "Activo", "Colombia", "Actividades no Incluidas en las dos categorías siguientes", "No Certificado", "2025-04-02"],
-  ["900103", "Sample Client C", "NIT", "900000103", "Cartagena", "Nacional", "2010-01-20", 1500000000, "COP", "2021-05-11", "Activo", "Colombia", "Hoteles y agencias de viaje", "No Certificado", "2022-03-15"],
-  ["900104", "Sample Client D", "TID", "XX-XXX0104", "Miami", "Internacional", "", 0, "USD", "2024-08-19", "Activo", "Estados Unidos", "Otras actividades", "No Certificado", ""],
-  ["900105", "Sample Client E", "NIT", "900000105", "Medellín", "Nacional", "2016-07-07", 250000000, "COP", "2020-01-30", "Activo", "Colombia", "Distribuidores", "OEA", "2025-10-01"],
-  ["900106", "Sample Client F", "RUC", "XXXXXXX0106", "Ciudad de Panamá", "Internacional", "2024-09-12", 520000, "USD", "2025-02-14", "Activo", "Panamá", "Constructoras", "No Certificado", ""],
-  ["900107", "Sample Client G", "Tax ID", "XX-XXX0107", "George Town", "Internacional", "2026-03-01", 600000, "USD", "2026-04-01", "Activo", "Islas Caimán", "Comercializadoras o agencias de bienes raíces", "No Certificado", ""],
-  ["900108", "Sample Client H", "TID", "XX-XXX0108", "Houston", "Internacional", "2008-02-25", 150000, "USD", "2019-09-20", "Inactivo", "Estados Unidos", "Constructoras", "No Certificado", ""],
-  ["900109", "Sample Client I", "NIT", "900000109", "Barranquilla", "Nacional", "2019-10-10", 0, "COP", "2025-07-22", "Activo", "Colombia", "Sector transportador", "No Certificado", ""],
-  ["900110", "Sample Client J", "TID", "XX-XXX0110", "San Juan", "Internacional", "2011-05-30", 90000, "USD", "2022-11-08", "Activo", "Puerto Rico", "Otras actividades", "No Certificado", "2026-01-12"],
-  ["900111", "Sample Client K", "TID", "XX-XXX0111", "Orlando", "Internacional", "2014-08-08", 260000, "USD", "2021-03-03", "Activo", "Estados Unidos", "Constructoras", "CTPAT", "2024-02-20"],
-  ["900112", "Sample Client L", "NIT", "900000112", "Cali", "Nacional", "2013-12-01", 900000000, "COP", "2018-04-16", "Activo", "Colombia", "Constructoras", "No Certificado", "2023-01-09"]
+  ["900101", "Sample Client A", "TID", "XX-XXX0101", "Tampa", "International", "2012-03-14", 380000, "USD", "2023-02-10", "Active", "United States", "Construction companies", "Not certified", ""],
+  ["900102", "Sample Client B", "NIT", "900000102", "Bogotá", "National", "2018-06-01", 450000000, "COP", "2019-09-20", "Active", "Colombia", "Activities not included in the following categories", "Not certified", "2025-04-02"],
+  ["900103", "Sample Client C", "NIT", "900000103", "Cartagena", "National", "2010-01-20", 1500000000, "COP", "2021-05-11", "Active", "Colombia", "Hotels and travel agencies", "Not certified", "2022-03-15"],
+  ["900104", "Sample Client D", "TID", "XX-XXX0104", "Miami", "International", "", 0, "USD", "2024-08-19", "Active", "United States", "Other activities", "Not certified", ""],
+  ["900105", "Sample Client E", "NIT", "900000105", "Medellín", "National", "2016-07-07", 250000000, "COP", "2020-01-30", "Active", "Colombia", "Distributors", "OEA", "2025-10-01"],
+  ["900106", "Sample Client F", "RUC", "XXXXXXX0106", "Ciudad de Panamá", "International", "2024-09-12", 520000, "USD", "2025-02-14", "Active", "Panama", "Construction companies", "Not certified", ""],
+  ["900107", "Sample Client G", "Tax ID", "XX-XXX0107", "George Town", "International", "2026-03-01", 600000, "USD", "2026-04-01", "Active", "Cayman Islands", "Real estate dealers or agencies", "Not certified", ""],
+  ["900108", "Sample Client H", "TID", "XX-XXX0108", "Houston", "International", "2008-02-25", 150000, "USD", "2019-09-20", "Inactive", "United States", "Construction companies", "Not certified", ""],
+  ["900109", "Sample Client I", "NIT", "900000109", "Barranquilla", "National", "2019-10-10", 0, "COP", "2025-07-22", "Active", "Colombia", "Transportation sector", "Not certified", ""],
+  ["900110", "Sample Client J", "TID", "XX-XXX0110", "San Juan", "International", "2011-05-30", 90000, "USD", "2022-11-08", "Active", "Puerto Rico", "Other activities", "Not certified", "2026-01-12"],
+  ["900111", "Sample Client K", "TID", "XX-XXX0111", "Orlando", "International", "2014-08-08", 260000, "USD", "2021-03-03", "Active", "United States", "Construction companies", "CTPAT", "2024-02-20"],
+  ["900112", "Sample Client L", "NIT", "900000112", "Cali", "National", "2013-12-01", 900000000, "COP", "2018-04-16", "Active", "Colombia", "Construction companies", "Not certified", "2023-01-09"]
 ].map(([sap, name, idType, idNum, city, type, founded, amount, currency, linked, status, country, activity, security, docDate]) =>
   ({ sap, name, idType, idNum, city, type, founded, amount, currency, linked, status, country, activity, security, docDate, visits: blankVisits(), terms: STANDARD_TERMS }));
-data[6].visits[2026] = ["2026-05-20", "Favorable", "Actualizar plan de contingencia"];
+data[6].visits[2026] = ["2026-05-20", "Favorable", "Update contingency plan"];
 data[2].terms = "50% Advance, 50% Before shipment.";
 
 function calc(c) {
@@ -480,17 +480,17 @@ function calc(c) {
   c.sSec = CERTS.find((x) => x.name === c.security)?.score ?? "";
   c.score = Math.round([c.sJur, c.sAct, c.sTrack, c.sAmount, c.sSec].reduce((a, b) => a + (typeof b === "number" ? b : 0), 0));
   c.risk = riskOf(c.score);
-  c.docApplies = (TODAY - d(c.linked)) / DAY > CFG.vigencia ? "SI" : "NO";
-  c.docState = c.docApplies === "NO" ? "Vigente" : !c.docDate ? "Pendiente por actualizar" : d(c.docDate) > TODAY - CFG.vigencia * DAY ? "Vigente" : "Pendiente por actualizar";
+  c.docApplies = (TODAY - d(c.linked)) / DAY > CFG.vigencia ? "Yes" : "No";
+  c.docState = c.docApplies === "No" ? "Up to date" : !c.docDate ? "Pending update" : d(c.docDate) > TODAY - CFG.vigencia * DAY ? "Up to date" : "Pending update";
   const last = Object.values(c.visits).map((v) => v[0]).filter(Boolean).map(d).sort((a, b) => b - a)[0];
-  c.visit = RISK_LEVELS.find((r) => r.label === c.risk)?.visit !== "Yes" ? "No aplica" : last && (TODAY - last) / DAY < CFG.vigencia ? "Cumple" : "No cumple";
+  c.visit = RISK_LEVELS.find((r) => r.label === c.risk)?.visit !== "Yes" ? "Not applicable" : last && (TODAY - last) / DAY < CFG.vigencia ? "Compliant" : "Non-compliant";
   return c;
 }
 data.forEach(calc);
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
-const tone = (v) => (v === "Vigente" || v === "Cumple" ? "ok" : v === "Pendiente por actualizar" || v === "No cumple" ? "warn" : "");
+const tone = (v) => (v === "Up to date" || v === "Compliant" ? "ok" : v === "Pending update" || v === "Non-compliant" ? "warn" : "");
 const COLS = [
   ["sap", "SAP CODE", "sticky1"], ["name", "COMPANY NAME", "sticky2 name"], ["idType", "ID TYPE"], ["idNum", "# ID"], ["city", "CITY"], ["type", "CUSTOMER TYPE"],
   ["founded", "INCORPORATION DATE", "", fmtDate], ["amount", "ANNUAL OPERATING AMOUNT", "num", fmtMoney], ["currency", "CURRENCY"], ["linked", "ESM ONBOARDING DATE", "", fmtDate], ["status", "STATUS"],
@@ -518,7 +518,7 @@ function filtered() {
     .sort((a, b) => { const x = val(a, sortKey), y = val(b, sortKey); return (x > y ? 1 : x < y ? -1 : 0) * sortDir; });
 }
 
-const KPIS = [["Total customers", null], ["High risk", ["risk", "ALTO"]], ["Medium risk", ["risk", "MEDIO"]], ["Low risk", ["risk", "BAJO"]], ["Documentation up to date", ["docState", "Vigente"]], ["Documentation pending", ["docState", "Pendiente por actualizar"]], ["Site visit overdue", ["visit", "No cumple"]]];
+const KPIS = [["Total customers", null], ["High risk", ["risk", "HIGH"]], ["Medium risk", ["risk", "MEDIUM"]], ["Low risk", ["risk", "LOW"]], ["Documentation up to date", ["docState", "Up to date"]], ["Documentation pending", ["docState", "Pending update"]], ["Site visit overdue", ["visit", "Non-compliant"]]];
 function renderKpis() {
   const same = (f) => f && kpiFilter && f[0] === kpiFilter[0] && f[1] === kpiFilter[1];
   $("kpis").innerHTML = KPIS.map(([label, f], i) => `<button type="button" class="kpi ${same(f) ? "on" : ""}" data-i="${i}"><small>${label}</small><b>${f ? data.filter((c) => c[f[0]] === f[1]).length : data.length}</b></button>`).join("");
@@ -552,8 +552,8 @@ function renderClients() {
   $("clientList").querySelector(".selected")?.scrollIntoView({ block: "nearest" });
   $("detailTabs").querySelectorAll("[data-tab]").forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
   $("dName").textContent = c.name;
-  $("dToggle").classList.toggle("off", c.status !== "Activo");
-  $("dToggle").setAttribute("aria-checked", c.status === "Activo");
+  $("dToggle").classList.toggle("off", c.status !== "Active");
+  $("dToggle").setAttribute("aria-checked", c.status === "Active");
   $("dToggle").title = c.status;
   tab === "matrix" ? drawMatrixTab(c) : drawGeneral(c);
 }
@@ -600,14 +600,14 @@ function drawMatrixTab(c) {
       <span>ID type</span><span class="val"><select data-k="idType">${opts(TIPOS_ID, c.idType)}</select></span>
       <span># ID</span><span class="val"><input data-k="idNum" value="${esc(c.idNum)}"></span>
       <span>City ${ERP}</span><span class="val">${esc(c.city)}</span>
-      <span>Customer type</span><span class="val"><select data-k="type">${opts(["Nacional", "Internacional"], c.type)}</select></span>
+      <span>Customer type</span><span class="val"><select data-k="type">${opts(["National", "International"], c.type)}</select></span>
       <span>Incorporation date</span><span class="val"><input type="date" data-k="founded" value="${c.founded}"></span>
       <span>Annual operating amount</span><span class="val"><input type="number" min="0" data-k="amount" value="${c.amount}"></span>
       <span>Currency</span><span class="val"><select data-k="currency">${opts(["COP", "USD"], c.currency)}</select></span>
       <span>ESM onboarding date</span><span class="val"><input type="date" data-k="linked" value="${c.linked}"></span>
     </div></div>
     <div class="section"><h2>Risk assessment criteria</h2><div class="fields">
-      <span>Territorial jurisdiction</span><span class="val"><select data-k="country">${opts(Object.keys(JUR).sort((a, b) => a.localeCompare(b, "es")), c.country)}</select></span>
+      <span>Territorial jurisdiction</span><span class="val"><select data-k="country">${opts(Object.keys(JUR).sort((a, b) => a.localeCompare(b, "en")), c.country)}</select></span>
       <span>Business activity</span><span class="val"><select data-k="activity">${opts(ACTS.filter((a) => a.enabled !== false || a.name === c.activity).map((a) => a.name), c.activity)}</select></span>
       <span>Market track record ${CALC}</span><span class="val">${c.track}</span>
       <span>Operating amount ${CALC}</span><span class="val">${c.range}</span>
@@ -646,7 +646,7 @@ function go(view, sap = current, t = tab, push = true) {
 }
 
 document.querySelectorAll("[data-go]").forEach((b) => b.onclick = () => go(b.dataset.go));
-$("dToggle").onclick = () => { const c = data.find((x) => x.sap === current); c.status = c.status === "Activo" ? "Inactivo" : "Activo"; renderClients(); };
+$("dToggle").onclick = () => { const c = data.find((x) => x.sap === current); c.status = c.status === "Active" ? "Inactive" : "Active"; renderClients(); };
 $("detailTabs").querySelectorAll("[data-tab]").forEach((b) => b.onclick = () => go("clients", current, b.dataset.tab));
 Object.keys(filters).forEach((id) => $(id).onchange = renderMatrix);
 $("clear").onclick = () => { colQ = []; Object.keys(filters).forEach((id) => $(id).value = ""); kpiFilter = null; renderMatrix(); };
@@ -694,7 +694,7 @@ function wireRanges(rules, readNew, order) {
     rules.push(r); resort(); applyChange(); };
 }
 const used = (key, name) => data.filter((c) => c[key] === name).length;
-const LVL = ["", "BAJO", "MEDIO", "ALTO"];
+const LVL = ["", "LOW", "MEDIUM", "HIGH"];
 const dash = (v) => (v === "" || v === undefined ? "—" : v);
 const scoreField = { k: "score", label: "Rating*", icon: "pin", type: "number", req: true };
 const listCat = (title, formTitle, label, icon, usedKey, list) => ({
@@ -840,7 +840,7 @@ function renderSettingsPage() {
     return;
   }
   if (CAT[sPage]) { renderCatalog(CAT[sPage]); return; }
-  const pend = data.filter((c) => c.docState === "Pendiente por actualizar").length;
+  const pend = data.filter((c) => c.docState === "Pending update").length;
   body.innerHTML = `
     <div class="cfg">
       <span>Validity (days)</span><input type="number" min="1" data-c="vigencia" value="${CFG.vigencia}" aria-label="Validity in days"><small>${pend} customers with pending documentation</small>
@@ -867,7 +867,7 @@ const XL_DATES = new Set(["founded", "linked", "docDate", "v20240", "v20250", "v
 const XL_GROUPS = [["CUSTOMER IDENTIFICATION", 11], ["RISK ASSESSMENT CRITERIA", 5], ["CUSTOMER RISK RATING", 5], ["RISK LEVEL ASSESSMENT", 2], ["DOCUMENTATION UPDATE", 3], ["SITE VISIT", 1], ["YEAR 2024", 3], ["YEAR 2025", 3], ["YEAR 2026", 3]];
 const XL_NAMES = { docApplies: "DOCUMENTATION UPDATE APPLIES", docDate: "DOCUMENTATION UPDATE DATE", docState: "DOCUMENTATION STATUS", visit: "SITE VISIT STATUS" };
 const xlHeader = (key, label) => (key.startsWith("v20") ? `VISIT ${key.slice(1, 5)} ${label}` : XL_NAMES[key] || label);
-const XL_LISTS = () => ({ idType: TIPOS_ID, type: ["Nacional", "Internacional"], currency: ["COP", "USD"], country: JURD.map((r) => r[0]).sort((a, b) => a.localeCompare(b, "es")),
+const XL_LISTS = () => ({ idType: TIPOS_ID, type: ["National", "International"], currency: ["COP", "USD"], country: JURD.map((r) => r[0]).sort((a, b) => a.localeCompare(b, "en")),
   activity: ACTS.filter((a) => a.enabled !== false).map((a) => a.name), security: CERTS.filter((x) => x.enabled !== false).map((x) => x.name) });
 let excelLib = null;
 const loadExcel = () => excelLib || (excelLib = new Promise((ok, fail) => { if (window.ExcelJS) return ok(window.ExcelJS); const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"; s.onload = () => ok(window.ExcelJS); s.onerror = () => { excelLib = null; fail(new Error("load")); }; document.head.appendChild(s); }));
@@ -886,36 +886,62 @@ function busy(btn, on) { btn.disabled = on; btn.classList.toggle("busy", on); }
 async function exportMatrix() {
   const btn = $("mxExport"); busy(btn, true);
   try {
-    const ExcelJS = await loadExcel(), wb = new ExcelJS.Workbook(), ws = wb.addWorksheet("Customer Matrix", { views: [{ state: "frozen", xSplit: 2, ySplit: 2 }] });
+    const ExcelJS = await loadExcel(), wb = new ExcelJS.Workbook(), N = COLS.length, HR = 9, FIRST = HR + 1;
+    const ws = wb.addWorksheet("Customer Matrix", { views: [{ state: "frozen", xSplit: 2, ySplit: HR, showGridLines: false }] });
     const lists = XL_LISTS(), lw = wb.addWorksheet("Lists", { state: "veryHidden" }), listRef = {};
     Object.entries(lists).forEach(([k, arr], i) => { const L = colLetter(i + 1); lw.getCell(`${L}1`).value = k; arr.forEach((v, j) => { lw.getCell(`${L}${j + 2}`).value = v; }); listRef[k] = `Lists!$${L}$2:$${L}$${arr.length + 1}`; });
-    const fill = (argb) => ({ type: "pattern", pattern: "solid", fgColor: { argb } }), thin = { style: "thin", color: { argb: "FFD0D0D0" } }, border = { top: thin, left: thin, bottom: thin, right: thin };
-    let c = 1; XL_GROUPS.forEach(([g, n]) => { ws.mergeCells(1, c, 1, c + n - 1); const cell = ws.getCell(1, c); cell.value = g; cell.font = { bold: true, color: { argb: "FF424242" } }; cell.fill = fill("FFEEEEEE"); cell.alignment = { horizontal: "center" }; c += n; });
+    const fill = (argb) => ({ type: "pattern", pattern: "solid", fgColor: { argb } });
+    const line = (style = "thin", argb = "FFBFBFBF") => ({ style, color: { argb } });
+    const box = (r1, c1, r2, c2) => { for (let r = r1; r <= r2; r++) for (let c = c1; c <= c2; c++) { const b = { ...ws.getCell(r, c).border }; if (r === r1) b.top = line("medium", "FF000000"); if (r === r2) b.bottom = line("medium", "FF000000"); if (c === c1) b.left = line("medium", "FF000000"); if (c === c2) b.right = line("medium", "FF000000"); ws.getCell(r, c).border = b; } };
+    const LIGHT = "FFDDEBF7", MID = "FF9BC2E6", font = (o = {}) => ({ name: "Arial", size: 10, ...o });
+    for (let r = 1; r <= HR; r++) ws.getRow(r).font = font();
+    ws.mergeCells(1, 1, 4, 2); ws.mergeCells(1, 3, 4, N - 10);
+    const t = ws.getCell(1, 3); t.value = "CUSTOMER CRITICALITY ASSESSMENT MATRIX"; t.font = font({ size: 16, bold: true }); t.alignment = { horizontal: "center", vertical: "middle" };
+    ["CODE: MT01-PRSA-02", "DATE: 02/03/2026", "VERSION: 02", "TYPE: RESTRICTED"].forEach((txt, i) => { ws.mergeCells(i + 1, N - 9, i + 1, N); const c = ws.getCell(i + 1, N - 9); c.value = txt; c.font = font({ bold: true }); c.alignment = { vertical: "middle", horizontal: "left", indent: 1 }; c.border = { bottom: line() }; });
+    box(1, 1, 4, 2); box(1, 3, 4, N - 10); box(1, N - 9, 4, N);
+    for (let r = 1; r <= 4; r++) ws.getRow(r).height = 22;
+    try {
+      const res = await fetch("es-metals-logo.png"), blob = await res.blob();
+      const base64 = await new Promise((ok) => { const fr = new FileReader(); fr.onload = () => ok(fr.result); fr.readAsDataURL(blob); });
+      ws.addImage(wb.addImage({ base64, extension: "png" }), { tl: { col: 0.25, row: 0.6 }, ext: { width: 230, height: 58 } });
+    } catch (e) { ws.getCell(1, 1).value = "ES METALS"; ws.getCell(1, 1).font = font({ size: 18, bold: true, color: { argb: "FF4F81BD" } }); ws.getCell(1, 1).alignment = { horizontal: "center", vertical: "middle" }; }
+    ws.mergeCells(6, 1, 6, 2); const ul = ws.getCell(6, 1); ul.value = "UPDATE DATE"; ul.font = font({ bold: true, size: 11 }); ul.fill = fill(LIGHT); ul.alignment = { horizontal: "center", vertical: "middle" };
+    const ud = ws.getCell(6, 3); ud.value = new Date(TODAY.toISOString().slice(0, 10) + "T00:00:00Z"); ud.numFmt = "dd/mm/yyyy"; ud.font = font(); ud.alignment = { horizontal: "center" };
+    let c = 1;
+    XL_GROUPS.forEach(([g, n]) => { ws.mergeCells(8, c, 8, c + n - 1); const cell = ws.getCell(8, c); cell.value = g; cell.font = font({ bold: true, size: 11, color: { argb: "FFFFFFFF" } }); cell.fill = fill(MID); cell.alignment = { horizontal: "center", vertical: "middle" };
+      for (let k = c; k < c + n; k++) ws.getCell(8, k).border = { top: line("thin", "FFFFFFFF"), bottom: line("thin", "FFFFFFFF"), left: k === c ? line("medium", "FF000000") : undefined, right: k === c + n - 1 ? line("medium", "FF000000") : undefined };
+      c += n; });
+    ws.getRow(8).height = 20;
     COLS.forEach(([key, label], i) => {
-      const cell = ws.getCell(2, i + 1), kind = XL_EDIT.has(key) ? "edit" : XL_RECORD.has(key) ? "record" : "calc";
+      const cell = ws.getCell(HR, i + 1), kind = XL_EDIT.has(key) ? "edit" : XL_RECORD.has(key) ? "record" : "calc";
       cell.value = xlHeader(key, label) + (kind === "calc" ? " (CALCULATED)" : "");
-      cell.font = { bold: true, color: { argb: kind === "edit" ? "FFFFFFFF" : "FF424242" } };
-      cell.fill = fill(kind === "edit" ? "FF1976D2" : kind === "record" ? "FFE0E0E0" : "FFBDBDBD");
-      cell.alignment = { wrapText: true, vertical: "middle" }; cell.border = border;
-      cell.note = kind === "edit" ? "Editable" : kind === "record" ? "From the customer record. Not editable here." : "Calculated with the Excel formula. Not editable.";
-      ws.getColumn(i + 1).width = Math.max(12, Math.min(40, label.length + 4));
+      cell.font = font({ bold: true, color: { argb: kind === "calc" ? "FF595959" : "FF000000" } });
+      cell.fill = fill(LIGHT); cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+      cell.border = { top: line("thin", "FFFFFFFF"), bottom: line("medium", "FF9BC2E6"), left: line("thin", "FFFFFFFF"), right: line("thin", "FFFFFFFF") };
+      cell.note = kind === "edit" ? "Editable" : kind === "record" ? "From the customer record. Not editable here." : "Calculated with the matrix formula. Not editable.";
+      ws.getColumn(i + 1).width = key === "name" || key === "activity" ? 34 : Math.max(13, Math.min(26, label.length * 0.9 + 4));
     });
-    ws.getRow(2).height = 42;
-    data.forEach((cl, r) => COLS.forEach(([key], i) => {
-      const cell = ws.getCell(r + 3, i + 1), v = val(cl, key), kind = XL_EDIT.has(key) ? "edit" : XL_RECORD.has(key) ? "record" : "calc";
-      cell.value = XL_DATES.has(key) ? (v ? new Date(v + "T00:00:00Z") : null) : v === "" ? null : v;
-      if (XL_DATES.has(key)) cell.numFmt = "dd/mm/yyyy"; if (key === "amount") cell.numFmt = "#,##0";
-      cell.border = border;
-      if (kind === "edit") cell.protection = { locked: false }; else { cell.fill = fill(kind === "record" ? "FFF5F5F5" : "FFEEEEEE"); cell.font = { italic: kind === "calc", color: { argb: "FF616161" } }; }
-    }));
-    const last = data.length + 2;
-    COLS.forEach(([key], i) => { if (listRef[key]) ws.dataValidations.add(`${colLetter(i + 1)}3:${colLetter(i + 1)}${last}`, { type: "list", allowBlank: true, formulae: [listRef[key]], showErrorMessage: true, errorTitle: "Invalid value", error: "Choose a value from the list." }); });
-    ws.autoFilter = { from: { row: 2, column: 1 }, to: { row: last, column: COLS.length } };
+    ws.getRow(HR).height = 48;
+    data.forEach((cl, r) => {
+      ws.getRow(FIRST + r).height = 20;
+      COLS.forEach(([key], i) => {
+        const cell = ws.getCell(FIRST + r, i + 1), v = val(cl, key), kind = XL_EDIT.has(key) ? "edit" : XL_RECORD.has(key) ? "record" : "calc";
+        cell.value = XL_DATES.has(key) ? (v ? new Date(v + "T00:00:00Z") : null) : v === "" ? null : v;
+        if (XL_DATES.has(key)) cell.numFmt = "d/mm/yyyy"; if (key === "amount") cell.numFmt = '"$"#,##0';
+        cell.font = font({ size: 10, italic: kind === "calc", color: { argb: kind === "edit" ? "FF000000" : "FF595959" } });
+        cell.alignment = { horizontal: key === "name" || key === "activity" ? "left" : "center", vertical: "middle", wrapText: key === "activity" };
+        cell.border = { bottom: line("thin", "FFD9D9D9"), right: line("thin", "FFEDEDED") };
+        if (kind === "edit") cell.protection = { locked: false }; else cell.fill = fill(kind === "record" ? "FFF7F7F7" : "FFF2F2F2");
+      });
+    });
+    const last = FIRST + data.length - 1;
+    COLS.forEach(([key], i) => { if (listRef[key]) ws.dataValidations.add(`${colLetter(i + 1)}${FIRST}:${colLetter(i + 1)}${last}`, { type: "list", allowBlank: true, formulae: [listRef[key]], showErrorMessage: true, errorTitle: "Invalid value", error: "Choose a value from the list." }); });
+    ws.autoFilter = { from: { row: HR, column: 1 }, to: { row: last, column: N } };
     await ws.protect("", { selectLockedCells: true, selectUnlockedCells: true, formatColumns: true, formatRows: true, autoFilter: true, sort: false });
-    const info = wb.addWorksheet("Instructions");
-    [["Customer Matrix template"], [""], ["Blue columns: editable. Change the values and import the file in Customer Matrix > IMPORT."], ["Light grey columns: come from the customer record (SAP code, company name, city, status). Not editable here."],
-      ["Dark grey columns marked (CALCULATED): calculated with the Excel formulas. They are locked and recalculated after the import."], ["Do not add, remove or reorder rows or columns. Rows are matched by SAP code."]].forEach((row, i) => { info.getCell(i + 1, 1).value = row[0]; });
-    info.getCell(1, 1).font = { bold: true, size: 14 }; info.getColumn(1).width = 110;
+    const info = wb.addWorksheet("Instructions", { views: [{ showGridLines: false }] });
+    [["Customer Matrix template"], [""], ["Edit only the white cells. Rows are matched by SAP code."], ["Grey cells come from the customer record (SAP code, company name, city, status) and can't be edited here."],
+      ["Columns marked (CALCULATED) are calculated with the matrix formulas. They are locked and recalculated after the import."], ["Do not add, remove or reorder rows or columns. Then import the file in Customer Matrix > IMPORT."]].forEach((row, i) => { const cl = info.getCell(i + 1, 1); cl.value = row[0]; cl.font = font({ size: i ? 11 : 14, bold: !i }); });
+    info.getColumn(1).width = 110;
     const buf = await wb.xlsx.writeBuffer(), a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
     a.download = `Customer_Matrix_${TODAY.toISOString().slice(0, 10)}.xlsx`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
@@ -929,9 +955,10 @@ async function importMatrix(file) {
     const ExcelJS = await loadExcel(), wb = new ExcelJS.Workbook(); await wb.xlsx.load(await file.arrayBuffer());
     const ws = wb.getWorksheet("Customer Matrix");
     const expected = COLS.map(([key, label]) => xlHeader(key, label) + (XL_EDIT.has(key) || XL_RECORD.has(key) ? "" : " (CALCULATED)"));
-    if (!ws || expected.some((h, i) => String(cellVal(ws.getCell(2, i + 1))).trim() !== h)) { busy(btn, false); return notice("This file doesn't match the Customer Matrix template. Use EXPORT to download it again.", true); }
+    let HR = 0; if (ws) for (let r = 1; r <= Math.min(20, ws.rowCount); r++) if (String(cellVal(ws.getCell(r, 1))).trim() === expected[0]) { HR = r; break; }
+    if (!ws || !HR || expected.some((h, i) => String(cellVal(ws.getCell(HR, i + 1))).trim() !== h)) { busy(btn, false); return notice("This file doesn't match the Customer Matrix template. Use EXPORT to download it again.", true); }
     const lists = XL_LISTS(), errors = [], changes = [], seen = new Set();
-    for (let r = 3; r <= ws.rowCount; r++) {
+    for (let r = HR + 1; r <= ws.rowCount; r++) {
       const sap = String(cellVal(ws.getCell(r, 1))).trim(); if (!sap) continue;
       const cl = data.find((x) => x.sap === sap);
       if (!cl) { errors.push(`Row ${r}: SAP code ${sap} doesn't exist.`); continue; }
