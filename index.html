@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Módulo de Clientes</title>
+<title>Clients Module</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined">
 <style>
@@ -194,6 +194,47 @@
   .stable input.name-in.short { min-width: 160px; }
   .stable input.money { width: 150px; }
   .stable tr.add-row td { background: #fafafa; }
+  .cat { max-width: 1320px; border: 1px solid var(--line); border-radius: 4px; background: #fff; }
+  .cat-head { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; padding: 22px 22px; background: #eeeeee; }
+  .cat-head h2 { margin: 0 8px 0 0; color: var(--text); font-size: 26px; font-weight: 700; letter-spacing: .2px; }
+  .cat-head .btn-new { height: 42px; font-size: 16px; cursor: pointer; }
+  .cat-search { display: flex; align-items: center; gap: 6px; margin-left: auto; border-bottom: 1px solid #9e9e9e; }
+  .cat-search input { width: 220px; height: 36px; border: 0; background: none; outline: none; font-size: 15px; }
+  .cat-search .material-icons { color: var(--muted); }
+  .cat-body { max-height: 620px; overflow: auto; }
+  .cat-table { width: 100%; min-width: 0; font-size: 15px; }
+  .cat-table th { position: sticky; top: 0; height: 48px; background: #fff; color: var(--muted); font-size: 13px; font-weight: 500; letter-spacing: .4px; border-bottom: 1px solid #cfcfcf; }
+  .cat-table td { height: 58px; color: var(--text); white-space: normal; }
+  .cat-table td.first { min-width: 220px; max-width: 520px; }
+  .cat-table .act-col { width: 110px; white-space: nowrap; }
+  .cat-table .act-col .icon-btn { display: inline-flex; color: #616161; }
+  .cat-table .act-col .icon-btn.del:hover { color: var(--high); }
+  .toggle.mini { width: 40px; height: 22px; margin: 0; }
+  .toggle.mini i { top: 2px; right: 2px; width: 18px; height: 18px; }
+  .toggle.mini.off i { left: 2px; right: auto; }
+  .modal-back { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(0, 0, 0, .45); }
+  .modal { width: 750px; max-width: 100%; max-height: 92vh; overflow: auto; padding: 18px 26px 22px; border-radius: 6px; background: #fff; box-shadow: 0 12px 32px rgba(0, 0, 0, .3); }
+  .m-head { display: flex; align-items: center; gap: 12px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+  .m-head h3 { margin: 0; color: var(--text); font-size: 26px; font-weight: 700; }
+  .m-close { display: flex; padding: 4px; border: 0; background: none; color: var(--blue); cursor: pointer; }
+  .m-close .material-icons { font-size: 30px; }
+  .m-field { display: grid; grid-template-columns: 40px minmax(0, 1fr); align-items: end; column-gap: 4px; margin-top: 22px; }
+  .m-icon { padding-bottom: 8px; color: #616161; }
+  .m-field label { display: block; }
+  .m-label { display: block; color: var(--muted); font-size: 14px; }
+  .m-field input, .m-field select, .m-field textarea { width: 100%; height: 36px; padding: 0 2px; border: 0; border-bottom: 1px solid #9e9e9e; background: none; color: var(--text); font-size: 16px; }
+  .m-field textarea { height: auto; min-height: 84px; padding-top: 6px; resize: vertical; }
+  .m-field input:focus, .m-field select:focus, .m-field textarea:focus { outline: none; border-bottom: 2px solid var(--blue); }
+  .m-hint { grid-column: 2; margin-top: 4px; color: var(--soft); font-size: 12px; }
+  .m-enabled { display: flex; align-items: center; gap: 10px; margin-top: 28px; color: var(--muted); }
+  .m-err { margin-top: 14px; color: var(--high); font-size: 14px; }
+  .m-foot { display: flex; justify-content: flex-end; margin-top: 26px; }
+  .m-save { height: 44px; padding: 0 24px; border: 0; border-radius: 22px; background: var(--blue); color: #fff; font-size: 16px; font-weight: 500; letter-spacing: 1px; cursor: pointer; }
+  .m-save:disabled { background: #e0e0e0; color: #9e9e9e; cursor: default; }
+  .cat-table th { vertical-align: bottom; padding-top: 10px; padding-bottom: 6px; height: auto; }
+  .col-h { display: block; margin-bottom: 4px; white-space: nowrap; }
+  .col-f { width: 100%; min-width: 70px; height: 30px; padding: 0 2px; border: 0; border-bottom: 1px solid #9e9e9e; background: none; color: var(--text); font-size: 15px; font-weight: 500; }
+  .col-f:focus { outline: none; border-bottom: 2px solid var(--blue); }
   footer { flex: none; display: flex; justify-content: space-between; gap: 16px; padding: 12px 24px; background: #fafafa; font-size: 18px; }
   [hidden] { display: none !important; }
   @media (max-width: 1500px) { .contacts { grid-template-columns: 219px minmax(0, 328px) 70px; } .contacts .predef { display: none; } }
@@ -225,7 +266,7 @@
 </head>
 <body>
 <div class="app">
-  <nav class="rail" aria-label="Módulos"><button type="button" class="active" data-rail="clients" title="Clients" aria-label="Clients"><span class="material-icons" aria-hidden="true">person</span></button><button type="button" data-rail="settings" title="Settings" aria-label="Settings"><span class="material-icons" aria-hidden="true">settings</span></button><button type="button" class="logout" title="Log out" aria-label="Log out"><span class="material-icons" aria-hidden="true">logout</span></button></nav>
+  <nav class="rail" aria-label="Modules"><button type="button" class="active" data-rail="clients" title="Clients" aria-label="Clients"><span class="material-icons" aria-hidden="true">person</span></button><button type="button" data-rail="settings" title="Settings" aria-label="Settings"><span class="material-icons" aria-hidden="true">settings</span></button><button type="button" class="logout" title="Log out" aria-label="Log out"><span class="material-icons" aria-hidden="true">logout</span></button></nav>
 
   <aside class="clients" id="clientsPanel">
     <div class="module-tabs">
@@ -250,7 +291,7 @@
     <div class="title">
       <span class="material-icons building" aria-hidden="true">apartment</span>
       <h1 id="dName"></h1>
-      <button type="button" class="toggle" id="dToggle" role="switch" aria-label="Estado del cliente"><i></i></button>
+      <button type="button" class="toggle" id="dToggle" role="switch" aria-label="Customer status"><i></i></button>
       <div class="more" aria-hidden="true"><span class="material-icons">more_horiz</span></div>
     </div>
     <div class="scroll" id="dBody"></div>
@@ -262,33 +303,33 @@
       <button class="active" type="button">CUSTOMER MATRIX</button>
     </div>
     <div class="toolbar">
-      <label class="search"><span class="material-icons" aria-hidden="true">search</span><input id="q" type="search" placeholder="Search" aria-label="Buscar por razón social, código SAP, ID o ciudad"></label>
-      <span class="filter"><select id="fRisk" aria-label="Interpretación"><option value="">Interpretación</option><option>BAJO</option><option>MEDIO</option><option>ALTO</option></select></span>
-      <span class="filter"><select id="fType" aria-label="Tipo de cliente"><option value="">Tipo de cliente</option><option>Nacional</option><option>Internacional</option></select></span>
-      <span class="filter"><select id="fCountry" aria-label="Jurisdicción territorial"><option value="">Jurisdicción territorial</option></select></span>
-      <span class="filter"><select id="fActivity" aria-label="Actividades desarrolladas"><option value="">Actividades desarrolladas</option></select></span>
-      <span class="filter"><select id="fSec" aria-label="Programa de seguridad"><option value="">Programa de seguridad</option></select></span>
-      <span class="filter"><select id="fDoc" aria-label="Actualización de documentación"><option value="">Actualización de documentación</option><option>Vigente</option><option>Pendiente por actualizar</option></select></span>
-      <span class="filter"><select id="fStatus" aria-label="Estado"><option value="">Estado</option><option>Activo</option><option>Inactivo</option></select></span>
-      <button class="link-btn" id="clear" type="button" hidden><span class="material-icons" aria-hidden="true">close</span>Limpiar filtros</button>
+      <label class="search"><span class="material-icons" aria-hidden="true">search</span><input id="q" type="search" placeholder="Search" aria-label="Search by company name, SAP code, ID or city"></label>
+      <span class="filter"><select id="fRisk" aria-label="Risk level"><option value="">Risk level</option><option>BAJO</option><option>MEDIO</option><option>ALTO</option></select></span>
+      <span class="filter"><select id="fType" aria-label="Customer type"><option value="">Customer type</option><option>Nacional</option><option>Internacional</option></select></span>
+      <span class="filter"><select id="fCountry" aria-label="Jurisdiction"><option value="">Jurisdiction</option></select></span>
+      <span class="filter"><select id="fActivity" aria-label="Business activity"><option value="">Business activity</option></select></span>
+      <span class="filter"><select id="fSec" aria-label="Security program"><option value="">Security program</option></select></span>
+      <span class="filter"><select id="fDoc" aria-label="Documentation"><option value="">Documentation</option><option>Vigente</option><option>Pendiente por actualizar</option></select></span>
+      <span class="filter"><select id="fStatus" aria-label="Status"><option value="">Status</option><option>Activo</option><option>Inactivo</option></select></span>
+      <button class="link-btn" id="clear" type="button" hidden><span class="material-icons" aria-hidden="true">close</span>Clear filters</button>
       <span class="spacer"></span>
-      <span class="meta">MT01-PRSA-02 · Versión 02 · Actualizada el <span id="updated"></span></span>
+      <span class="meta">MT01-PRSA-02 · Version 02 · Updated<span id="updated"></span></span>
     </div>
     <div class="kpis" id="kpis"></div>
     <div class="table-wrap">
       <table>
         <thead>
           <tr class="g1">
-            <th colspan="11" rowspan="2">IDENTIFICACIÓN DEL CLIENTE</th>
-            <th colspan="5" rowspan="2">CRITERIOS PARA EVALUACIÓN DEL NIVEL DE RIESGO</th>
-            <th colspan="5" rowspan="2">CALIFICACIÓN NIVEL DE RIESGO DE CLIENTES</th>
-            <th colspan="2" rowspan="2">EVALUACIÓN DEL NIVEL DE RIESGO</th>
-            <th colspan="13">MEDIDAS DE CONTROL</th>
+            <th colspan="11" rowspan="2">CUSTOMER IDENTIFICATION</th>
+            <th colspan="5" rowspan="2">RISK ASSESSMENT CRITERIA</th>
+            <th colspan="5" rowspan="2">CUSTOMER RISK RATING</th>
+            <th colspan="2" rowspan="2">RISK LEVEL ASSESSMENT</th>
+            <th colspan="13">CONTROL MEASURES</th>
           </tr>
           <tr class="g2">
-            <th colspan="3">ACTUALIZACIÓN DE DOCUMENTACIÓN</th>
-            <th>VISITA A INSTALACIONES</th>
-            <th colspan="3">AÑO 2024</th><th colspan="3">AÑO 2025</th><th colspan="3">AÑO 2026</th>
+            <th colspan="3">DOCUMENTATION UPDATE</th>
+            <th>SITE VISIT</th>
+            <th colspan="3">YEAR 2024</th><th colspan="3">YEAR 2025</th><th colspan="3">YEAR 2026</th>
           </tr>
           <tr class="cols" id="cols"></tr>
         </thead>
@@ -338,8 +379,11 @@ let ACTS = ACTIVIDADES.map((name) => ({ name, score: name === "Actividades no In
 let CERTS = Object.entries(CERT).map(([name, score]) => ({ name, score }));
 let TRAY_RULES = [{ label: "<1 año", from: 0, to: 0, score: 3 }, { label: "1<>3 años", from: 1, to: 3, score: 2 }, { label: "> 3 años", from: 4, to: "", score: 1 }];
 let MONTO_RULES = [{ label: "Menor $600.000.000", cop: 599999999, usd: 217000, score: 1 }, { label: "Entre $600.000.000 y $1.200.000.000", cop: 1200000000, usd: 434000, score: 2 }, { label: "Mayor a $1.200.000.000", cop: "", usd: "", score: 3 }];
-const RISK = { MEDIO: 7, ALTO: 10 };
-const riskOf = (s) => (s >= RISK.ALTO ? "ALTO" : s >= RISK.MEDIO ? "MEDIO" : "BAJO");
+let RISK_LEVELS = [{ label: "BAJO", from: "", to: 6, color: "Green", visit: "No" }, { label: "MEDIO", from: 7, to: 9, color: "Yellow", visit: "No" }, { label: "ALTO", from: 10, to: "", color: "Red", visit: "Yes" }];
+const COLOR_CLS = { Green: "BAJO", Yellow: "MEDIO", Red: "ALTO" };
+const levelOf = (s) => RISK_LEVELS.find((r) => (r.from === "" || s >= r.from) && (r.to === "" || s <= r.to));
+const riskOf = (s) => levelOf(s)?.label ?? "No level";
+const riskCls = (name) => COLOR_CLS[RISK_LEVELS.find((r) => r.label === name)?.color] || "";
 let CT_TEMPLATE = `INCLUSIONS
 
 1. Submittals as required for ES METALS scope portions of the project only
@@ -382,18 +426,18 @@ const yearsSince = (s) => { const a = d(s); let y = TODAY.getFullYear() - a.getF
 
 const blankVisits = () => ({ 2024: ["", "", ""], 2025: ["", "", ""], 2026: ["", "", ""] });
 const data = [
-  ["900101", "Cliente de ejemplo A", "TID", "XX-XXX0101", "Tampa", "Internacional", "2012-03-14", 380000, "USD", "2023-02-10", "Activo", "Estados Unidos", "Constructoras", "No Certificado", ""],
-  ["900102", "Cliente de ejemplo B", "NIT", "900000102", "Bogotá", "Nacional", "2018-06-01", 450000000, "COP", "2019-09-20", "Activo", "Colombia", "Actividades no Incluidas en las dos categorías siguientes", "No Certificado", "2025-04-02"],
-  ["900103", "Cliente de ejemplo C", "NIT", "900000103", "Cartagena", "Nacional", "2010-01-20", 1500000000, "COP", "2021-05-11", "Activo", "Colombia", "Hoteles y agencias de viaje", "No Certificado", "2022-03-15"],
-  ["900104", "Cliente de ejemplo D", "TID", "XX-XXX0104", "Miami", "Internacional", "", 0, "USD", "2024-08-19", "Activo", "Estados Unidos", "Otras actividades", "No Certificado", ""],
-  ["900105", "Cliente de ejemplo E", "NIT", "900000105", "Medellín", "Nacional", "2016-07-07", 250000000, "COP", "2020-01-30", "Activo", "Colombia", "Distribuidores", "OEA", "2025-10-01"],
-  ["900106", "Cliente de ejemplo F", "RUC", "XXXXXXX0106", "Ciudad de Panamá", "Internacional", "2024-09-12", 520000, "USD", "2025-02-14", "Activo", "Panamá", "Constructoras", "No Certificado", ""],
-  ["900107", "Cliente de ejemplo G", "Tax ID", "XX-XXX0107", "George Town", "Internacional", "2026-03-01", 600000, "USD", "2026-04-01", "Activo", "Islas Caimán", "Comercializadoras o agencias de bienes raíces", "No Certificado", ""],
-  ["900108", "Cliente de ejemplo H", "TID", "XX-XXX0108", "Houston", "Internacional", "2008-02-25", 150000, "USD", "2019-09-20", "Inactivo", "Estados Unidos", "Constructoras", "No Certificado", ""],
-  ["900109", "Cliente de ejemplo I", "NIT", "900000109", "Barranquilla", "Nacional", "2019-10-10", 0, "COP", "2025-07-22", "Activo", "Colombia", "Sector transportador", "No Certificado", ""],
-  ["900110", "Cliente de ejemplo J", "TID", "XX-XXX0110", "San Juan", "Internacional", "2011-05-30", 90000, "USD", "2022-11-08", "Activo", "Puerto Rico", "Otras actividades", "No Certificado", "2026-01-12"],
-  ["900111", "Cliente de ejemplo K", "TID", "XX-XXX0111", "Orlando", "Internacional", "2014-08-08", 260000, "USD", "2021-03-03", "Activo", "Estados Unidos", "Constructoras", "CTPAT", "2024-02-20"],
-  ["900112", "Cliente de ejemplo L", "NIT", "900000112", "Cali", "Nacional", "2013-12-01", 900000000, "COP", "2018-04-16", "Activo", "Colombia", "Constructoras", "No Certificado", "2023-01-09"]
+  ["900101", "Sample Client A", "TID", "XX-XXX0101", "Tampa", "Internacional", "2012-03-14", 380000, "USD", "2023-02-10", "Activo", "Estados Unidos", "Constructoras", "No Certificado", ""],
+  ["900102", "Sample Client B", "NIT", "900000102", "Bogotá", "Nacional", "2018-06-01", 450000000, "COP", "2019-09-20", "Activo", "Colombia", "Actividades no Incluidas en las dos categorías siguientes", "No Certificado", "2025-04-02"],
+  ["900103", "Sample Client C", "NIT", "900000103", "Cartagena", "Nacional", "2010-01-20", 1500000000, "COP", "2021-05-11", "Activo", "Colombia", "Hoteles y agencias de viaje", "No Certificado", "2022-03-15"],
+  ["900104", "Sample Client D", "TID", "XX-XXX0104", "Miami", "Internacional", "", 0, "USD", "2024-08-19", "Activo", "Estados Unidos", "Otras actividades", "No Certificado", ""],
+  ["900105", "Sample Client E", "NIT", "900000105", "Medellín", "Nacional", "2016-07-07", 250000000, "COP", "2020-01-30", "Activo", "Colombia", "Distribuidores", "OEA", "2025-10-01"],
+  ["900106", "Sample Client F", "RUC", "XXXXXXX0106", "Ciudad de Panamá", "Internacional", "2024-09-12", 520000, "USD", "2025-02-14", "Activo", "Panamá", "Constructoras", "No Certificado", ""],
+  ["900107", "Sample Client G", "Tax ID", "XX-XXX0107", "George Town", "Internacional", "2026-03-01", 600000, "USD", "2026-04-01", "Activo", "Islas Caimán", "Comercializadoras o agencias de bienes raíces", "No Certificado", ""],
+  ["900108", "Sample Client H", "TID", "XX-XXX0108", "Houston", "Internacional", "2008-02-25", 150000, "USD", "2019-09-20", "Inactivo", "Estados Unidos", "Constructoras", "No Certificado", ""],
+  ["900109", "Sample Client I", "NIT", "900000109", "Barranquilla", "Nacional", "2019-10-10", 0, "COP", "2025-07-22", "Activo", "Colombia", "Sector transportador", "No Certificado", ""],
+  ["900110", "Sample Client J", "TID", "XX-XXX0110", "San Juan", "Internacional", "2011-05-30", 90000, "USD", "2022-11-08", "Activo", "Puerto Rico", "Otras actividades", "No Certificado", "2026-01-12"],
+  ["900111", "Sample Client K", "TID", "XX-XXX0111", "Orlando", "Internacional", "2014-08-08", 260000, "USD", "2021-03-03", "Activo", "Estados Unidos", "Constructoras", "CTPAT", "2024-02-20"],
+  ["900112", "Sample Client L", "NIT", "900000112", "Cali", "Nacional", "2013-12-01", 900000000, "COP", "2018-04-16", "Activo", "Colombia", "Constructoras", "No Certificado", "2023-01-09"]
 ].map(([sap, name, idType, idNum, city, type, founded, amount, currency, linked, status, country, activity, security, docDate]) =>
   ({ sap, name, idType, idNum, city, type, founded, amount, currency, linked, status, country, activity, security, docDate, visits: blankVisits(), terms: STANDARD_TERMS }));
 data[6].visits[2026] = ["2026-05-20", "Favorable", "Actualizar plan de contingencia"];
@@ -402,7 +446,7 @@ data[2].terms = "50% Advance, 50% Before shipment.";
 function calc(c) {
   const yrs = c.founded ? yearsSince(c.founded) : Infinity;
   const tr = TRAY_RULES.find((r) => yrs >= (r.from === "" ? -Infinity : r.from) && yrs <= (r.to === "" ? Infinity : r.to));
-  c.track = tr ? tr.label : "Sin rango";
+  c.track = tr ? tr.label : "No range";
   const h = Number(c.amount) || 0, cur = c.currency === "COP" ? "cop" : c.currency === "USD" ? "usd" : "";
   const mr = cur ? MONTO_RULES.find((r) => r[cur] === "" || h <= r[cur]) : null;
   c.range = mr ? mr.label : "0";
@@ -416,7 +460,7 @@ function calc(c) {
   c.docApplies = (TODAY - d(c.linked)) / DAY > CFG.vigencia ? "SI" : "NO";
   c.docState = c.docApplies === "NO" ? "Vigente" : !c.docDate ? "Pendiente por actualizar" : d(c.docDate) > TODAY - CFG.vigencia * DAY ? "Vigente" : "Pendiente por actualizar";
   const last = Object.values(c.visits).map((v) => v[0]).filter(Boolean).map(d).sort((a, b) => b - a)[0];
-  c.visit = c.risk !== "ALTO" ? "No aplica" : last && (TODAY - last) / DAY < CFG.vigencia ? "Cumple" : "No cumple";
+  c.visit = RISK_LEVELS.find((r) => r.label === c.risk)?.visit !== "Yes" ? "No aplica" : last && (TODAY - last) / DAY < CFG.vigencia ? "Cumple" : "No cumple";
   return c;
 }
 data.forEach(calc);
@@ -425,14 +469,14 @@ const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
 const tone = (v) => (v === "Vigente" || v === "Cumple" ? "ok" : v === "Pendiente por actualizar" || v === "No cumple" ? "warn" : "");
 const COLS = [
-  ["sap", "CÓD. SAP", "sticky1"], ["name", "RAZÓN SOCIAL", "sticky2 name"], ["idType", "TIPO DE ID"], ["idNum", "# ID"], ["city", "CIUDAD"], ["type", "TIPO DE CLIENTE"],
-  ["founded", "FECHA DE CONSTITUCIÓN", "", fmtDate], ["amount", "MONTO DE OPERACIÓN ANUAL", "num", fmtMoney], ["currency", "MONEDA"], ["linked", "FECHA DE VINCULACIÓN CON ESM", "", fmtDate], ["status", "ESTADO"],
-  ["country", "Jurisdicción territorial"], ["activity", "Actividades desarrolladas", "wrap"], ["track", "Trayectoria en el mercado"], ["range", "Monto de las operaciones"], ["security", "Programa de seguridad en la cadena de suministro"],
-  ["sJur", "JURISDICCIÓN TERRITORIAL", "num"], ["sAct", "ACTIVIDADES DESARROLLADAS", "num"], ["sTrack", "TRAYECTORIA EN LA ACTIVIDAD", "num"], ["sAmount", "MONTO DE LAS OPERACIONES", "num"], ["sSec", "SEGURIDAD EN LA CADENA DE SUMINISTRO", "num"],
-  ["score", "VALORACIÓN", "num"], ["risk", "INTERPRETACIÓN", "", (v) => `<span class="badge ${v}">${v}</span>`],
-  ["docApplies", "APLICABILIDAD"], ["docDate", "FECHA", "", fmtDate], ["docState", "ESTADO", "", (v) => `<span class="${tone(v)}">${v}</span>`],
-  ["visit", "ESTADO", "", (v) => `<span class="${tone(v)}">${v}</span>`],
-  ...[2024, 2025, 2026].flatMap((y) => [[`v${y}0`, "FECHA", "", fmtDate], [`v${y}1`, "CONCEPTO"], [`v${y}2`, "RECOMENDACIONES"]])
+  ["sap", "SAP CODE", "sticky1"], ["name", "COMPANY NAME", "sticky2 name"], ["idType", "ID TYPE"], ["idNum", "# ID"], ["city", "CITY"], ["type", "CUSTOMER TYPE"],
+  ["founded", "INCORPORATION DATE", "", fmtDate], ["amount", "ANNUAL OPERATING AMOUNT", "num", fmtMoney], ["currency", "CURRENCY"], ["linked", "ESM ONBOARDING DATE", "", fmtDate], ["status", "STATUS"],
+  ["country", "TERRITORIAL JURISDICTION"], ["activity", "BUSINESS ACTIVITY", "wrap"], ["track", "MARKET TRACK RECORD"], ["range", "OPERATING AMOUNT"], ["security", "SUPPLY CHAIN SECURITY PROGRAM"],
+  ["sJur", "TERRITORIAL JURISDICTION", "num"], ["sAct", "BUSINESS ACTIVITIES", "num"], ["sTrack", "TRACK RECORD", "num"], ["sAmount", "OPERATING AMOUNT", "num"], ["sSec", "SUPPLY CHAIN SECURITY", "num"],
+  ["score", "SCORE", "num"], ["risk", "RISK LEVEL", "", (v) => `<span class="badge ${riskCls(v)}">${v}</span>`],
+  ["docApplies", "APPLIES"], ["docDate", "DATE", "", fmtDate], ["docState", "STATUS", "", (v) => `<span class="${tone(v)}">${v}</span>`],
+  ["visit", "STATUS", "", (v) => `<span class="${tone(v)}">${v}</span>`],
+  ...[2024, 2025, 2026].flatMap((y) => [[`v${y}0`, "DATE", "", fmtDate], [`v${y}1`, "FINDING"], [`v${y}2`, "RECOMMENDATIONS"]])
 ];
 const val = (c, key) => key.startsWith("v20") ? c.visits[key.slice(1, 5)][key[5]] : c[key];
 
@@ -450,30 +494,30 @@ function filtered() {
     .sort((a, b) => { const x = val(a, sortKey), y = val(b, sortKey); return (x > y ? 1 : x < y ? -1 : 0) * sortDir; });
 }
 
-const KPIS = [["Total clientes", null], ["Riesgo alto", ["risk", "ALTO"]], ["Riesgo medio", ["risk", "MEDIO"]], ["Riesgo bajo", ["risk", "BAJO"]], ["Documentación actualizada", ["docState", "Vigente"]], ["Documentación pendiente", ["docState", "Pendiente por actualizar"]], ["Visita no cumple", ["visit", "No cumple"]]];
+const KPIS = [["Total customers", null], ["High risk", ["risk", "ALTO"]], ["Medium risk", ["risk", "MEDIO"]], ["Low risk", ["risk", "BAJO"]], ["Documentation up to date", ["docState", "Vigente"]], ["Documentation pending", ["docState", "Pendiente por actualizar"]], ["Site visit overdue", ["visit", "No cumple"]]];
 function renderKpis() {
   const same = (f) => f && kpiFilter && f[0] === kpiFilter[0] && f[1] === kpiFilter[1];
   $("kpis").innerHTML = KPIS.map(([label, f], i) => `<button type="button" class="kpi ${same(f) ? "on" : ""}" data-i="${i}"><small>${label}</small><b>${f ? data.filter((c) => c[f[0]] === f[1]).length : data.length}</b></button>`).join("");
   $("kpis").querySelectorAll(".kpi").forEach((b) => b.onclick = () => { const f = KPIS[b.dataset.i][1]; kpiFilter = f && !same(f) ? f : null; renderMatrix(); });
 }
 
-function refill() { [["fCountry", "country", "Jurisdicción territorial"], ["fActivity", "activity", "Actividades desarrolladas"], ["fSec", "security", "Programa de seguridad"]].forEach(([id, key, label]) => { const v = $(id).value; $(id).innerHTML = `<option value="">${label}</option>` + [...new Set(data.map((c) => c[key]))].sort().map((o) => `<option>${esc(o)}</option>`).join(""); $(id).value = v; }); }
+function refill() { { const v = $("fRisk").value; $("fRisk").innerHTML = `<option value="">Risk level</option>` + RISK_LEVELS.map((r) => `<option>${esc(r.label)}</option>`).join(""); $("fRisk").value = v; } [["fCountry", "country", "Jurisdiction"], ["fActivity", "activity", "Business activity"], ["fSec", "security", "Security program"]].forEach(([id, key, label]) => { const v = $(id).value; $(id).innerHTML = `<option value="">${label}</option>` + [...new Set(data.map((c) => c[key]))].sort().map((o) => `<option>${esc(o)}</option>`).join(""); $(id).value = v; }); }
 function renderMatrix() {
   refill();
   $("cols").innerHTML = COLS.map(([key, label, cls = ""]) => `<th class="${cls.replace(/name|wrap/, "")}" data-key="${key}">${label} ${sortKey === key ? `<span class="material-icons" aria-hidden="true">${sortDir > 0 ? "arrow_upward" : "arrow_downward"}</span>` : ""}</th>`).join("");
   $("cols").querySelectorAll("th").forEach((th) => th.onclick = () => { sortDir = sortKey === th.dataset.key ? -sortDir : 1; sortKey = th.dataset.key; renderMatrix(); });
   const rows = filtered();
   $("rows").innerHTML = rows.length ? rows.map((c) => `<tr data-sap="${c.sap}">${COLS.map(([key, , cls = "", f]) => { const v = val(c, key); return `<td class="${cls}">${f ? f(v, c) : esc(v)}</td>`; }).join("")}</tr>`).join("")
-    : `<tr><td class="empty" colspan="${COLS.length}">No hay clientes con estos filtros.</td></tr>`;
+    : `<tr><td class="empty" colspan="${COLS.length}">No customers match these filters.</td></tr>`;
   $("rows").querySelectorAll("tr[data-sap]").forEach((tr) => tr.onclick = () => go("clients", tr.dataset.sap, "matrix"));
   Object.keys(filters).forEach((id) => $(id).classList.toggle("on", !!$(id).value));
   $("clear").hidden = !(Object.keys(filters).some((id) => $(id).value) || $("q").value || kpiFilter);
-  $("count").textContent = `${rows.length} de ${data.length} clientes`;
+  $("count").textContent = `${rows.length} of ${data.length} customers`;
   renderKpis();
 }
 
 const tag = (icon, text) => `<span class="tag" title="${text}"><span class="material-icons" aria-hidden="true">${icon}</span></span>`;
-const ERP = tag("link", "Viene de la ficha del cliente"), CALC = tag("functions", "Calculado con la fórmula del Excel");
+const ERP = tag("link", "From the customer record"), CALC = tag("functions", "Calculated with the Excel formula");
 const opts = (list, v) => list.map((o) => `<option ${o === v ? "selected" : ""}>${esc(o)}</option>`).join("");
 
 function renderClients() {
@@ -498,14 +542,14 @@ function drawGeneral(c) {
       <span class="predef">Predefined Contacts:</span>
       <div class="underline predef"><span class="material-icons" aria-hidden="true">people</span><span class="grow">Contacts</span><span class="material-icons" aria-hidden="true">arrow_drop_down</span></div>
     </div>
-    <div class="contact"><b>CE</b>Contacto Ejemplo</div>
+    <div class="contact"><b>SC</b>Sample Contact</div>
     <div class="gi-fields">
       <span>City</span><span>${esc(c.city)}</span>
       <span>Currency</span><span>${c.currency}</span>
       <span>Margin</span><span>XX %</span>
       <span>Accessories Margin</span><span>XX %</span>
       <span>Commission</span><span>X %</span>
-      <span>Language</span><span class="flag" role="img" aria-label="Español"></span>
+      <span>Language</span><span class="flag" role="img" aria-label="Spanish"></span>
       <span>Standard Client</span><span class="box" aria-hidden="true"></span>
     </div>
     <div class="divider"></div>
@@ -515,7 +559,7 @@ function drawGeneral(c) {
       <span id="pt-title">Payment Terms</span>
       <div class="terms-control">
         <textarea id="terms" aria-labelledby="pt-title">${esc(c.terms)}</textarea>
-        <div class="hint">Condiciones de pago de este cliente. Se insertarán en Commercial Terms de cada cotización nueva.</div>
+        
       </div>
     </section>
   </div>`;
@@ -524,42 +568,42 @@ function drawGeneral(c) {
 
 function drawMatrixTab(c) {
   $("dBody").innerHTML = `
-    <div class="legend"><span>${ERP} Viene de la ficha del cliente</span><span>${CALC} Calculado con la fórmula del Excel</span><span><span class="material-icons" aria-hidden="true" style="font-size:17px;color:var(--blue)">edit</span> Editable</span></div>
-    <div class="section"><h2>Identificación del cliente</h2><div class="fields">
-      <span>Cód. SAP ${ERP}</span><span class="val">${c.sap}</span>
-      <span>Razón social ${ERP}</span><span class="val">${esc(c.name)}</span>
-      <span>Tipo de ID</span><span class="val"><select data-k="idType">${opts(TIPOS_ID, c.idType)}</select></span>
+    <div class="legend"><span>${ERP} From the customer record</span><span>${CALC} Calculated with the Excel formula</span><span><span class="material-icons" aria-hidden="true" style="font-size:17px;color:var(--blue)">edit</span> Editable</span></div>
+    <div class="section"><h2>Customer identification</h2><div class="fields">
+      <span>SAP code ${ERP}</span><span class="val">${c.sap}</span>
+      <span>Company name ${ERP}</span><span class="val">${esc(c.name)}</span>
+      <span>ID type</span><span class="val"><select data-k="idType">${opts(TIPOS_ID, c.idType)}</select></span>
       <span># ID</span><span class="val"><input data-k="idNum" value="${esc(c.idNum)}"></span>
-      <span>Ciudad ${ERP}</span><span class="val">${esc(c.city)}</span>
-      <span>Tipo de cliente</span><span class="val"><select data-k="type">${opts(["Nacional", "Internacional"], c.type)}</select></span>
-      <span>Fecha de constitución</span><span class="val"><input type="date" data-k="founded" value="${c.founded}"></span>
-      <span>Monto de operación anual</span><span class="val"><input type="number" min="0" data-k="amount" value="${c.amount}"></span>
-      <span>Moneda</span><span class="val"><select data-k="currency">${opts(["COP", "USD"], c.currency)}</select></span>
-      <span>Fecha de vinculación con ESM</span><span class="val"><input type="date" data-k="linked" value="${c.linked}"></span>
+      <span>City ${ERP}</span><span class="val">${esc(c.city)}</span>
+      <span>Customer type</span><span class="val"><select data-k="type">${opts(["Nacional", "Internacional"], c.type)}</select></span>
+      <span>Incorporation date</span><span class="val"><input type="date" data-k="founded" value="${c.founded}"></span>
+      <span>Annual operating amount</span><span class="val"><input type="number" min="0" data-k="amount" value="${c.amount}"></span>
+      <span>Currency</span><span class="val"><select data-k="currency">${opts(["COP", "USD"], c.currency)}</select></span>
+      <span>ESM onboarding date</span><span class="val"><input type="date" data-k="linked" value="${c.linked}"></span>
     </div></div>
-    <div class="section"><h2>Criterios para evaluación del nivel de riesgo</h2><div class="fields">
-      <span>Jurisdicción territorial</span><span class="val"><select data-k="country">${opts(Object.keys(JUR).sort((a, b) => a.localeCompare(b, "es")), c.country)}</select></span>
-      <span>Actividades desarrolladas</span><span class="val"><select data-k="activity">${opts(ACTS.map((a) => a.name), c.activity)}</select></span>
-      <span>Trayectoria en el mercado ${CALC}</span><span class="val">${c.track}</span>
-      <span>Monto de las operaciones ${CALC}</span><span class="val">${c.range}</span>
-      <span>Programa de seguridad en la cadena de suministro</span><span class="val"><select data-k="security">${opts(CERTS.map((x) => x.name), c.security)}</select></span>
+    <div class="section"><h2>Risk assessment criteria</h2><div class="fields">
+      <span>Territorial jurisdiction</span><span class="val"><select data-k="country">${opts(Object.keys(JUR).sort((a, b) => a.localeCompare(b, "es")), c.country)}</select></span>
+      <span>Business activity</span><span class="val"><select data-k="activity">${opts(ACTS.filter((a) => a.enabled !== false || a.name === c.activity).map((a) => a.name), c.activity)}</select></span>
+      <span>Market track record ${CALC}</span><span class="val">${c.track}</span>
+      <span>Operating amount ${CALC}</span><span class="val">${c.range}</span>
+      <span>Supply chain security program</span><span class="val"><select data-k="security">${opts(CERTS.filter((x) => x.enabled !== false || x.name === c.security).map((x) => x.name), c.security)}</select></span>
     </div></div>
-    <div class="section"><h2>Calificación y evaluación del nivel de riesgo ${CALC}</h2><div class="score-grid">
-      <div class="score"><small>Jurisdicción territorial</small><b>${c.sJur}</b></div>
-      <div class="score"><small>Actividades desarrolladas</small><b>${c.sAct}</b></div>
-      <div class="score"><small>Trayectoria en la actividad</small><b>${c.sTrack}</b></div>
-      <div class="score"><small>Monto de las operaciones</small><b>${c.sAmount}</b></div>
-      <div class="score"><small>Seguridad en la cadena de suministro</small><b>${c.sSec}</b></div>
-      <div class="score total"><small>Valoración · Interpretación</small><b>${c.score} <span class="badge ${c.risk}" style="font-size:13px;vertical-align:4px">${c.risk}</span></b></div>
+    <div class="section"><h2>Risk rating and assessment ${CALC}</h2><div class="score-grid">
+      <div class="score"><small>Territorial jurisdiction</small><b>${c.sJur}</b></div>
+      <div class="score"><small>Business activity</small><b>${c.sAct}</b></div>
+      <div class="score"><small>Track record</small><b>${c.sTrack}</b></div>
+      <div class="score"><small>Operating amount</small><b>${c.sAmount}</b></div>
+      <div class="score"><small>Supply chain security</small><b>${c.sSec}</b></div>
+      <div class="score total"><small>Score · Risk level</small><b>${c.score} <span class="badge ${riskCls(c.risk)}" style="font-size:13px;vertical-align:4px">${c.risk}</span></b></div>
     </div></div>
-    <div class="section"><h2>Medidas de control</h2><div class="fields">
-      <span>Actualización de documentación: aplicabilidad ${CALC}</span><span class="val">${c.docApplies}</span>
-      <span>Fecha de actualización</span><span class="val"><input type="date" data-k="docDate" value="${c.docDate}"></span>
-      <span>Estado de la documentación ${CALC}</span><span class="val ${tone(c.docState)}">${c.docState}</span>
-      <span>Visita a instalaciones ${CALC}</span><span class="val ${tone(c.visit)}">${c.visit}</span>
+    <div class="section"><h2>Control measures</h2><div class="fields">
+      <span>Documentation update applies ${CALC}</span><span class="val">${c.docApplies}</span>
+      <span>Update date</span><span class="val"><input type="date" data-k="docDate" value="${c.docDate}"></span>
+      <span>Documentation status ${CALC}</span><span class="val ${tone(c.docState)}">${c.docState}</span>
+      <span>Site visit ${CALC}</span><span class="val ${tone(c.visit)}">${c.visit}</span>
     </div>
-    <table class="visits"><thead><tr><th style="width:110px">Año</th><th style="width:200px">Fecha</th><th>Concepto</th><th>Recomendaciones</th></tr></thead><tbody>
-      ${[2024, 2025, 2026].map((y) => `<tr><td>${y}</td><td><input type="date" data-v="${y}0" value="${c.visits[y][0]}" aria-label="Fecha ${y}"></td><td><input data-v="${y}1" value="${esc(c.visits[y][1])}" aria-label="Concepto ${y}"></td><td><input data-v="${y}2" value="${esc(c.visits[y][2])}" aria-label="Recomendaciones ${y}"></td></tr>`).join("")}
+    <table class="visits"><thead><tr><th style="width:110px">Year</th><th style="width:200px">Date</th><th>Finding</th><th>Recommendations</th></tr></thead><tbody>
+      ${[2024, 2025, 2026].map((y) => `<tr><td>${y}</td><td><input type="date" data-v="${y}0" value="${c.visits[y][0]}" aria-label="Date ${y}"></td><td><input data-v="${y}1" value="${esc(c.visits[y][1])}" aria-label="Finding ${y}"></td><td><input data-v="${y}2" value="${esc(c.visits[y][2])}" aria-label="Recommendations ${y}"></td></tr>`).join("")}
     </tbody></table>
     </div>`;
   const redraw = () => { calc(c); const y = $("dBody").scrollTop; drawMatrixTab(c); $("dBody").scrollTop = y; };
@@ -584,7 +628,7 @@ Object.keys(filters).forEach((id) => $(id).onchange = renderMatrix);
 $("clear").onclick = () => { $("q").value = ""; Object.keys(filters).forEach((id) => $(id).value = ""); kpiFilter = null; renderMatrix(); };
 
 const SETTINGS = [["ct", "Commercial Terms"], ["cm", "Customer Matrix"]];
-const CM_TABS = [["jur", "JURISDICCIÓN"], ["act", "ACTIVIDADES"], ["tray", "TRAYECTORIA"], ["monto", "MONTOS"], ["cert", "SEGURIDAD"], ["interp", "NIVEL DE RIESGO"], ["control", "MEDIDAS DE CONTROL"]];
+const CM_TABS = [["jur", "JURISDICTION"], ["act", "ACTIVITIES"], ["tray", "TRACK RECORD"], ["monto", "AMOUNTS"], ["cert", "SECURITY"], ["interp", "RISK LEVEL"], ["control", "CONTROL MEASURES"]];
 let sGroup = "", sPage = "jur", ctClient = "900102", jurQuery = "";
 const scoreSel = (key, list, v) => `<select data-s="${esc(key)}">${list.map((o) => `<option value="${o}" ${String(o) === String(v) ? "selected" : ""}>${o === "" ? "—" : o}</option>`).join("")}</select>`;
 const keepScroll = (fn) => { const a = $("sBody").scrollTop, w = $("sBody").querySelector(".stable-wrap"), b = w ? w.scrollTop : 0; fn(); $("sBody").scrollTop = a; const w2 = $("sBody").querySelector(".stable-wrap"); if (w2) w2.scrollTop = b; };
@@ -607,24 +651,150 @@ const PT_CHIP = '<span class="pt-chip" contenteditable="false">Payment Terms</sp
 let CT_HTML = null, ctRange = null;
 document.addEventListener("selectionchange", () => { const ed = document.getElementById("ctEditor"), s = getSelection(); if (ed && s.rangeCount && ed.contains(s.anchorNode)) ctRange = s.getRangeAt(0).cloneRange(); });
 const num = (v) => (String(v).trim() === "" ? "" : Number(v));
-const delBtn = (i) => `<button type="button" class="icon-btn" data-del="${i}" title="Eliminar" aria-label="Eliminar"><span class="material-icons" aria-hidden="true">delete_outline</span></button>`;
+const delBtn = (i) => `<button type="button" class="icon-btn" data-del="${i}" title="Delete" aria-label="Delete"><span class="material-icons" aria-hidden="true">delete_outline</span></button>`;
 const addBtn = `<button type="button" class="outline-btn" id="addBtn"><span class="material-icons" aria-hidden="true">add</span>AGREGAR</button>`;
 function rangeIssue(rules, from, to) {
   const s = [...rules].sort((a, b) => (a[from] === "" ? -1 : a[from]) - (b[from] === "" ? -1 : b[from]));
-  for (let i = 1; i < s.length; i++) { const prevTo = s[i - 1][to]; if (prevTo === "" || s[i][from] <= prevTo) return "Hay rangos que se cruzan. Revisa los valores Desde y Hasta."; if (s[i][from] > prevTo + 1) return `Hay un hueco entre ${prevTo} y ${s[i][from]} años: esos clientes quedarían sin rango.`; }
+  for (let i = 1; i < s.length; i++) { const prevTo = s[i - 1][to]; if (prevTo === "" || s[i][from] <= prevTo) return "Some ranges overlap. Check the From and To values."; if (s[i][from] > prevTo + 1) return `There's a gap between ${prevTo} and ${s[i][from]}: those customers would have no range.`; }
   return "";
 }
 function wireRanges(rules, readNew, order) {
   const body = $("sBody"), err = (m) => { $("sErr").textContent = m; $("sErr").hidden = !m; };
   const resort = () => rules.sort((a, b) => order(a) - order(b));
   body.querySelectorAll("[data-f]").forEach((el) => el.onchange = () => { const [i, k] = el.dataset.f.split(","), r = rules[+i];
-    if (k === "label") { const n = el.value.trim(); if (!n || rules.some((x) => x !== r && x.label.toLowerCase() === n.toLowerCase())) { el.value = r.label; return err("Escribe un nombre que no esté repetido."); } r.label = n; }
+    if (k === "label") { const n = el.value.trim(); if (!n || rules.some((x) => x !== r && x.label.toLowerCase() === n.toLowerCase())) { el.value = r.label; return err("Enter a name that isn't already used."); } r.label = n; }
     else r[k] = k === "score" ? Number(el.value) || 0 : num(el.value);
     resort(); applyChange(); });
-  body.querySelectorAll("[data-del]").forEach((b) => b.onclick = () => { if (rules.length === 1) return err("Debe quedar al menos un rango."); rules.splice(+b.dataset.del, 1); applyChange(); });
-  $("addBtn").onclick = () => { const r = readNew(); if (!r.label || rules.some((x) => x.label.toLowerCase() === r.label.toLowerCase())) return err("Escribe un nombre que no esté repetido.");
+  body.querySelectorAll("[data-del]").forEach((b) => b.onclick = () => { if (rules.length === 1) return err("At least one range must remain."); rules.splice(+b.dataset.del, 1); applyChange(); });
+  $("addBtn").onclick = () => { const r = readNew(); if (!r.label || rules.some((x) => x.label.toLowerCase() === r.label.toLowerCase())) return err("Enter a name that isn't already used.");
     rules.push(r); resort(); applyChange(); };
 }
+const used = (key, name) => data.filter((c) => c[key] === name).length;
+const LVL = ["", "BAJO", "MEDIO", "ALTO"];
+const dash = (v) => (v === "" || v === undefined ? "—" : v);
+const scoreField = { k: "score", label: "Rating*", icon: "pin", type: "number", req: true };
+const listCat = (title, formTitle, label, icon, usedKey, list) => ({
+  title, formTitle, list, enabled: true, usedKey, nameOf: (x) => x.name,
+  cols: [[label.toUpperCase(), (x) => esc(x.name)], ["RATING", (x) => x.score], ["CUSTOMERS", (x) => used(usedKey, x.name)]],
+  fields: [{ k: "name", label: `${label}*`, icon, req: true, type: "textarea" }, scoreField],
+  blank: { name: "", score: "", enabled: true }, toForm: (x) => ({ ...x, enabled: x.enabled !== false }),
+  fromForm: (v) => ({ name: v.name.trim(), score: Number(v.score), enabled: v.enabled })
+});
+const CAT = {
+  jur: {
+    title: "TERRITORIAL JURISDICTION", formTitle: "Territorial Jurisdiction", list: () => JURD, usedKey: "country", nameOf: (r) => r[0], after: () => rebuildJur(),
+    cols: [["COUNTRY", (r) => esc(r[0])], ["TRANSPARENCY INT.", (r) => dash(r[1])], ["BASEL INDEX", (r) => (r[2] === "" ? "—" : String(r[2]).replace(".", ","))], ["TAX HAVEN", (r) => dash(r[3])], ["FATF", (r) => dash(r[4])], ["SANCTIONED", (r) => dash(r[5])],
+      ["RISK LEVEL", (r) => { const k = jurLevel(r).K; return `<span class="badge ${LVL[k]}">${k} · ${LVL[k]}</span>`; }], ["CUSTOMERS", (r) => used("country", r[0])]],
+    fields: [{ k: "name", label: "Country*", icon: "public", req: true }, { k: "ti", label: "Transparency International (score 0 to 100)", icon: "gavel", type: "number" },
+      { k: "ba", label: "Basel AML Index (score 0 to 10)", icon: "account_balance", type: "number", step: "0.01" },
+      { k: "g", label: "Tax haven", icon: "beach_access", type: "select", options: ["", 1, 2, 3] }, { k: "h", label: "FATF", icon: "policy", type: "select", options: ["", 1, 2, 3] },
+      { k: "i", label: "Sanctioned by UN, OFAC or EU", icon: "block", type: "select", options: ["", 1, 2, 3] }],
+    blank: { name: "", ti: "", ba: "", g: "", h: "", i: "" }, toForm: (r) => ({ name: r[0], ti: r[1], ba: r[2], g: r[3], h: r[4], i: r[5] }),
+    fromForm: (v) => [v.name.trim(), num(v.ti), num(v.ba), num(v.g), num(v.h), num(v.i)], sort: (a, b) => a[0].localeCompare(b[0], "es")
+  },
+  act: listCat("BUSINESS ACTIVITIES", "Business Activity", "Activity", "work_outline", "activity", () => ACTS),
+  cert: listCat("SECURITY PROGRAMS", "Security Program", "Program", "verified_user", "security", () => CERTS),
+  tray: {
+    title: "MARKET TRACK RECORD", formTitle: "Track Record", list: () => TRAY_RULES, nameOf: (r) => r.label, minOne: true,
+    cols: [["TRAYECTORIA", (r) => esc(r.label)], ["FROM (YEARS)", (r) => dash(r.from)], ["TO (YEARS)", (r) => (r.to === "" ? "No limit" : r.to)], ["RATING", (r) => r.score], ["CUSTOMERS", (r) => data.filter((c) => c.track === r.label).length]],
+    fields: [{ k: "label", label: "Name*", icon: "label", req: true }, { k: "from", label: "From (years)*", icon: "first_page", type: "number", req: true },
+      { k: "to", label: "To (years)", icon: "last_page", type: "number", hint: "Leave empty for an open-ended range." }, scoreField],
+    blank: { label: "", from: "", to: "", score: "" }, toForm: (r) => ({ ...r }), fromForm: (v) => ({ label: v.label.trim(), from: num(v.from), to: num(v.to), score: Number(v.score) }),
+    sort: (a, b) => (a.from === "" ? -1 : a.from) - (b.from === "" ? -1 : b.from), warn: () => rangeIssue(TRAY_RULES, "from", "to")
+  },
+  monto: {
+    title: "OPERATING AMOUNT", formTitle: "Operating Amount", list: () => MONTO_RULES, nameOf: (r) => r.label, minOne: true,
+    cols: [["RANGE", (r) => esc(r.label)], ["COP UP TO", (r) => (r.cop === "" ? "No limit" : fmtMoney(r.cop))], ["USD UP TO", (r) => (r.usd === "" ? "No limit" : fmtMoney(r.usd))], ["RATING", (r) => r.score], ["CUSTOMERS", (r) => data.filter((c) => c.range === r.label).length]],
+    fields: [{ k: "label", label: "Name*", icon: "label", req: true }, { k: "cop", label: "COP up to", icon: "payments", type: "number", hint: "Leave empty in the last range so it has no limit." },
+      { k: "usd", label: "USD up to", icon: "attach_money", type: "number", hint: "Leave empty in the last range so it has no limit." }, scoreField],
+    blank: { label: "", cop: "", usd: "", score: "" }, toForm: (r) => ({ ...r }), fromForm: (v) => ({ label: v.label.trim(), cop: num(v.cop), usd: num(v.usd), score: Number(v.score) }),
+    sort: (a, b) => (a.cop === "" ? Infinity : a.cop) - (b.cop === "" ? Infinity : b.cop),
+    warn: () => { const m = ["cop", "usd"].filter((k) => !MONTO_RULES.some((r) => r[k] === "")).map((k) => k.toUpperCase()); return m.length ? `The last ${m.join(" and ")} range must have no limit; otherwise larger amounts have no range.` : ""; }
+  }
+};
+const catQuery = {};
+
+function renderCatalog(cfg) {
+  const body = $("sBody"), all = cfg.list(), qs = (catQuery[sPage] ||= []);
+  const plain = (h) => String(h).replace(/<[^>]*>/g, "").toLowerCase();
+  const rows = all.map((x, i) => [x, i]).filter(([x]) => cfg.cols.every(([, f], j) => !(qs[j] || "").trim() || plain(f(x)).includes(qs[j].trim().toLowerCase())));
+  const warn = cfg.warn ? cfg.warn() : "";
+  body.innerHTML = `<div class="cat">
+    <div class="cat-head"><h2>${cfg.title}</h2><button class="btn-new" type="button" id="catNew"><span class="material-icons" aria-hidden="true">add</span>NEW</button></div>
+    <div class="cat-body"><table class="cat-table"><thead><tr>${cfg.cols.map(([h], j) => `<th><span class="col-h">${h}</span><input class="col-f" data-cf="${j}" value="${esc(qs[j] || "")}" aria-label="Filter ${h}"></th>`).join("")}${cfg.enabled ? "<th>ENABLED</th>" : ""}<th class="act-col">ACTIONS</th></tr></thead>
+      <tbody>${rows.length ? rows.map(([x, i]) => `<tr>${cfg.cols.map(([, f], j) => `<td class="${j === 0 ? "first" : ""}">${f(x)}</td>`).join("")}
+        ${cfg.enabled ? `<td><button type="button" class="toggle mini ${x.enabled === false ? "off" : ""}" data-en="${i}" role="switch" aria-checked="${x.enabled !== false}" aria-label="Enabled"><i></i></button></td>` : ""}
+        <td class="act-col"><button type="button" class="icon-btn" data-edit="${i}" aria-label="Edit" title="Edit"><span class="material-icons" aria-hidden="true">edit</span></button><button type="button" class="icon-btn del" data-del="${i}" aria-label="Delete" title="Delete"><span class="material-icons" aria-hidden="true">delete</span></button></td></tr>`).join("")
+        : `<tr><td class="empty" colspan="${cfg.cols.length + 2}">No results.</td></tr>`}</tbody></table></div>
+    <div class="alert" id="sWarn" ${warn ? "" : "hidden"}>${warn}</div><div class="alert" id="sErr" hidden></div></div>`;
+  const err = (m) => { $("sErr").textContent = m; $("sErr").hidden = !m; };
+  $("catNew").onclick = () => openForm(cfg, null);
+  body.querySelectorAll("[data-cf]").forEach((el) => el.oninput = () => { const j = +el.dataset.cf, pos = el.selectionStart; qs[j] = el.value; renderCatalog(cfg); const n = body.querySelector(`[data-cf="${j}"]`); n.focus(); n.setSelectionRange(pos, pos); });
+  body.querySelectorAll("[data-edit]").forEach((b) => b.onclick = () => openForm(cfg, +b.dataset.edit));
+  body.querySelectorAll("[data-en]").forEach((b) => b.onclick = () => { const x = all[+b.dataset.en]; x.enabled = x.enabled === false; applyChange(); });
+  body.querySelectorAll("[data-del]").forEach((b) => b.onclick = () => {
+    const i = +b.dataset.del, x = all[i], n = cfg.usedKey ? used(cfg.usedKey, cfg.nameOf(x)) : 0;
+    if (n) return err(`"${cfg.nameOf(x)}" can't be deleted because ${n} customers use it. Change it on those customers or turn it off with Enabled.`);
+    if (cfg.minOne && all.length === 1) return err("At least one range must remain.");
+    if (!confirm(`Delete "${cfg.nameOf(x)}"?`)) return;
+    all.splice(i, 1); cfg.after?.(); applyChange();
+  });
+}
+
+function openForm(cfg, idx) {
+  const all = cfg.list(), editing = idx !== null, v = editing ? cfg.toForm(all[idx]) : { ...cfg.blank };
+  const input = (f) => {
+    const val = v[f.k] ?? "", common = `id="f_${f.k}" data-k="${f.k}" ${f.req ? "required" : ""}`;
+    if (f.type === "select") return `<select ${common}>${f.options.map((o) => `<option value="${o}" ${String(o) === String(val) ? "selected" : ""}>${o === "" ? "—" : o}</option>`).join("")}</select>`;
+    if (f.type === "textarea") return `<textarea ${common} rows="3">${esc(val)}</textarea>`;
+    return `<input ${common} type="${f.type || "text"}" ${f.step ? `step="${f.step}"` : ""} value="${esc(val)}">`;
+  };
+  const back = document.createElement("div");
+  back.className = "modal-back";
+  back.innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="m-head"><button type="button" class="m-close" aria-label="Close"><span class="material-icons" aria-hidden="true">close</span></button><h3 id="mTitle">${cfg.formTitle}</h3></div>
+    ${cfg.fields.map((f) => `<div class="m-field"><span class="material-icons m-icon" aria-hidden="true">${f.icon}</span><label for="f_${f.k}"><span class="m-label">${f.label}</span>${input(f)}</label>${f.hint ? `<span class="m-hint">${f.hint}</span>` : ""}</div>`).join("")}
+    ${cfg.enabled ? `<div class="m-enabled"><button type="button" class="toggle mini ${v.enabled === false ? "off" : ""}" id="mEnabled" role="switch" aria-checked="${v.enabled !== false}" aria-label="Enabled"><i></i></button>Enabled</div>` : ""}
+    <div class="m-err" id="mErr" hidden></div>
+    <div class="m-foot"><button type="button" class="m-save" id="mSave" disabled>SAVE</button></div></div>`;
+  document.body.appendChild(back);
+  const close = () => { back.remove(); document.removeEventListener("keydown", onKey); };
+  const onKey = (e) => { if (e.key === "Escape") close(); };
+  document.addEventListener("keydown", onKey);
+  back.onclick = (e) => { if (e.target === back) close(); };
+  back.querySelector(".m-close").onclick = close;
+  let enabled = v.enabled !== false;
+  if (cfg.enabled) back.querySelector("#mEnabled").onclick = (e) => { enabled = !enabled; e.currentTarget.classList.toggle("off", !enabled); e.currentTarget.setAttribute("aria-checked", enabled); };
+  const read = () => Object.fromEntries(cfg.fields.map((f) => [f.k, back.querySelector(`#f_${f.k}`).value]));
+  const valid = () => cfg.fields.every((f) => !f.req || String(back.querySelector(`#f_${f.k}`).value).trim() !== "");
+  back.querySelectorAll("[data-k]").forEach((el) => el.oninput = el.onchange = () => { back.querySelector("#mSave").disabled = !valid(); back.querySelector("#mErr").hidden = true; });
+  back.querySelector("#mSave").disabled = !valid();
+  back.querySelector("#mSave").onclick = () => {
+    const vals = { ...read(), enabled }, obj = cfg.fromForm(vals), name = cfg.nameOf(obj), mErr = back.querySelector("#mErr");
+    const fail = (m) => { mErr.textContent = m; mErr.hidden = false; };
+    if (all.some((x, j) => j !== idx && cfg.nameOf(x).toLowerCase() === name.toLowerCase())) return fail(`"${name}" already exists. Enter another name.`);
+    if (cfg.fields.some((f) => f.type === "number" && f.req && Number.isNaN(Number(vals[f.k])))) return fail("Check the numeric values.");
+    if (editing) {
+      const old = cfg.nameOf(all[idx]);
+      if (cfg.usedKey && old !== name) data.forEach((c) => { if (c[cfg.usedKey] === old) c[cfg.usedKey] = name; });
+      all[idx] = obj;
+    } else all.push(obj);
+    if (cfg.sort) all.sort(cfg.sort);
+    cfg.after?.(); close(); applyChange();
+  };
+  back.querySelector("[data-k]").focus();
+}
+CAT.interp = {
+  title: "RISK LEVEL", formTitle: "Risk Level", list: () => RISK_LEVELS, nameOf: (r) => r.label, minOne: true,
+  cols: [["LEVEL", (r) => `<span class="badge ${COLOR_CLS[r.color] || ""}">${esc(r.label)}</span>`], ["SCORE FROM", (r) => (r.from === "" ? "Minimum" : r.from)], ["SCORE TO", (r) => (r.to === "" ? "No limit" : r.to)], ["SITE VISIT", (r) => r.visit], ["CUSTOMERS", (r) => data.filter((c) => c.risk === r.label).length]],
+  fields: [{ k: "label", label: "Level*", icon: "label", req: true }, { k: "from", label: "Score from", icon: "first_page", type: "number", hint: "Leave empty for the lowest level." },
+    { k: "to", label: "Score to", icon: "last_page", type: "number", hint: "Leave empty for the highest level." },
+    { k: "color", label: "Color*", icon: "palette", type: "select", options: ["Green", "Yellow", "Red"], req: true },
+    { k: "visit", label: "Requires site visit*", icon: "location_on", type: "select", options: ["No", "Yes"], req: true }],
+  blank: { label: "", from: "", to: "", color: "Red", visit: "No" }, toForm: (r) => ({ ...r }),
+  fromForm: (v) => ({ label: v.label.trim().toUpperCase(), from: num(v.from), to: num(v.to), color: v.color, visit: v.visit }),
+  sort: (a, b) => (a.from === "" ? -Infinity : a.from) - (b.from === "" ? -Infinity : b.from), warn: () => rangeIssue(RISK_LEVELS, "from", "to")
+};
 function renderSettingsPage() {
   const body = $("sBody");
   if (sPage === "ct") {
@@ -645,81 +815,12 @@ function renderSettingsPage() {
     };
     return;
   }
-  if (sPage === "jur") {
-    body.innerHTML = `<p class="s-intro">Tabla de la hoja "2. Jurisdicción territorial" del Excel. El nivel se calcula con las mismas fórmulas: calificación de Transparencia Internacional y del Índice de Basilea, promedio con Paraíso fiscal y GAFI, y nivel 3 si el país está sancionado. La matriz usa este nivel en la columna Jurisdicción territorial.</p>
-      <label class="search" style="margin-bottom:14px"><span class="material-icons" aria-hidden="true">search</span><input id="jurQ" type="search" placeholder="Buscar país" value="${esc(jurQuery)}"></label>
-      <div class="stable-wrap"><table class="stable"><thead><tr><th>País</th><th>Transparencia Int.<br>Score</th><th>Calif.</th><th>Índice Basilea<br>Score</th><th>Calif.</th><th>Paraíso fiscal</th><th>GAFI</th><th>Sancionados ONU, OFAC, UE</th><th>Promedio</th><th>Nivel de riesgo</th></tr></thead><tbody id="jurRows"></tbody></table></div>`;
-    const draw = () => {
-      const q = jurQuery.trim().toLowerCase();
-      $("jurRows").innerHTML = JURD.map((r, i) => [r, i]).filter(([r]) => !q || r[0].toLowerCase().includes(q)).map(([r, i]) => { const L = jurLevel(r), lvl = ["", "BAJO", "MEDIO", "ALTO"][L.K];
-        return `<tr><td>${esc(r[0])}</td><td><input type="number" min="0" max="100" data-j="${i},1" value="${r[1]}" aria-label="Score TI ${esc(r[0])}"></td><td class="muted">${L.D}</td><td><input type="number" step="0.01" min="0" max="10" data-j="${i},2" value="${r[2]}" aria-label="Score Basilea ${esc(r[0])}"></td><td class="muted">${L.F}</td>
-          <td>${scoreSel(`j${i},3`, ["", 1, 2, 3], r[3])}</td><td>${scoreSel(`j${i},4`, ["", 1, 2, 3], r[4])}</td><td>${scoreSel(`j${i},5`, ["", 1, 2, 3], r[5])}</td><td class="muted">${Math.round(L.J * 100) / 100}</td><td><span class="badge ${lvl}">${L.K} · ${lvl}</span></td></tr>`; }).join("");
-      const set = (i, k, v) => { JURD[i][k] = v === "" ? "" : Number(v); rebuildJur(); data.forEach(calc); const w = $("sBody").querySelector(".stable-wrap"), y = w.scrollTop; draw(); w.scrollTop = y; };
-      $("jurRows").querySelectorAll("[data-j]").forEach((el) => el.onchange = () => { const [i, k] = el.dataset.j.split(","); set(+i, +k, el.value); });
-      $("jurRows").querySelectorAll("[data-s]").forEach((el) => el.onchange = () => { const [i, k] = el.dataset.s.slice(1).split(","); set(+i, +k, el.value); });
-    };
-    $("jurQ").oninput = (e) => { jurQuery = e.target.value; draw(); };
-    draw();
-    return;
-  }
-  if (sPage === "act" || sPage === "cert") {
-    const isAct = sPage === "act", list = isAct ? ACTS : CERTS, key = isAct ? "activity" : "security";
-    const used = (n) => data.filter((c) => c[key] === n).length;
-    body.innerHTML = `<table class="stable"><thead><tr><th>${isAct ? "Actividad desarrollada" : "Programa de seguridad"}</th><th>Calificación</th><th>Clientes</th><th></th></tr></thead><tbody>
-      ${list.map((x, i) => `<tr><td class="wide"><input class="name-in" data-n="${i}" value="${esc(x.name)}" aria-label="Nombre"></td><td><input type="number" data-sc="${i}" value="${x.score}" aria-label="Calificación"></td><td class="muted">${used(x.name)}</td><td>${delBtn(i)}</td></tr>`).join("")}
-      <tr class="add-row"><td class="wide"><input class="name-in" id="newName" placeholder="${isAct ? "Nueva actividad" : "Nuevo programa"}" aria-label="Nombre nuevo"></td><td><input type="number" id="newScore" value="${isAct ? 3 : 0}" aria-label="Calificación nueva"></td><td colspan="2">${addBtn}</td></tr>
-      </tbody></table><div class="alert" id="sErr" hidden></div>`;
-    const err = (m) => { $("sErr").textContent = m; $("sErr").hidden = !m; };
-    const clash = (n, i) => !n || list.some((x, j) => j !== i && x.name.toLowerCase() === n.toLowerCase());
-    body.querySelectorAll("[data-n]").forEach((el) => el.onchange = () => { const i = +el.dataset.n, n = el.value.trim(), old = list[i].name;
-      if (clash(n, i)) { el.value = old; return err("Escribe un nombre que no esté repetido."); }
-      data.forEach((c) => { if (c[key] === old) c[key] = n; }); list[i].name = n; applyChange(); });
-    body.querySelectorAll("[data-sc]").forEach((el) => el.onchange = () => { list[+el.dataset.sc].score = Number(el.value) || 0; applyChange(); });
-    body.querySelectorAll("[data-del]").forEach((b) => b.onclick = () => { const i = +b.dataset.del, u = used(list[i].name);
-      if (u) return err(`No se puede eliminar "${list[i].name}" porque la usan ${u} clientes. Cámbiales la opción primero.`);
-      list.splice(i, 1); applyChange(); });
-    $("addBtn").onclick = () => { const n = $("newName").value.trim(); if (clash(n, -1)) return err("Escribe un nombre que no esté repetido.");
-      list.push({ name: n, score: Number($("newScore").value) || 0 }); applyChange(); };
-    return;
-  }
-  if (sPage === "tray") {
-    const count = (l) => data.filter((c) => c.track === l).length;
-    body.innerHTML = `<p class="s-intro">Rangos en años desde la fecha de constitución. Deja "Hasta" vacío para un rango sin límite.</p>
-      <table class="stable"><thead><tr><th>Trayectoria</th><th>Desde (años)</th><th>Hasta (años)</th><th>Calificación</th><th>Clientes</th><th></th></tr></thead><tbody>
-      ${TRAY_RULES.map((r, i) => `<tr><td><input class="name-in short" data-f="${i},label" value="${esc(r.label)}" aria-label="Nombre del rango"></td><td><input type="number" min="0" data-f="${i},from" value="${r.from}" aria-label="Desde"></td><td><input type="number" min="0" data-f="${i},to" value="${r.to}" placeholder="Sin límite" aria-label="Hasta"></td><td><input type="number" data-f="${i},score" value="${r.score}" aria-label="Calificación"></td><td class="muted">${count(r.label)}</td><td>${delBtn(i)}</td></tr>`).join("")}
-      <tr class="add-row"><td><input class="name-in short" id="nLabel" placeholder="Nuevo rango" aria-label="Nombre del rango nuevo"></td><td><input type="number" min="0" id="nFrom" aria-label="Desde"></td><td><input type="number" min="0" id="nTo" placeholder="Sin límite" aria-label="Hasta"></td><td><input type="number" id="nScore" value="1" aria-label="Calificación"></td><td colspan="2">${addBtn}</td></tr>
-      </tbody></table><div class="alert" id="sErr" ${rangeIssue(TRAY_RULES, "from", "to") ? "" : "hidden"}>${rangeIssue(TRAY_RULES, "from", "to")}</div>`;
-    wireRanges(TRAY_RULES, () => ({ label: $("nLabel").value.trim(), from: num($("nFrom").value), to: num($("nTo").value), score: Number($("nScore").value) || 0 }), (r) => r.from === "" ? -1 : r.from);
-    return;
-  }
-  if (sPage === "monto") {
-    const count = (l) => data.filter((c) => c.range === l).length;
-    body.innerHTML = `<p class="s-intro">Cada rango llega hasta el valor indicado en COP y en USD. Deja "Hasta" vacío en el último rango para que no tenga límite.</p>
-      <table class="stable"><thead><tr><th>Monto de las operaciones</th><th>COP hasta</th><th>USD hasta</th><th>Calificación</th><th>Clientes</th><th></th></tr></thead><tbody>
-      ${MONTO_RULES.map((r, i) => `<tr><td class="wide"><input class="name-in" data-f="${i},label" value="${esc(r.label)}" aria-label="Nombre del rango"></td><td><input class="money" type="number" min="0" data-f="${i},cop" value="${r.cop}" placeholder="Sin límite" aria-label="COP hasta"></td><td><input class="money" type="number" min="0" data-f="${i},usd" value="${r.usd}" placeholder="Sin límite" aria-label="USD hasta"></td><td><input type="number" data-f="${i},score" value="${r.score}" aria-label="Calificación"></td><td class="muted">${count(r.label)}</td><td>${delBtn(i)}</td></tr>`).join("")}
-      <tr class="add-row"><td class="wide"><input class="name-in" id="nLabel" placeholder="Nuevo rango" aria-label="Nombre del rango nuevo"></td><td><input class="money" type="number" min="0" id="nCop" placeholder="Sin límite" aria-label="COP hasta"></td><td><input class="money" type="number" min="0" id="nUsd" placeholder="Sin límite" aria-label="USD hasta"></td><td><input type="number" id="nScore" value="1" aria-label="Calificación"></td><td colspan="2">${addBtn}</td></tr>
-      </tbody></table>${(() => { const m = ["cop", "usd"].filter((k) => !MONTO_RULES.some((r) => r[k] === "")).map((k) => k.toUpperCase()); return `<div class="alert" id="sErr" ${m.length ? "" : "hidden"}>${m.length ? `Deja vacío "Hasta" en el último rango de ${m.join(" y ")}; si no, los montos mayores quedan sin rango.` : ""}</div>`; })()}`;
-    wireRanges(MONTO_RULES, () => ({ label: $("nLabel").value.trim(), cop: num($("nCop").value), usd: num($("nUsd").value), score: Number($("nScore").value) || 0 }), (r) => r.cop === "" ? Infinity : r.cop);
-    return;
-  }
-  if (sPage === "interp") {
-    const n = (r) => data.filter((c) => c.risk === r).length;
-    body.innerHTML = `<p class="s-intro">La valoración es la suma de las cinco calificaciones. Indica a partir de qué valoración un cliente es riesgo medio y riesgo alto.</p>
-      <table class="stable"><thead><tr><th>Nivel de riesgo</th><th>Desde</th><th>Hasta</th><th>Clientes</th></tr></thead><tbody>
-        <tr><td><span class="badge BAJO">BAJO</span></td><td class="muted">Mínimo</td><td class="muted">${RISK.MEDIO - 1}</td><td class="muted">${n("BAJO")}</td></tr>
-        <tr><td><span class="badge MEDIO">MEDIO</span></td><td><input type="number" data-r="MEDIO" value="${RISK.MEDIO}" aria-label="MEDIO desde"></td><td class="muted">${RISK.ALTO - 1}</td><td class="muted">${n("MEDIO")}</td></tr>
-        <tr><td><span class="badge ALTO">ALTO</span></td><td><input type="number" data-r="ALTO" value="${RISK.ALTO}" aria-label="ALTO desde"></td><td class="muted">Sin límite</td><td class="muted">${n("ALTO")}</td></tr>
-      </tbody></table><div class="alert" id="sErr" hidden></div>`;
-    body.querySelectorAll("[data-r]").forEach((el) => el.onchange = () => { const k = el.dataset.r, v = Number(el.value), next = { ...RISK, [k]: v };
-      if (!(next.MEDIO < next.ALTO)) { el.value = RISK[k]; $("sErr").textContent = "El valor de riesgo alto debe ser mayor que el de riesgo medio."; $("sErr").hidden = false; return; }
-      RISK[k] = v; applyChange(); });
-    return;
-  }
+  if (CAT[sPage]) { renderCatalog(CAT[sPage]); return; }
   const pend = data.filter((c) => c.docState === "Pendiente por actualizar").length;
-  body.innerHTML = `<p class="s-intro">Plazos de las medidas de control. En el Excel se usan 730 días (2 años) para decidir si aplica la actualización, si la documentación está vigente y si la visita a instalaciones cumple.</p>
+  body.innerHTML = `
     <div class="cfg">
-      <span>Vigencia en días</span><input type="number" min="1" data-c="vigencia" value="${CFG.vigencia}" aria-label="Vigencia en días"><small>${pend} clientes con documentación pendiente</small>
-      <span>Visita a instalaciones aplica para</span><span style="color:var(--text)">Nivel ALTO</span><small>Se revisa la fecha de visita más reciente de 2024, 2025 y 2026</small>
+      <span>Validity (days)</span><input type="number" min="1" data-c="vigencia" value="${CFG.vigencia}" aria-label="Validity in days"><small>${pend} customers with pending documentation</small>
+      <span>Site visit required for</span><span style="color:var(--text)">${RISK_LEVELS.filter((r) => r.visit === "Yes").map((r) => esc(r.label)).join(", ") || "—"}</span><small>Uses the most recent visit date from 2024, 2025 and 2026</small>
     </div>`;
   body.querySelectorAll("[data-c]").forEach((el) => el.onchange = () => { CFG[el.dataset.c] = Number(el.value) || 0; applyChange(); });
 }
