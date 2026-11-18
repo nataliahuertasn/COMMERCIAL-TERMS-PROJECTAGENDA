@@ -1,6 +1,10 @@
-# Maquetas módulo de Clientes
+# Maqueta módulo de Clientes
 
-- `index.html`: Fase 1, sección Payment Terms en la ficha del cliente (pestaña General Information).
-- `customer-matrix.html`: Fase 2, Customer Matrix. Vista de tabla con búsqueda, filtros y ordenamiento; al hacer clic en un cliente se abre su pestaña Customer Matrix.
+Toda la maqueta está en `index.html`:
+
+- Pestaña CLIENTS: ficha del cliente con General Information (incluye Payment Terms, Fase 1) y la pestaña CUSTOMER MATRIX del cliente.
+- Pestaña CUSTOMER MATRIX: tabla con las columnas, listas y fórmulas del Excel MT01-PRSA-02 (Fase 2), con búsqueda, filtros, indicadores y ordenamiento.
+
+`customer-matrix.html` solo redirige a `index.html#matrix` para que el link anterior siga funcionando.
 
 Los datos son de ejemplo. Los campos se pueden editar en la maqueta, pero no guardan datos.
