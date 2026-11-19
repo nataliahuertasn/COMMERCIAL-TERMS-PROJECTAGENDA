@@ -554,7 +554,7 @@ function renderMatrix() {
 }
 
 const tag = (icon, text) => `<span class="tag" title="${text}"><span class="material-icons" aria-hidden="true">${icon}</span></span>`;
-const ERP = tag("link", "From the customer record"), CALC = tag("functions", "Calculated with the Excel formula");
+const ERP = "", CALC = "";
 const opts = (list, v) => list.map((o) => `<option ${o === v ? "selected" : ""}>${esc(o)}</option>`).join("");
 
 function renderClients() {
@@ -608,7 +608,6 @@ function drawGeneral(c) {
 
 function drawMatrixTab(c) {
   $("dBody").innerHTML = `
-    <div class="legend"><span>${ERP} From the customer record</span><span>${CALC} Calculated with the Excel formula</span><span><span class="material-icons" aria-hidden="true" style="font-size:17px;color:var(--blue)">edit</span> Editable</span></div>
     <div class="section"><h2>Customer identification</h2><div class="fields">
       <span>SAP code ${ERP}</span><span class="val">${c.sap}</span>
       <span>Company name ${ERP}</span><span class="val">${esc(c.name)}</span>
@@ -739,15 +738,15 @@ const CAT = {
     title: "MARKET TRACK RECORD", formTitle: "Track Record", list: () => TRAY_RULES, nameOf: (r) => r.label, minOne: true,
     cols: [["TRAYECTORIA", (r) => esc(r.label)], ["FROM (YEARS)", (r) => dash(r.from)], ["TO (YEARS)", (r) => (r.to === "" ? "No limit" : r.to)], ["RATING", (r) => r.score], ["CUSTOMERS", (r) => data.filter((c) => c.track === r.label).length]],
     fields: [{ k: "label", label: "Name*", icon: "label", req: true }, { k: "from", label: "From (years)*", icon: "first_page", type: "number", req: true },
-      { k: "to", label: "To (years)", icon: "last_page", type: "number", hint: "Leave empty for an open-ended range." }, scoreField],
+      { k: "to", label: "To (years)", icon: "last_page", type: "number" }, scoreField],
     blank: { label: "", from: "", to: "", score: "" }, toForm: (r) => ({ ...r }), fromForm: (v) => ({ label: v.label.trim(), from: num(v.from), to: num(v.to), score: Number(v.score) }),
     sort: (a, b) => (a.from === "" ? -1 : a.from) - (b.from === "" ? -1 : b.from), warn: () => rangeIssue(TRAY_RULES, "from", "to")
   },
   monto: {
     title: "OPERATING AMOUNT", formTitle: "Operating Amount", list: () => MONTO_RULES, nameOf: (r) => r.label, minOne: true,
     cols: [["RANGE", (r) => esc(r.label)], ["COP UP TO", (r) => (r.cop === "" ? "No limit" : fmtMoney(r.cop))], ["USD UP TO", (r) => (r.usd === "" ? "No limit" : fmtMoney(r.usd))], ["RATING", (r) => r.score], ["CUSTOMERS", (r) => data.filter((c) => c.range === r.label).length]],
-    fields: [{ k: "label", label: "Name*", icon: "label", req: true }, { k: "cop", label: "COP up to", icon: "payments", type: "number", hint: "Leave empty in the last range so it has no limit." },
-      { k: "usd", label: "USD up to", icon: "attach_money", type: "number", hint: "Leave empty in the last range so it has no limit." }, scoreField],
+    fields: [{ k: "label", label: "Name*", icon: "label", req: true }, { k: "cop", label: "COP up to", icon: "payments", type: "number" },
+      { k: "usd", label: "USD up to", icon: "attach_money", type: "number" }, scoreField],
     blank: { label: "", cop: "", usd: "", score: "" }, toForm: (r) => ({ ...r }), fromForm: (v) => ({ label: v.label.trim(), cop: num(v.cop), usd: num(v.usd), score: Number(v.score) }),
     sort: (a, b) => (a.cop === "" ? Infinity : a.cop) - (b.cop === "" ? Infinity : b.cop),
     warn: () => { const m = ["cop", "usd"].filter((k) => !MONTO_RULES.some((r) => r[k] === "")).map((k) => k.toUpperCase()); return m.length ? `The last ${m.join(" and ")} range must have no limit; otherwise larger amounts have no range.` : ""; }
@@ -828,8 +827,8 @@ function openForm(cfg, idx) {
 CAT.interp = {
   title: "RISK LEVEL", formTitle: "Risk Level", list: () => RISK_LEVELS, nameOf: (r) => r.label, minOne: true,
   cols: [["LEVEL", (r) => `<span class="badge ${COLOR_CLS[r.color] || ""}">${esc(r.label)}</span>`], ["SCORE FROM", (r) => (r.from === "" ? "Minimum" : r.from)], ["SCORE TO", (r) => (r.to === "" ? "No limit" : r.to)], ["SITE VISIT", (r) => r.visit], ["CUSTOMERS", (r) => data.filter((c) => c.risk === r.label).length]],
-  fields: [{ k: "label", label: "Level*", icon: "label", req: true }, { k: "from", label: "Score from", icon: "first_page", type: "number", hint: "Leave empty for the lowest level." },
-    { k: "to", label: "Score to", icon: "last_page", type: "number", hint: "Leave empty for the highest level." },
+  fields: [{ k: "label", label: "Level*", icon: "label", req: true }, { k: "from", label: "Score from", icon: "first_page", type: "number" },
+    { k: "to", label: "Score to", icon: "last_page", type: "number" },
     { k: "color", label: "Color*", icon: "palette", type: "select", options: ["Green", "Yellow", "Red"], req: true },
     { k: "visit", label: "Requires site visit*", icon: "location_on", type: "select", options: ["No", "Yes"], req: true }],
   blank: { label: "", from: "", to: "", color: "Red", visit: "No" }, toForm: (r) => ({ ...r }),
@@ -839,7 +838,7 @@ CAT.interp = {
 CAT.pt = {
   title: "PAYMENT TERMS", formTitle: "Payment Terms", list: () => PTS, enabled: true, usedKey: "pt", nameOf: (x) => x.name,
   cols: [["NAME", (x) => esc(x.name)], ["PAYMENT TERMS", (x) => esc(x.text)], ["CUSTOMERS", (x) => used("pt", x.name)]],
-  fields: [{ k: "name", label: "Name*", icon: "label", req: true }, { k: "text", label: "Payment terms*", icon: "notes", type: "textarea", req: true, hint: "This text is inserted in the quote where Payment Terms is placed in Commercial Terms." }],
+  fields: [{ k: "name", label: "Name*", icon: "label", req: true }, { k: "text", label: "Payment terms*", icon: "notes", type: "textarea", req: true }],
   blank: { name: "", text: "", enabled: true }, toForm: (x) => ({ ...x, enabled: x.enabled !== false }),
   fromForm: (v) => ({ name: v.name.trim(), text: v.text.trim(), enabled: v.enabled })
 };
@@ -871,11 +870,10 @@ function renderSettingsPage() {
     return;
   }
   if (CAT[sPage]) { renderCatalog(CAT[sPage]); return; }
-  const pend = data.filter((c) => c.docState === "Pending update").length;
   body.innerHTML = `
     <div class="cfg">
-      <span>Validity (days)</span><input type="number" min="1" data-c="vigencia" value="${CFG.vigencia}" aria-label="Validity in days"><small>${pend} customers with pending documentation</small>
-      <span>Site visit required for</span><span style="color:var(--text)">${RISK_LEVELS.filter((r) => r.visit === "Yes").map((r) => esc(r.label)).join(", ") || "—"}</span><small>Uses the most recent visit date from 2024, 2025 and 2026</small>
+      <span>Validity (days)</span><input type="number" min="1" data-c="vigencia" value="${CFG.vigencia}" aria-label="Validity in days"><span></span>
+      <span>Site visit required for</span><span style="color:var(--text)">${RISK_LEVELS.filter((r) => r.visit === "Yes").map((r) => esc(r.label)).join(", ") || "—"}</span><span></span>
     </div>`;
   body.querySelectorAll("[data-c]").forEach((el) => el.onchange = () => { CFG[el.dataset.c] = Number(el.value) || 0; applyChange(); });
 }
@@ -949,7 +947,6 @@ async function exportMatrix() {
       cell.font = font({ bold: true, color: { argb: kind === "calc" ? "FF595959" : "FF000000" } });
       cell.fill = fill(LIGHT); cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
       cell.border = { top: line("thin", "FFFFFFFF"), bottom: line("medium", "FF9BC2E6"), left: line("thin", "FFFFFFFF"), right: line("thin", "FFFFFFFF") };
-      cell.note = kind === "edit" ? "Editable" : kind === "record" ? "From the customer record. Not editable here." : "Calculated with the matrix formula. Not editable.";
       ws.getColumn(i + 1).width = key === "name" || key === "activity" ? 34 : Math.max(13, Math.min(26, label.length * 0.9 + 4));
     });
     ws.getRow(HR).height = 48;
@@ -969,10 +966,6 @@ async function exportMatrix() {
     COLS.forEach(([key], i) => { if (listRef[key]) ws.dataValidations.add(`${colLetter(i + 1)}${FIRST}:${colLetter(i + 1)}${last}`, { type: "list", allowBlank: true, formulae: [listRef[key]], showErrorMessage: true, errorTitle: "Invalid value", error: "Choose a value from the list." }); });
     ws.autoFilter = { from: { row: HR, column: 1 }, to: { row: last, column: N } };
     await ws.protect("", { selectLockedCells: true, selectUnlockedCells: true, formatColumns: true, formatRows: true, autoFilter: true, sort: false });
-    const info = wb.addWorksheet("Instructions", { views: [{ showGridLines: false }] });
-    [["Customer Matrix template"], [""], ["Edit only the white cells. Rows are matched by SAP code."], ["Grey cells come from the customer record (SAP code, company name, city, payment terms, status) and can't be edited here."],
-      ["Columns marked (CALCULATED) are calculated with the matrix formulas. They are locked and recalculated after the import."], ["Do not add, remove or reorder rows or columns. Then import the file in Customer Matrix > IMPORT."]].forEach((row, i) => { const cl = info.getCell(i + 1, 1); cl.value = row[0]; cl.font = font({ size: i ? 11 : 14, bold: !i }); });
-    info.getColumn(1).width = 110;
     const buf = await wb.xlsx.writeBuffer(), a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
     a.download = `Customer_Matrix_${TODAY.toISOString().slice(0, 10)}.xlsx`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
