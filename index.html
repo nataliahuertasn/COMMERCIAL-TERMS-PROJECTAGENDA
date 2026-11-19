@@ -257,6 +257,9 @@
   .m-save.secondary { background: #fff; color: var(--blue); border: 1px solid var(--blue); }
   .notice { position: fixed; left: 50%; bottom: 70px; z-index: 60; transform: translateX(-50%); max-width: calc(100% - 32px); padding: 12px 20px; border-radius: 6px; background: #323232; color: #fff; font-size: 15px; box-shadow: 0 6px 18px rgba(0, 0, 0, .3); }
   .notice.error { background: var(--high); }
+  .pt-select { width: 100%; max-width: 760px; height: 40px; padding: 0 2px; border: 0; border-bottom: 1px solid #9e9e9e; background: none; color: var(--text); font-size: 17px; cursor: pointer; }
+  .pt-select:focus { outline: none; border-bottom: 2px solid var(--blue); }
+  .pt-text { max-width: 760px; min-height: 46px; margin-top: 12px; padding: 12px 14px; border-radius: 4px; background: #f5f5f5; color: var(--muted); font-size: 16px; line-height: 1.45; }
   footer { flex: none; display: flex; justify-content: space-between; gap: 16px; padding: 12px 24px; background: #fafafa; font-size: 18px; }
   [hidden] { display: none !important; }
   @media (max-width: 1500px) { .contacts { grid-template-columns: 219px minmax(0, 328px) 70px; } .contacts .predef { display: none; } }
@@ -444,6 +447,7 @@ TERMS AND CONDITIONS
 6. If the Subcontract is terminated by the Contractor for any reason, ES METALS reserves the right to be compensated per the terms of the A1A 401 or on the basis of the completed percentage of its Schedule of Values, whichever ES METALS elects.
 7. Intellectual Property and Confidentiality of Information: All rights to designs, trademarks, patents, software, procedures, and other intangible assets used or developed by ES METALS will remain its exclusive property, as will the technical information shared. Acceptance of this proposal does not imply transfer or authorization for its use; unauthorized disclosure may lead to legal action under applicable law. Processing of Personal Data: ES METALS informs you that, in compliance with Law 1581 of 2012 and its regulations, the personal data collected will be treated confidentially and securely, exclusively for the provision of the service, administrative, legal, and billing purposes. By accepting this proposal, the client authorizes such processing. The information will not be shared with unauthorized third parties, except by legal obligation. The client may exercise their rights of access, update, rectification, or deletion through official channels.`;
 const STANDARD_TERMS = "40% Advance, 30% Before shipment and 30% 30 days after shipment.";
+let PTS = [{ name: "Standard 40/30/30", text: STANDARD_TERMS, enabled: true }, { name: "50/50", text: "50% Advance, 50% Before shipment.", enabled: true }, { name: "Net 30", text: "100% 30 days after invoice date.", enabled: true }];
 const DAY = 864e5, TODAY = new Date(); TODAY.setHours(0, 0, 0, 0);
 const d = (s) => new Date(s + "T00:00:00");
 const fmtDate = (s) => s ? d(s).toLocaleDateString("es-CO", { day: "2-digit", month: "2-digit", year: "numeric" }) : "";
@@ -465,9 +469,9 @@ const data = [
   ["900111", "Sample Client K", "TID", "XX-XXX0111", "Orlando", "International", "2014-08-08", 260000, "USD", "2021-03-03", "Active", "United States", "Construction companies", "CTPAT", "2024-02-20"],
   ["900112", "Sample Client L", "NIT", "900000112", "Cali", "National", "2013-12-01", 900000000, "COP", "2018-04-16", "Active", "Colombia", "Construction companies", "Not certified", "2023-01-09"]
 ].map(([sap, name, idType, idNum, city, type, founded, amount, currency, linked, status, country, activity, security, docDate]) =>
-  ({ sap, name, idType, idNum, city, type, founded, amount, currency, linked, status, country, activity, security, docDate, visits: blankVisits(), terms: STANDARD_TERMS }));
+  ({ sap, name, idType, idNum, city, type, founded, amount, currency, linked, status, country, activity, security, docDate, visits: blankVisits(), pt: "Standard 40/30/30" }));
 data[6].visits[2026] = ["2026-05-20", "Favorable", "Update contingency plan"];
-data[2].terms = "50% Advance, 50% Before shipment.";
+data[2].pt = "50/50";
 
 function calc(c) {
   const yrs = c.founded ? yearsSince(c.founded) : Infinity;
@@ -585,12 +589,13 @@ function drawGeneral(c) {
     <section class="terms" aria-labelledby="pt-title">
       <span id="pt-title">Payment Terms</span>
       <div class="terms-control">
-        <textarea id="terms" aria-labelledby="pt-title">${esc(c.terms)}</textarea>
+        <select id="ptSel" class="pt-select" aria-labelledby="pt-title">${opts(PTS.filter((p) => p.enabled !== false || p.name === c.pt).map((p) => p.name), c.pt)}</select>
+        <div class="pt-text" id="ptText">${esc(PTS.find((p) => p.name === c.pt)?.text || "")}</div>
         
       </div>
     </section>
   </div>`;
-  $("terms").oninput = (e) => { c.terms = e.target.value; };
+  $("ptSel").onchange = (e) => { c.pt = e.target.value; $("ptText").textContent = PTS.find((p) => p.name === c.pt)?.text || ""; };
 }
 
 function drawMatrixTab(c) {
@@ -665,7 +670,7 @@ function renderSettings() {
   $("settingsList").querySelectorAll("li").forEach((li) => li.onclick = () => go("settings", current, tab, true, li.dataset.group === "cm" ? (CM_TABS.some((t) => t[0] === sPage) ? sPage : "jur") : "ct", li.dataset.group));
   $("sEmpty").hidden = !!sGroup; $("sContent").hidden = !sGroup;
   if (!sGroup) return;
-  const tabs = sGroup === "cm" ? CM_TABS : [["ct", "GENERAL"]];
+  const tabs = sGroup === "cm" ? CM_TABS : [["ct", "COMMERCIAL TERMS"], ["pt", "PAYMENT TERMS"]];
   $("sTabs").innerHTML = tabs.map(([id, label]) => `<button type="button" data-sub="${id}" class="${id === sPage ? "active" : ""}">${label}</button>`).join("");
   $("sTabs").querySelectorAll("[data-sub]").forEach((b) => b.onclick = () => go("settings", current, tab, true, b.dataset.sub, sGroup));
   $("sTitle").textContent = SETTINGS.find((s) => s[0] === sGroup)[1];
@@ -760,7 +765,7 @@ function renderCatalog(cfg) {
   body.querySelectorAll("[data-en]").forEach((b) => b.onclick = () => { const x = all[+b.dataset.en]; x.enabled = x.enabled === false; applyChange(); });
   body.querySelectorAll("[data-del]").forEach((b) => b.onclick = () => {
     const i = +b.dataset.del, x = all[i], n = cfg.usedKey ? used(cfg.usedKey, cfg.nameOf(x)) : 0;
-    if (n) return err(`"${cfg.nameOf(x)}" can't be deleted because ${n} customers use it. Change it on those customers or turn it off with Enabled.`);
+    if (n) return err(`"${cfg.nameOf(x)}" can't be deleted because ${n} ${n === 1 ? "customer uses" : "customers use"} it. Change it on those customers or turn it off with Enabled.`);
     if (cfg.minOne && all.length === 1) return err("At least one range must remain.");
     if (!confirm(`Delete "${cfg.nameOf(x)}"?`)) return;
     all.splice(i, 1); cfg.after?.(); applyChange();
@@ -821,6 +826,13 @@ CAT.interp = {
   fromForm: (v) => ({ label: v.label.trim().toUpperCase(), from: num(v.from), to: num(v.to), color: v.color, visit: v.visit }),
   sort: (a, b) => (a.from === "" ? -Infinity : a.from) - (b.from === "" ? -Infinity : b.from), warn: () => rangeIssue(RISK_LEVELS, "from", "to")
 };
+CAT.pt = {
+  title: "PAYMENT TERMS", formTitle: "Payment Terms", list: () => PTS, enabled: true, usedKey: "pt", nameOf: (x) => x.name,
+  cols: [["NAME", (x) => esc(x.name)], ["PAYMENT TERMS", (x) => esc(x.text)], ["CUSTOMERS", (x) => used("pt", x.name)]],
+  fields: [{ k: "name", label: "Name*", icon: "label", req: true }, { k: "text", label: "Payment terms*", icon: "notes", type: "textarea", req: true, hint: "This text is inserted in the quote where Payment Terms is placed in Commercial Terms." }],
+  blank: { name: "", text: "", enabled: true }, toForm: (x) => ({ ...x, enabled: x.enabled !== false }),
+  fromForm: (v) => ({ name: v.name.trim(), text: v.text.trim(), enabled: v.enabled })
+};
 function renderSettingsPage() {
   const body = $("sBody");
   if (sPage === "ct") {
@@ -857,7 +869,7 @@ function go(view, sap = current, t = tab, push = true, page = sPage, group = sGr
   ["clientsPanel", "detailView", "matrixView", "settingsPanel", "settingsView"].forEach((id) => { $(id).hidden = !show[view].includes(id); });
   document.querySelectorAll(".rail [data-rail]").forEach((b) => b.classList.toggle("active", b.dataset.rail === (view === "settings" ? "settings" : "clients")));
   if (view === "matrix") renderMatrix(); else if (view === "settings") renderSettings(); else { renderClients(); $("dBody").scrollTop = 0; }
-  const hash = view === "matrix" ? "#matrix" : view === "settings" ? (sGroup === "cm" ? `#settings/cm/${sPage}` : sGroup ? "#settings/ct" : "#settings") : `#${sap}/${t}`;
+  const hash = view === "matrix" ? "#matrix" : view === "settings" ? (sGroup ? `#settings/${sGroup}/${sPage}` : "#settings") : `#${sap}/${t}`;
   if (push && location.hash !== hash) history.replaceState(null, "", hash);
 }
 document.querySelectorAll(".rail [data-rail]").forEach((b) => b.onclick = () => go(b.dataset.rail));
@@ -1011,7 +1023,7 @@ $("mxFile").onchange = (e) => { const f = e.target.files[0]; e.target.value = ""
 
 const [h1, h2] = location.hash.slice(1).split("/");
 if (h1 === "matrix") go("matrix", current, tab, false);
-else if (h1 === "settings") { const h3 = location.hash.split("/")[2]; go("settings", current, tab, false, h2 === "cm" ? (CM_TABS.some((x) => x[0] === h3) ? h3 : "jur") : "ct", ["ct", "cm"].includes(h2) ? h2 : ""); }
+else if (h1 === "settings") { const h3 = location.hash.split("/")[2]; go("settings", current, tab, false, h2 === "cm" ? (CM_TABS.some((x) => x[0] === h3) ? h3 : "jur") : h3 === "pt" ? "pt" : "ct", ["ct", "cm"].includes(h2) ? h2 : ""); }
 else go("clients", data.some((c) => c.sap === h1) ? h1 : current, h2 === "matrix" ? "matrix" : "general", false);
 </script>
 </body>
