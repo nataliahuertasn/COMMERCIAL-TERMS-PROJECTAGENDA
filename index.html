@@ -474,7 +474,7 @@ const data = [
   ({ sap, name, idType, idNum, city, type, founded, amount, currency, linked, status, country, activity, security, docDate, visits: blankVisits(), pt: "Standard 40/30/30" }));
 data[6].visits[2026] = ["2026-05-20", "Favorable", "Update contingency plan"];
 data[2].pt = "50/50";
-let COMPANY_TYPES = ["Architecture Firm", "Construction Company", "Developer", "Engineering Firm", "General Contractor", "Glazing Contractor", "Owner", "Other"].map((name) => ({ name, description: "", enabled: true }));
+let COMPANY_TYPES = ["Architecture Firm", "Construction Company", "Developer", "Engineering Firm", "General Contractor", "Glazing Contractor", "Owner", "Other"].map((name) => ({ name, enabled: true }));
 ["General Contractor", "Architecture Firm", "Developer", "Construction Company", "Glazing Contractor", "General Contractor", "Developer", "Construction Company", "Owner", "Architecture Firm", "General Contractor", "Engineering Firm"].forEach((t, i) => { data[i].companyType = t; });
 
 function calc(c) {
@@ -841,10 +841,10 @@ CAT.pt = {
 };
 CAT.ctype = {
   title: "COMPANY TYPES", formTitle: "Company Type", list: () => COMPANY_TYPES, enabled: true, usedKey: "companyType", nameOf: (x) => x.name,
-  cols: [["COMPANY TYPE", (x) => esc(x.name)], ["DESCRIPTION", (x) => esc(x.description || "—")], ["CUSTOMERS", (x) => used("companyType", x.name)]],
-  fields: [{ k: "name", label: "Company type*", icon: "business", req: true }, { k: "description", label: "Description", icon: "notes", type: "textarea" }],
-  blank: { name: "", description: "", enabled: true }, toForm: (x) => ({ ...x, enabled: x.enabled !== false }),
-  fromForm: (v) => ({ name: v.name.trim(), description: v.description.trim(), enabled: v.enabled }), sort: (a, b) => a.name.localeCompare(b.name, "en")
+  cols: [["COMPANY TYPE", (x) => esc(x.name)]],
+  fields: [{ k: "name", label: "Company type*", icon: "business", req: true }],
+  blank: { name: "", enabled: true }, toForm: (x) => ({ ...x, enabled: x.enabled !== false }),
+  fromForm: (v) => ({ name: v.name.trim(), enabled: v.enabled }), sort: (a, b) => a.name.localeCompare(b.name, "en")
 };
 function renderSettingsPage() {
   const body = $("sBody");
