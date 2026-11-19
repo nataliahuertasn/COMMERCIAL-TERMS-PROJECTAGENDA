@@ -409,7 +409,7 @@ const CFG = { cop1: 600000000, cop2: 1200000000, usd1: 217000, usd2: 434000, alt
 let ACTS = ACTIVIDADES.map((name) => ({ name, score: name === "Activities not included in the following categories" ? 1 : name === "Distributors" ? 2 : 3 }));
 let CERTS = Object.entries(CERT).map(([name, score]) => ({ name, score }));
 let TRAY_RULES = [{ label: "< 1 year", from: 0, to: 0, score: 3 }, { label: "1 to 3 years", from: 1, to: 3, score: 2 }, { label: "> 3 years", from: 4, to: "", score: 1 }];
-let MONTO_RULES = [{ label: "Less than $600.000.000", cop: 599999999, usd: 217000, score: 1 }, { label: "Between $600.000.000 and $1.200.000.000", cop: 1200000000, usd: 434000, score: 2 }, { label: "More than $1.200.000.000", cop: "", usd: "", score: 3 }];
+let MONTO_RULES = [{ label: "Less than $600.000.000", cop: 600000000, copStrict: true, usd: 217000, score: 1 }, { label: "Between $600.000.000 and $1.200.000.000", cop: 1200000000, usd: 434000, score: 2 }, { label: "More than $1.200.000.000", cop: "", usd: "", score: 3 }];
 let RISK_LEVELS = [{ label: "LOW", from: "", to: 6, color: "Green", visit: "No" }, { label: "MEDIUM", from: 7, to: 9, color: "Yellow", visit: "No" }, { label: "HIGH", from: 10, to: "", color: "Red", visit: "Yes" }];
 const COLOR_CLS = { Green: "LOW", Yellow: "MEDIUM", Red: "HIGH" };
 const levelOf = (s) => RISK_LEVELS.find((r) => (r.from === "" || s >= r.from) && (r.to === "" || s <= r.to));
@@ -479,12 +479,13 @@ let COMPANY_TYPES = ["Architecture Firm", "Construction Company", "Developer", "
 ["Credit", "Credit", "Cash", "Credit", "Credit", "Cash", "Credit", "Credit", "Cash", "Credit", "Credit", "Credit"].forEach((t, i) => { data[i].payType = t; });
 const PAY_TYPES = ["Cash", "Credit"];
 
+const daysSince = (s) => Math.round((TODAY - d(s)) / DAY);
 function calc(c) {
   const yrs = c.founded ? yearsSince(c.founded) : Infinity;
-  const tr = TRAY_RULES.find((r) => yrs >= (r.from === "" ? -Infinity : r.from) && yrs <= (r.to === "" ? Infinity : r.to));
-  c.track = tr ? tr.label : "No range";
+  const tr = yrs < 0 ? null : TRAY_RULES.find((r) => yrs >= (r.from === "" ? -Infinity : r.from) && yrs <= (r.to === "" ? Infinity : r.to));
+  c.track = yrs < 0 ? "Invalid date" : tr ? tr.label : "No range";
   const h = Number(c.amount) || 0, cur = c.currency === "COP" ? "cop" : c.currency === "USD" ? "usd" : "";
-  const mr = cur ? MONTO_RULES.find((r) => r[cur] === "" || h <= r[cur]) : null;
+  const mr = cur ? MONTO_RULES.find((r) => r[cur] === "" || (r[cur + "Strict"] ? h < r[cur] : h <= r[cur])) : null;
   c.range = mr ? mr.label : "0";
   c.sJur = JUR[c.country] ?? "";
   c.sAct = ACTS.find((a) => a.name === c.activity)?.score ?? 3;
@@ -493,10 +494,10 @@ function calc(c) {
   c.sSec = CERTS.find((x) => x.name === c.security)?.score ?? "";
   c.score = Math.round([c.sJur, c.sAct, c.sTrack, c.sAmount, c.sSec].reduce((a, b) => a + (typeof b === "number" ? b : 0), 0));
   c.risk = riskOf(c.score);
-  c.docApplies = (TODAY - d(c.linked)) / DAY > CFG.vigencia ? "Yes" : "No";
-  c.docState = c.docApplies === "No" ? "Up to date" : !c.docDate ? "Pending update" : d(c.docDate) > TODAY - CFG.vigencia * DAY ? "Up to date" : "Pending update";
-  const last = Object.values(c.visits).map((v) => v[0]).filter(Boolean).map(d).sort((a, b) => b - a)[0];
-  c.visit = RISK_LEVELS.find((r) => r.label === c.risk)?.visit !== "Yes" ? "Not applicable" : last && (TODAY - last) / DAY < CFG.vigencia ? "Compliant" : "Non-compliant";
+  c.docApplies = !c.linked || daysSince(c.linked) > CFG.vigencia ? "Yes" : "No";
+  c.docState = c.docApplies === "No" ? "Up to date" : !c.docDate ? "Pending update" : daysSince(c.docDate) < CFG.vigencia ? "Up to date" : "Pending update";
+  const last = Object.values(c.visits).map((v) => v[0]).filter(Boolean).sort().pop();
+  c.visit = RISK_LEVELS.find((r) => r.label === c.risk)?.visit !== "Yes" ? "Not applicable" : last && daysSince(last) < CFG.vigencia ? "Compliant" : "Non-compliant";
   return c;
 }
 data.forEach(calc);
@@ -744,10 +745,10 @@ const CAT = {
   },
   monto: {
     title: "OPERATING AMOUNT", formTitle: "Operating Amount", list: () => MONTO_RULES, nameOf: (r) => r.label, minOne: true,
-    cols: [["RANGE", (r) => esc(r.label)], ["COP UP TO", (r) => (r.cop === "" ? "No limit" : fmtMoney(r.cop))], ["USD UP TO", (r) => (r.usd === "" ? "No limit" : fmtMoney(r.usd))], ["RATING", (r) => r.score], ["CUSTOMERS", (r) => data.filter((c) => c.range === r.label).length]],
+    cols: [["RANGE", (r) => esc(r.label)], ["COP UP TO", (r) => (r.cop === "" ? "No limit" : (r.copStrict ? "Less than " : "") + fmtMoney(r.cop))], ["USD UP TO", (r) => (r.usd === "" ? "No limit" : fmtMoney(r.usd))], ["RATING", (r) => r.score], ["CUSTOMERS", (r) => data.filter((c) => c.range === r.label).length]],
     fields: [{ k: "label", label: "Name*", icon: "label", req: true }, { k: "cop", label: "COP up to", icon: "payments", type: "number" },
       { k: "usd", label: "USD up to", icon: "attach_money", type: "number" }, scoreField],
-    blank: { label: "", cop: "", usd: "", score: "" }, toForm: (r) => ({ ...r }), fromForm: (v) => ({ label: v.label.trim(), cop: num(v.cop), usd: num(v.usd), score: Number(v.score) }),
+    blank: { label: "", cop: "", usd: "", score: "" }, toForm: (r) => ({ ...r }), fromForm: (v) => ({ label: v.label.trim(), cop: num(v.cop), copStrict: !!v.copStrict, usd: num(v.usd), score: Number(v.score) }),
     sort: (a, b) => (a.cop === "" ? Infinity : a.cop) - (b.cop === "" ? Infinity : b.cop),
     warn: () => { const m = ["cop", "usd"].filter((k) => !MONTO_RULES.some((r) => r[k] === "")).map((k) => k.toUpperCase()); return m.length ? `The last ${m.join(" and ")} range must have no limit; otherwise larger amounts have no range.` : ""; }
   }
@@ -810,7 +811,7 @@ function openForm(cfg, idx) {
   back.querySelectorAll("[data-k]").forEach((el) => el.oninput = el.onchange = () => { back.querySelector("#mSave").disabled = !valid(); back.querySelector("#mErr").hidden = true; });
   back.querySelector("#mSave").disabled = !valid();
   back.querySelector("#mSave").onclick = () => {
-    const vals = { ...read(), enabled }, obj = cfg.fromForm(vals), name = cfg.nameOf(obj), mErr = back.querySelector("#mErr");
+    const vals = { ...read(), enabled }, obj = cfg.fromForm({ ...v, ...vals }), name = cfg.nameOf(obj), mErr = back.querySelector("#mErr");
     const fail = (m) => { mErr.textContent = m; mErr.hidden = false; };
     if (all.some((x, j) => j !== idx && cfg.nameOf(x).toLowerCase() === name.toLowerCase())) return fail(`"${name}" already exists. Enter another name.`);
     if (cfg.fields.some((f) => f.type === "number" && f.req && Number.isNaN(Number(vals[f.k])))) return fail("Check the numeric values.");
