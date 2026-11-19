@@ -840,11 +840,11 @@ CAT.pt = {
   fromForm: (v) => ({ name: v.name.trim(), text: v.text.trim(), enabled: v.enabled })
 };
 CAT.ctype = {
-  title: "COMPANY TYPES", formTitle: "Company Type", list: () => COMPANY_TYPES, enabled: true, usedKey: "companyType", nameOf: (x) => x.name,
+  title: "COMPANY TYPES", formTitle: "Company Type", list: () => COMPANY_TYPES, usedKey: "companyType", nameOf: (x) => x.name,
   cols: [["COMPANY TYPE", (x) => esc(x.name)]],
   fields: [{ k: "name", label: "Company type*", icon: "business", req: true }],
   blank: { name: "", enabled: true }, toForm: (x) => ({ ...x, enabled: x.enabled !== false }),
-  fromForm: (v) => ({ name: v.name.trim(), enabled: v.enabled }), sort: (a, b) => a.name.localeCompare(b.name, "en")
+  fromForm: (v) => ({ name: v.name.trim(), enabled: true }), sort: (a, b) => a.name.localeCompare(b.name, "en")
 };
 function renderSettingsPage() {
   const body = $("sBody");
