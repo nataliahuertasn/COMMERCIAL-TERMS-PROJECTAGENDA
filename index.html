@@ -351,7 +351,7 @@
       <table>
         <thead>
           <tr class="g1">
-            <th colspan="11" rowspan="2">CUSTOMER IDENTIFICATION</th>
+            <th colspan="13" rowspan="2">CUSTOMER IDENTIFICATION</th>
             <th colspan="5" rowspan="2">RISK ASSESSMENT CRITERIA</th>
             <th colspan="5" rowspan="2">CUSTOMER RISK RATING</th>
             <th colspan="2" rowspan="2">RISK LEVEL ASSESSMENT</th>
@@ -476,6 +476,8 @@ data[6].visits[2026] = ["2026-05-20", "Favorable", "Update contingency plan"];
 data[2].pt = "50/50";
 let COMPANY_TYPES = ["Architecture Firm", "Construction Company", "Developer", "Engineering Firm", "General Contractor", "Glazing Contractor", "Owner", "Other"].map((name) => ({ name, enabled: true }));
 ["General Contractor", "Architecture Firm", "Developer", "Construction Company", "Glazing Contractor", "General Contractor", "Developer", "Construction Company", "Owner", "Architecture Firm", "General Contractor", "Engineering Firm"].forEach((t, i) => { data[i].companyType = t; });
+["Credit", "Credit", "Cash", "Credit", "Credit", "Cash", "Credit", "Credit", "Cash", "Credit", "Credit", "Credit"].forEach((t, i) => { data[i].payType = t; });
+const PAY_TYPES = ["Cash", "Credit"];
 
 function calc(c) {
   const yrs = c.founded ? yearsSince(c.founded) : Infinity;
@@ -504,7 +506,7 @@ const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "
 const tone = (v) => (v === "Up to date" || v === "Compliant" ? "ok" : v === "Pending update" || v === "Non-compliant" ? "warn" : "");
 const COLS = [
   ["sap", "SAP CODE", "sticky1"], ["name", "COMPANY NAME", "sticky2 name"], ["idType", "ID TYPE"], ["idNum", "# ID"], ["city", "CITY"], ["type", "CUSTOMER TYPE"],
-  ["founded", "INCORPORATION DATE", "", fmtDate], ["amount", "ANNUAL OPERATING AMOUNT", "num", fmtMoney], ["currency", "CURRENCY"], ["linked", "ESM ONBOARDING DATE", "", fmtDate], ["status", "STATUS"],
+  ["founded", "INCORPORATION DATE", "", fmtDate], ["payType", "PAYMENT TYPE"], ["pt", "PAYMENT TERMS"], ["amount", "ANNUAL OPERATING AMOUNT", "num", fmtMoney], ["currency", "CURRENCY"], ["linked", "ESM ONBOARDING DATE", "", fmtDate], ["status", "STATUS"],
   ["country", "TERRITORIAL JURISDICTION"], ["activity", "BUSINESS ACTIVITY", "wrap"], ["track", "MARKET TRACK RECORD"], ["range", "OPERATING AMOUNT"], ["security", "SUPPLY CHAIN SECURITY PROGRAM"],
   ["sJur", "TERRITORIAL JURISDICTION", "num"], ["sAct", "BUSINESS ACTIVITIES", "num"], ["sTrack", "TRACK RECORD", "num"], ["sAmount", "OPERATING AMOUNT", "num"], ["sSec", "SUPPLY CHAIN SECURITY", "num"],
   ["score", "SCORE", "num"], ["risk", "RISK LEVEL", "", (v) => `<span class="badge ${riskCls(v)}">${v}</span>`],
@@ -615,6 +617,8 @@ function drawMatrixTab(c) {
       <span>City ${ERP}</span><span class="val">${esc(c.city)}</span>
       <span>Customer type</span><span class="val"><select data-k="type">${opts(["National", "International"], c.type)}</select></span>
       <span>Incorporation date</span><span class="val"><input type="date" data-k="founded" value="${c.founded}"></span>
+      <span>Payment type</span><span class="val"><select data-k="payType">${opts(PAY_TYPES, c.payType)}</select></span>
+      <span>Payment terms ${ERP}</span><span class="val">${esc(c.pt || "—")}</span>
       <span>Annual operating amount</span><span class="val"><input type="number" min="0" data-k="amount" value="${c.amount}"></span>
       <span>Currency</span><span class="val"><select data-k="currency">${opts(["COP", "USD"], c.currency)}</select></span>
       <span>ESM onboarding date</span><span class="val"><input type="date" data-k="linked" value="${c.linked}"></span>
@@ -888,13 +892,13 @@ function go(view, sap = current, t = tab, push = true, page = sPage, group = sGr
 document.querySelectorAll(".rail [data-rail]").forEach((b) => b.onclick = () => go(b.dataset.rail));
 $("dBody").addEventListener("click", (e) => { if (e.target.closest("#toCT")) { ctClient = current; go("settings", current, tab, true, "ct", "ct"); } });
 
-const XL_EDIT = new Set(["idType", "idNum", "type", "founded", "amount", "currency", "linked", "country", "activity", "security", "docDate", "v20240", "v20241", "v20242", "v20250", "v20251", "v20252", "v20260", "v20261", "v20262"]);
-const XL_RECORD = new Set(["sap", "name", "city", "status"]);
+const XL_EDIT = new Set(["idType", "idNum", "type", "founded", "payType", "amount", "currency", "linked", "country", "activity", "security", "docDate", "v20240", "v20241", "v20242", "v20250", "v20251", "v20252", "v20260", "v20261", "v20262"]);
+const XL_RECORD = new Set(["sap", "name", "city", "status", "pt"]);
 const XL_DATES = new Set(["founded", "linked", "docDate", "v20240", "v20250", "v20260"]);
-const XL_GROUPS = [["CUSTOMER IDENTIFICATION", 11], ["RISK ASSESSMENT CRITERIA", 5], ["CUSTOMER RISK RATING", 5], ["RISK LEVEL ASSESSMENT", 2], ["DOCUMENTATION UPDATE", 3], ["SITE VISIT", 1], ["YEAR 2024", 3], ["YEAR 2025", 3], ["YEAR 2026", 3]];
+const XL_GROUPS = [["CUSTOMER IDENTIFICATION", 13], ["RISK ASSESSMENT CRITERIA", 5], ["CUSTOMER RISK RATING", 5], ["RISK LEVEL ASSESSMENT", 2], ["DOCUMENTATION UPDATE", 3], ["SITE VISIT", 1], ["YEAR 2024", 3], ["YEAR 2025", 3], ["YEAR 2026", 3]];
 const XL_NAMES = { docApplies: "DOCUMENTATION UPDATE APPLIES", docDate: "DOCUMENTATION UPDATE DATE", docState: "DOCUMENTATION STATUS", visit: "SITE VISIT STATUS" };
 const xlHeader = (key, label) => (key.startsWith("v20") ? `VISIT ${key.slice(1, 5)} ${label}` : XL_NAMES[key] || label);
-const XL_LISTS = () => ({ idType: TIPOS_ID, type: ["National", "International"], currency: ["COP", "USD"], country: JURD.map((r) => r[0]).sort((a, b) => a.localeCompare(b, "en")),
+const XL_LISTS = () => ({ idType: TIPOS_ID, payType: PAY_TYPES, type: ["National", "International"], currency: ["COP", "USD"], country: JURD.map((r) => r[0]).sort((a, b) => a.localeCompare(b, "en")),
   activity: ACTS.filter((a) => a.enabled !== false).map((a) => a.name), security: CERTS.filter((x) => x.enabled !== false).map((x) => x.name) });
 let excelLib = null;
 const loadExcel = () => excelLib || (excelLib = new Promise((ok, fail) => { if (window.ExcelJS) return ok(window.ExcelJS); const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"; s.onload = () => ok(window.ExcelJS); s.onerror = () => { excelLib = null; fail(new Error("load")); }; document.head.appendChild(s); }));
@@ -966,7 +970,7 @@ async function exportMatrix() {
     ws.autoFilter = { from: { row: HR, column: 1 }, to: { row: last, column: N } };
     await ws.protect("", { selectLockedCells: true, selectUnlockedCells: true, formatColumns: true, formatRows: true, autoFilter: true, sort: false });
     const info = wb.addWorksheet("Instructions", { views: [{ showGridLines: false }] });
-    [["Customer Matrix template"], [""], ["Edit only the white cells. Rows are matched by SAP code."], ["Grey cells come from the customer record (SAP code, company name, city, status) and can't be edited here."],
+    [["Customer Matrix template"], [""], ["Edit only the white cells. Rows are matched by SAP code."], ["Grey cells come from the customer record (SAP code, company name, city, payment terms, status) and can't be edited here."],
       ["Columns marked (CALCULATED) are calculated with the matrix formulas. They are locked and recalculated after the import."], ["Do not add, remove or reorder rows or columns. Then import the file in Customer Matrix > IMPORT."]].forEach((row, i) => { const cl = info.getCell(i + 1, 1); cl.value = row[0]; cl.font = font({ size: i ? 11 : 14, bold: !i }); });
     info.getColumn(1).width = 110;
     const buf = await wb.xlsx.writeBuffer(), a = document.createElement("a");
